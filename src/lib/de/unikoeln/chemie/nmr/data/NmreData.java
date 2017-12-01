@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jcamp.spectrum.NMRSpectrum;
+import org.jcamp.spectrum.Spectrum;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 public class NmreData {
 	
 	private IAtomContainer molecule;
-	private List<NMRSpectrum> spectra;
+	private List<Spectrum> spectra;
 	
 	public IAtomContainer getMolecule() {
 		return molecule;
@@ -17,13 +18,13 @@ public class NmreData {
 	public void setMolecule(IAtomContainer molecule) {
 		this.molecule = molecule;
 	}
-	public List<NMRSpectrum> getSpectra() {
+	public List<Spectrum> getSpectra() {
 		return spectra;
 	}
-	public void setSpectra(List<NMRSpectrum> spectra) {
+	public void setSpectra(List<Spectrum> spectra) {
 		this.spectra = spectra;
 	}
-	public void addSpectrum(NMRSpectrum spectrum) {
+	public void addSpectrum(Spectrum spectrum) {
 		if(spectra==null)
 			spectra=new ArrayList<>();
 		spectra.add(spectrum);

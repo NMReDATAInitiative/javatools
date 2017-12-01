@@ -17,6 +17,7 @@ import org.jcamp.spectrum.ArrayData;
 import org.jcamp.spectrum.IAssignmentTarget;
 import org.jcamp.spectrum.IDataArray1D;
 import org.jcamp.spectrum.IOrderedDataArray1D;
+import org.jcamp.spectrum.NMR2DSpectrum;
 import org.jcamp.spectrum.NMRSpectrum;
 import org.jcamp.spectrum.OrderedArrayData;
 import org.jcamp.spectrum.Peak;
@@ -34,7 +35,8 @@ import de.unikoeln.chemie.nmr.data.NmreData;
 public class NmredataReader {
 	BufferedReader input = null;
 	
-	Map<String,String> spectra=new HashMap<String,String>();
+	Map<String,String> spectra1d=new HashMap<String,String>();
+	Map<String,String> spectra2d=new HashMap<String,String>();
 	Map<String,Peak> signals=new HashMap<String,Peak>();
 	Map<String,IAssignmentTarget[]> assignments=new HashMap<String,IAssignmentTarget[]>();
 	
@@ -55,10 +57,13 @@ public class NmredataReader {
 		String signalblock=null;
 		for(Object key : ac.getProperties().keySet()){
 			if(((String)key).startsWith("NMREDATA_1D")){
-				spectra.put(((String)key).substring(9),(String)ac.getProperties().get(key));
+				spectra1d.put(((String)key).substring(9),(String)ac.getProperties().get(key));
 			}else if(((String)key).equals("NMREDATA_ASSIGNMENT")){
 				signalblock=(String)ac.getProperties().get(key);
+			}else if(((String)key).startsWith("NMREDATA_2D")){
+				spectra2d.put(((String)key).substring(9),(String)ac.getProperties().get(key));
 			}
+
 		}
 		if(signalblock!=null)
 			analyzeSignals(data, signalblock);
@@ -104,13 +109,70 @@ public class NmredataReader {
 	}
 
 	private void analyzeSpectra(NmreData data) throws Exception {
-		for(String spectrum : spectra.keySet()){
+		for(String spectrum : spectra1d.keySet()){
 			String nucleus = spectrum.substring(spectrum.indexOf("_")+1);
 			if(nucleus.contains("#"))
 				nucleus=nucleus.substring(0,nucleus.indexOf('#'));
-			analyze1DSpectrum(spectra.get(spectrum), nucleus, data);
+			analyze1DSpectrum(spectra1d.get(spectrum), nucleus, data);
 		}
-		
+		for(String spectrum : spectra2d.keySet()){
+			String[] nucleus = new String[2];
+			nucleus[0] = spectrum.substring(spectrum.indexOf("_")+1);
+			nucleus[1] = nucleus[0].substring(spectrum.indexOf("_")+1);
+			nucleus[0] = nucleus[0].substring(0, nucleus[0].indexOf("_"));
+			nucleus[1] = nucleus[1].substring(spectrum.indexOf("_")+1);
+			if(nucleus[1].contains("#"))
+				nucleus[1]=nucleus[1].substring(0,nucleus[1].indexOf('#'));
+			analyze2DSpectrum(spectra2d.get(spectrum), nucleus, data);
+		}		
+	}
+
+	private void analyze2DSpectrum(String spectrumblock, String[] nucleus, NmreData data) throws Exception {
+		StringTokenizer st=new StringTokenizer(spectrumblock,"\n\r");
+		double[] freq=null;
+		String location=null;
+		int peakcount=0;
+		while(st.hasMoreTokens()){
+			String line = st.nextToken();
+			if(line.indexOf(";")>-1)
+				line=line.substring(0, line.indexOf(";"));
+			if(line.startsWith("Larmor=")){
+				freq=new double[]{Double.parseDouble(line.substring(7)),Double.parseDouble(line.substring(7))};
+			}else if(line.startsWith("Spectrum_Location=")){
+				location=line.substring(line.indexOf("=")+1);
+			}else if(line.matches("^H*[0-9]*/H*[0-9]*")){
+				peakcount++;
+			}
+		}
+		double[] xdata=new double[peakcount];
+		double[] ydata=new double[peakcount];
+		st=new StringTokenizer(spectrumblock,"\n\r");
+		int i=0;
+		while(st.hasMoreTokens()){
+			String line = st.nextToken();
+			if(line.matches("^H*[0-9]*/H*[0-9]*")){
+				StringTokenizer st2=new StringTokenizer(line,"/");
+				xdata[i]=signals.get(st2.nextToken()).getPosition()[0];
+				ydata[i]=signals.get(st2.nextToken()).getPosition()[0];
+			}
+		}
+		if(freq==null)
+			throw new Exception("No Larmor= line, this is mandatory");
+		if(location==null)
+			throw new Exception("No Spectrum_Location= line, this is mandatory");
+		NMR2DSpectrum spectrum = null;
+        Unit xUnit =  CommonUnit.hertz;
+        Unit yUnit = CommonUnit.hertz;
+        Unit zUnit = CommonUnit.intensity;
+		OrderedArrayData arraydatax=new OrderedArrayData(xdata, xUnit);
+		OrderedArrayData arraydatay=new OrderedArrayData(ydata, yUnit);
+		IDataArray1D arraydataz=new ArrayData(new double[xdata.length], zUnit);
+        double[] reference = new double[2];
+        spectrum = new NMR2DSpectrum(arraydatax, arraydatay, arraydataz, nucleus, freq, reference);
+        NoteDescriptor noteDescriptor=new NoteDescriptor("Spectrum_Location");
+        spectrum.setNote(noteDescriptor, location);
+        //spectrum.setAssignments((Assignment[]) tables[2]);
+        data.addSpectrum(spectrum);
 	}
 
 	private void analyze1DSpectrum(String spectrumblock, String nucleus, NmreData data) throws Exception {

@@ -2,6 +2,7 @@ package de.unikoeln.chemie.nmr.ui.cl;
 
 import java.io.FileInputStream;
 
+import org.jcamp.spectrum.NMRSpectrum;
 import org.openscience.cdk.interfaces.IMolecularFormula;
 import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
 
@@ -21,7 +22,8 @@ public class CheckFormat {
         System.out.println("The molecule in your file has formula "+MolecularFormulaManipulator.getString(mfa));
 		System.out.println("Your file contains "+data.getSpectra().size()+" spectra");
 		for(int i=0; i<data.getSpectra().size(); i++){
-			System.out.println("Spectrum "+i+" has "+data.getSpectra().get(i).getPeakTable().length+" peaks");
+			if(data.getSpectra().get(i) instanceof NMRSpectrum)
+				System.out.println("Spectrum "+i+" has "+((NMRSpectrum)data.getSpectra().get(i)).getPeakTable().length+" peaks");
 		}
 	}
 
