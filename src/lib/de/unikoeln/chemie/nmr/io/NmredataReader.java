@@ -188,6 +188,8 @@ public class NmredataReader {
 				freq=Double.parseDouble(line.substring(7));
 			}else if(line.startsWith("Spectrum_Location=")){
 				location=line.substring(line.indexOf("=")+1);
+			}else if(line.matches("^[0-9]*\\.[0-9]*")){
+				peaks.add(new Peak1D(Double.parseDouble(line),0));
 			}else if(line.matches("^[0-9]*\\.[0-9].*")){
 				StringTokenizer st2 = new StringTokenizer(line,",");
 				Peak peak=null;

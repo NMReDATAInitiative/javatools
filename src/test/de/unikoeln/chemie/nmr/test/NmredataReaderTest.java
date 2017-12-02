@@ -33,4 +33,15 @@ public class NmredataReaderTest  extends TestCase{
         Assert.assertEquals(12, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
         Assert.assertEquals(6, data.getSpectra().size());
 	}
+
+	public void testCmcse() throws Exception, IOException{
+		String filename = "testdata/cmcse.sdf";
+        InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
+        NmredataReader reader = new NmredataReader(ins);
+        NmreData data = reader.read();
+        Assert.assertEquals(8, data.getMolecule().getAtomCount());
+        Assert.assertEquals(7, data.getMolecule().getBondCount());
+        Assert.assertEquals(4, data.getSpectra().size());
+        Assert.assertEquals(5, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
+	}
 }
