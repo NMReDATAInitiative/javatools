@@ -11,7 +11,8 @@ public class NmreData {
 	
 	private IAtomContainer molecule;
 	private List<Spectrum> spectra;
-	
+	private String version;
+
 	public IAtomContainer getMolecule() {
 		return molecule;
 	}
@@ -28,6 +29,14 @@ public class NmreData {
 		if(spectra==null)
 			spectra=new ArrayList<>();
 		spectra.add(spectrum);
+	}
+	
+	public String getVersion() {
+		return version;
+	}
+	
+	public void setVersion(String version) {
+		this.version = version;
 	}
 	
 }

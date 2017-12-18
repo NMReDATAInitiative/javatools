@@ -62,8 +62,11 @@ public class NmredataReader {
 				signalblock=(String)ac.getProperties().get(key);
 			}else if(((String)key).startsWith("NMREDATA_2D")){
 				spectra2d.put(((String)key).substring(9),(String)ac.getProperties().get(key));
+			}else if(((String)key).equals("NMREDATA_VERSION")){
+				if(!((String)ac.getProperties().get(key)).equals("1.0"))
+					throw new Exception("Currently 1.0 is the only supported NMReDATA version");
+				data.setVersion((String)ac.getProperties().get(key));
 			}
-
 		}
 		if(signalblock!=null)
 			analyzeSignals(data, signalblock);
