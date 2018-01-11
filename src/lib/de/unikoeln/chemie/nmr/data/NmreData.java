@@ -12,6 +12,7 @@ public class NmreData {
 	private IAtomContainer molecule;
 	private List<Spectrum> spectra;
 	private String version;
+	private int level;
 
 	public IAtomContainer getMolecule() {
 		return molecule;
@@ -38,5 +39,12 @@ public class NmreData {
 	public void setVersion(String version) {
 		this.version = version;
 	}
-	
+
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
+	}	
 }
