@@ -3,7 +3,6 @@ package de.unikoeln.chemie.nmr.data;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jcamp.spectrum.NMRSpectrum;
 import org.jcamp.spectrum.Spectrum;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
