@@ -14,12 +14,15 @@ import java.util.StringTokenizer;
 import org.jcamp.parser.JCAMPException;
 import org.jcamp.parser.JCAMPReader;
 import org.jcamp.spectrum.ArrayData;
+import org.jcamp.spectrum.Assignment;
 import org.jcamp.spectrum.IAssignmentTarget;
 import org.jcamp.spectrum.IDataArray1D;
 import org.jcamp.spectrum.IOrderedDataArray1D;
+import org.jcamp.spectrum.Multiplicity;
 import org.jcamp.spectrum.NMR2DSpectrum;
 import org.jcamp.spectrum.NMRSpectrum;
 import org.jcamp.spectrum.OrderedArrayData;
+import org.jcamp.spectrum.Pattern;
 import org.jcamp.spectrum.Peak;
 import org.jcamp.spectrum.Peak1D;
 import org.jcamp.spectrum.assignments.AtomReference;
@@ -68,7 +71,7 @@ public class NmredataReader {
 				data.setVersion((String)ac.getProperties().get(key));
 			}else if(((String)key).startsWith("NMREDATA_LEVEL")){
 				int level=Integer.parseInt((String)ac.getProperties().get(key));
-				if(level<1 || level>3)
+				if(level<0 || level>3)
 					throw new Exception("Level must be 0, 1, 2, or 3");
 			}
 		}
@@ -110,6 +113,8 @@ public class NmredataReader {
 				IAssignmentTarget[] assigns = new IAssignmentTarget[atoms.size()];
 				for (int i=0;i<atoms.size();i++)
 					assigns[i] = (IAssignmentTarget) atoms.get(i);
+				if(atoms.size()>0)
+					assignments.put(label, assigns);
 			}
 			signals.put(label, peak);
 		}
@@ -185,6 +190,7 @@ public class NmredataReader {
 	private void analyze1DSpectrum(String spectrumblock, String nucleus, NmreData data) throws Exception {
 		StringTokenizer st=new StringTokenizer(spectrumblock,"\n\r");
 		List<Peak> peaks=new ArrayList<>();
+		List<String> labels=new ArrayList<>();
 		double freq=Double.NaN;
 		String location=null;
 		while(st.hasMoreTokens()){
@@ -207,6 +213,7 @@ public class NmredataReader {
 						//TODO use information - for now we use the assignment block via L
 					}else if(token.startsWith("L")){
 						peak=signals.get(token.substring(2).trim());
+						labels.add(token.substring(2).trim());
 					}else if(token.startsWith("S")){
 						multiplicity=token.substring(2).trim();
 					}
@@ -224,9 +231,12 @@ public class NmredataReader {
         Unit yUnit = CommonUnit.intensity;
         double reference = 0;
         Peak1D[] peaks1d = new Peak1D[peaks.size()];
+		Assignment[] assignmentslocal=new Assignment[peaks.size()];
         int i=0;
         for(Peak peak : peaks){
         	peaks1d[i]=(Peak1D)peak;
+        	if(labels.size()==peaks.size())
+        		assignmentslocal[i]=new Assignment(new Pattern(peaks1d[i].getPosition()[0], Multiplicity.UNKNOWN), assignments.get(labels.get(i)));
         	i++;
         }
         double[][] xy=new double[0][];
@@ -241,7 +251,8 @@ public class NmredataReader {
         spectrum.setPeakTable(peaks1d);
         NoteDescriptor noteDescriptor=new NoteDescriptor("Spectrum_Location");
         spectrum.setNote(noteDescriptor, location);
-        //spectrum.setAssignments((Assignment[]) tables[2]);
+        if(labels.size()==peaks.size())
+        	spectrum.setAssignments(assignmentslocal);
         data.addSpectrum(spectrum);
 	}
 

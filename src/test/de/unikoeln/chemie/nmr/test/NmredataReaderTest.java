@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.jcamp.spectrum.NMRSpectrum;
+import org.jcamp.spectrum.assignments.AtomReference;
 
 import de.unikoeln.chemie.nmr.data.NmreData;
 import de.unikoeln.chemie.nmr.io.NmredataReader;
@@ -20,7 +21,9 @@ public class NmredataReaderTest  extends TestCase{
         Assert.assertEquals(32, data.getMolecule().getAtomCount());
         Assert.assertEquals(36, data.getMolecule().getBondCount());
         Assert.assertEquals(1, data.getSpectra().size());
-        Assert.assertEquals(7, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
+        Assert.assertEquals(1.3, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable()[0].getPosition()[0]);
+        Assert.assertEquals(17, ((AtomReference)((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[0].getTargets()[0]).getAtomNumber());
+        Assert.assertEquals(6, ((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[0].getTargets().length);
 	}
 	
 	public void testHAP() throws Exception, IOException{
