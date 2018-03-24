@@ -1,6 +1,7 @@
 package de.unikoeln.chemie.nmr.io;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -42,6 +43,7 @@ public class NmredataReader {
 	Map<String,String> spectra2d=new HashMap<String,String>();
 	Map<String,Peak> signals=new HashMap<String,Peak>();
 	Map<String,IAssignmentTarget[]> assignments=new HashMap<String,IAssignmentTarget[]>();
+	String lineseparator="\n\r";
 	
 	public NmredataReader(Reader in){
         input = new BufferedReader(in);
@@ -51,7 +53,7 @@ public class NmredataReader {
 		this(new InputStreamReader(in));
 	}
 	
-	public NmreData read() throws Exception{
+	public NmreData read() throws IOException, NmreDataException, JCAMPException {
 		NmreData data=new NmreData();
 		IteratingSDFReader mdlreader=new IteratingSDFReader(input, DefaultChemObjectBuilder.getInstance());
 		IAtomContainer ac = mdlreader.next();
@@ -59,35 +61,42 @@ public class NmredataReader {
 		mdlreader.close();
 		String signalblock=null;
 		for(Object key : ac.getProperties().keySet()){
-			if(((String)key).startsWith("NMREDATA_1D")){
-				spectra1d.put(((String)key).substring(9),(String)ac.getProperties().get(key));
-			}else if(((String)key).equals("NMREDATA_ASSIGNMENT")){
-				signalblock=(String)ac.getProperties().get(key);
-			}else if(((String)key).startsWith("NMREDATA_2D")){
-				spectra2d.put(((String)key).substring(9),(String)ac.getProperties().get(key));
-			}else if(((String)key).equals("NMREDATA_VERSION")){
-				if(!((String)ac.getProperties().get(key)).equals("1.0"))
-					throw new Exception("Currently 1.0 is the only supported NMReDATA version");
-				data.setVersion((String)ac.getProperties().get(key));
-			}else if(((String)key).startsWith("NMREDATA_LEVEL")){
-				int level=Integer.parseInt((String)ac.getProperties().get(key));
-				if(level<0 || level>3)
-					throw new Exception("Level must be 0, 1, 2, or 3");
+			if(ac.getProperties().get(key)!=null){
+				String property=((String)ac.getProperties().get(key)).trim();
+				if(property.endsWith("\\"))
+					property=property.substring(0, property.length()-1).trim();
+				if(((String)key).startsWith("NMREDATA_1D")){
+					spectra1d.put(((String)key).substring(9),property);
+				}else if(((String)key).equals("NMREDATA_ASSIGNMENT")){
+					signalblock=property;
+				}else if(((String)key).startsWith("NMREDATA_2D")){
+					spectra2d.put(((String)key).substring(9),property);
+				}else if(((String)key).equals("NMREDATA_VERSION")){
+					if(!property.equals("1.0") && !property.equals("1.1"))
+						throw new NmreDataException("Currently 1.0 and 1.1 are the only supported NMReDATA versions");
+					data.setVersion(property);
+					if(property.equals("1.1"))
+						lineseparator="\\";
+				}else if(((String)key).startsWith("NMREDATA_LEVEL")){
+					int level=Integer.parseInt(property);
+					if(level<0 || level>3)
+						throw new NmreDataException("Level must be 0, 1, 2, or 3");
+				}
 			}
 		}
 		if(signalblock!=null)
 			analyzeSignals(data, signalblock);
 		else
-			throw new Exception("There is no NMREDATA_ASSIGNMENT block in this file - required");
+			throw new NmreDataException("There is no NMREDATA_ASSIGNMENT block in this file - required");
 		analyzeSpectra(data);
 		return data;
 	}
 	
 
-	private void analyzeSignals(NmreData data, String signalblock) throws Exception {
-		StringTokenizer st=new StringTokenizer(signalblock,"\n\r");
+	private void analyzeSignals(NmreData data, String signalblock) throws NmreDataException {
+		StringTokenizer st=new StringTokenizer(signalblock,lineseparator);
 		while(st.hasMoreTokens()){
-			String line = st.nextToken();
+			String line = st.nextToken().trim();
 			StringTokenizer st2 = new StringTokenizer(line,",");
 			String label=st2.nextToken();
 			double shift = Double.parseDouble(st2.nextToken().trim());
@@ -98,7 +107,7 @@ public class NmredataReader {
 				if(atom.indexOf("H")>-1){
 					int atomid=Integer.parseInt(atom.trim().substring(1))-1;
 					if(atomid>=data.getMolecule().getAtomCount())
-						throw new Exception("Atom "+atomid+" specified in MREDATA_ASSIGNMENT block, but only "+data.getMolecule().getAtomCount()+" atoms are in Molecule");
+						throw new NmreDataException("Atom "+atomid+" specified in MREDATA_ASSIGNMENT block, but only "+data.getMolecule().getAtomCount()+" atoms are in Molecule");
                     for(int k=0;k<data.getMolecule().getConnectedAtomsCount(data.getMolecule().getAtom(atomid));k++){
                         if(data.getMolecule().getConnectedAtomsList(data.getMolecule().getAtom(atomid)).get(k).getSymbol().equals("H")){
                         	atomid=data.getMolecule().getAtomNumber(data.getMolecule().getConnectedAtomsList(data.getMolecule().getAtom(atomid)).get(k));
@@ -120,7 +129,7 @@ public class NmredataReader {
 		}
 	}
 
-	private void analyzeSpectra(NmreData data) throws Exception {
+	private void analyzeSpectra(NmreData data) throws NmreDataException, JCAMPException {
 		for(String spectrum : spectra1d.keySet()){
 			String nucleus = spectrum.substring(spectrum.indexOf("_")+1);
 			if(nucleus.contains("#"))
@@ -139,13 +148,13 @@ public class NmredataReader {
 		}		
 	}
 
-	private void analyze2DSpectrum(String spectrumblock, String[] nucleus, NmreData data) throws Exception {
-		StringTokenizer st=new StringTokenizer(spectrumblock,"\n\r");
+	private void analyze2DSpectrum(String spectrumblock, String[] nucleus, NmreData data) throws NmreDataException {
+		StringTokenizer st=new StringTokenizer(spectrumblock,lineseparator);
 		double[] freq=null;
 		String location=null;
 		int peakcount=0;
 		while(st.hasMoreTokens()){
-			String line = st.nextToken();
+			String line = st.nextToken().trim();
 			if(line.indexOf(";")>-1)
 				line=line.substring(0, line.indexOf(";"));
 			if(line.startsWith("Larmor=")){
@@ -158,10 +167,10 @@ public class NmredataReader {
 		}
 		double[] xdata=new double[peakcount];
 		double[] ydata=new double[peakcount];
-		st=new StringTokenizer(spectrumblock,"\n\r");
+		st=new StringTokenizer(spectrumblock,lineseparator);
 		int i=0;
 		while(st.hasMoreTokens()){
-			String line = st.nextToken();
+			String line = st.nextToken().trim();
 			if(line.matches("^H*[0-9]*/H*[0-9]*")){
 				StringTokenizer st2=new StringTokenizer(line,"/");
 				xdata[i]=signals.get(st2.nextToken()).getPosition()[0];
@@ -169,9 +178,9 @@ public class NmredataReader {
 			}
 		}
 		if(freq==null)
-			throw new Exception("No Larmor= line, this is mandatory");
+			throw new NmreDataException("No Larmor= line, this is mandatory");
 		if(location==null)
-			throw new Exception("No Spectrum_Location= line, this is mandatory");
+			throw new NmreDataException("No Spectrum_Location= line, this is mandatory");
 		NMR2DSpectrum spectrum = null;
         Unit xUnit =  CommonUnit.hertz;
         Unit yUnit = CommonUnit.hertz;
@@ -187,14 +196,14 @@ public class NmredataReader {
         data.addSpectrum(spectrum);
 	}
 
-	private void analyze1DSpectrum(String spectrumblock, String nucleus, NmreData data) throws Exception {
-		StringTokenizer st=new StringTokenizer(spectrumblock,"\n\r");
+	private void analyze1DSpectrum(String spectrumblock, String nucleus, NmreData data) throws NmreDataException, JCAMPException {
+		StringTokenizer st=new StringTokenizer(spectrumblock,lineseparator);
 		List<Peak> peaks=new ArrayList<>();
 		List<String> labels=new ArrayList<>();
 		double freq=Double.NaN;
 		String location=null;
 		while(st.hasMoreTokens()){
-			String line = st.nextToken();
+			String line = st.nextToken().trim();
 			if(line.indexOf(";")>-1)
 				line=line.substring(0, line.indexOf(";"));
 			if(line.startsWith("Larmor=")){
@@ -223,9 +232,9 @@ public class NmredataReader {
 			}
 		}
 		if(Double.isNaN(freq))
-			throw new Exception("No Larmor= line, this is mandatory");
+			throw new NmreDataException("No Larmor= line, this is mandatory");
 		if(location==null)
-			throw new Exception("No Spectrum_Location= line, this is mandatory");
+			throw new NmreDataException("No Spectrum_Location= line, this is mandatory");
         NMRSpectrum spectrum = null;
         Unit xUnit =  CommonUnit.hertz;
         Unit yUnit = CommonUnit.intensity;
@@ -263,7 +272,7 @@ public class NmredataReader {
 	 * @param peaks Peak1D[]
 	 * @return double[][] array of {x,  y}
 	 */
-	protected static double[][] peakTableToPeakSpectrum(Peak1D[] peaks)
+	public static double[][] peakTableToPeakSpectrum(Peak1D[] peaks)
 	    throws JCAMPException {
 	    int n = peaks.length;
 	    if (n == 0)

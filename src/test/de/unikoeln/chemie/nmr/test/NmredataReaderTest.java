@@ -3,8 +3,10 @@ package de.unikoeln.chemie.nmr.test;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.jcamp.parser.JCAMPException;
 import org.jcamp.spectrum.NMRSpectrum;
 import org.jcamp.spectrum.assignments.AtomReference;
+import org.openscience.cdk.exception.CDKException;
 
 import de.unikoeln.chemie.nmr.data.NmreData;
 import de.unikoeln.chemie.nmr.io.NmredataReader;
@@ -46,5 +48,16 @@ public class NmredataReaderTest  extends TestCase{
         Assert.assertEquals(7, data.getMolecule().getBondCount());
         Assert.assertEquals(4, data.getSpectra().size());
         Assert.assertEquals(5, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
+	}
+	
+	public void testReadStandard() throws Exception, IOException{
+		String filename = "testdata/test.nmredata.sdf";
+        InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
+        NmredataReader reader = new NmredataReader(ins);
+        NmreData data = reader.read();
+        Assert.assertEquals(6, data.getMolecule().getAtomCount());
+        Assert.assertEquals(6, data.getMolecule().getBondCount());
+        Assert.assertEquals(1, data.getSpectra().size());
+        Assert.assertEquals(3, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
 	}
 }
