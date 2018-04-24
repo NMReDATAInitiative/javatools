@@ -32,7 +32,7 @@ public class NMReDATAeditor extends Application {
     }
     
     @Override
-    public void start(Stage primaryStage) {
+    public void start(final Stage primaryStage) {
         primaryStage.setTitle("NMReData editor");
         Scene scene = new Scene(new VBox(), 500, 500);
         MenuBar menuBar = new MenuBar();

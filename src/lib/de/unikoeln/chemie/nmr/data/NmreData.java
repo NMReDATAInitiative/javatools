@@ -12,7 +12,14 @@ public class NmreData {
 	private List<Spectrum> spectra;
 	private String version;
 	private int level;
+	private String solvent;
 
+	public String getSolvent() {
+		return solvent;
+	}
+	public void setSolvent(String solvent) {
+		this.solvent = solvent;
+	}
 	public IAtomContainer getMolecule() {
 		return molecule;
 	}
