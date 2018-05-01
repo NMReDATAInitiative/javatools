@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.jcamp.spectrum.Assignment;
 import org.jcamp.spectrum.IAssignmentTarget;
+import org.jcamp.spectrum.NMR2DSpectrum;
 import org.jcamp.spectrum.NMRSpectrum;
 import org.jcamp.spectrum.Spectrum;
 import org.jcamp.spectrum.assignments.AtomReference;
@@ -69,7 +70,12 @@ public class NmredataWriter {
 			}
 		}
 		ac.setProperty("NMREDATA_ASSIGNMENT", assignment);
+		Map<String,Integer> types=new HashMap<>();
 		for(Spectrum spectrum : data.getSpectra()){
+			//we need to count how often each type of spectrum exists for numbering
+			if(!types.containsKey(((NMRSpectrum)spectrum).getNucleus()))
+				types.put(((NMRSpectrum)spectrum).getNucleus(),0);
+			types.put(((NMRSpectrum)spectrum).getNucleus(), types.get(((NMRSpectrum)spectrum).getNucleus()).intValue()+1);
 			StringBuffer spectrumbuffer=new StringBuffer();
 			spectrumbuffer.append("Larmor="+((NMRSpectrum)spectrum).getFrequency()+"\\\r\n");
 	        NoteDescriptor noteDescriptor=new NoteDescriptor("Spectrum_Location");
@@ -81,7 +87,7 @@ public class NmredataWriter {
 				spectrumbuffer.append("L="+peaklabelmap.get(((NMRSpectrum)spectrum).getPeakTable()[i].getPosition()[0]));
 				spectrumbuffer.append("\\\r\n");
 			}
-			ac.setProperty("NMREDATA_1D_"+((NMRSpectrum)spectrum).getNucleus(), spectrumbuffer.toString());
+			ac.setProperty("NMREDATA_"+(spectrum instanceof NMR2DSpectrum ? "2" : "1")+"D_"+((NMRSpectrum)spectrum).getNucleus()+(types.get(((NMRSpectrum)spectrum).getNucleus()).intValue()>1 ? "#"+types.get(((NMRSpectrum)spectrum).getNucleus()).intValue() : ""), spectrumbuffer.toString());
 		}
 		ac.setProperty("NMREDATA_SMILES", SmilesGenerator.generic().create(data.getMolecule()));
   	  	InChIGeneratorFactory factory = InChIGeneratorFactory.getInstance();
