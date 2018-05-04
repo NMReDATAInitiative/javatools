@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.jcamp.spectrum.Assignment;
 import org.jcamp.spectrum.IAssignmentTarget;
-import org.jcamp.spectrum.NMR2DSpectrum;
 import org.jcamp.spectrum.NMRSpectrum;
 import org.jcamp.spectrum.Spectrum;
 import org.jcamp.spectrum.assignments.AtomReference;
@@ -22,6 +21,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.SDFWriter;
 import org.openscience.cdk.smiles.SmilesGenerator;
 
+import de.unikoeln.chemie.nmr.data.NMR2DSpectrum;
 import de.unikoeln.chemie.nmr.data.NmreData;
 import net.sf.jniinchi.INCHI_RET;
 
@@ -48,46 +48,58 @@ public class NmredataWriter {
 		Map<Double,String> peaklabelmap=new HashMap<>();
 		int k=0;
 		for(Spectrum spectrum : data.getSpectra()){
-			for(int i=0;i<((NMRSpectrum)spectrum).getPeakTable().length;i++){
-				peaklabelmap.put(((NMRSpectrum)spectrum).getPeakTable()[i].getPosition()[0],"s"+i);
-				assignment.append("s"+k+separator+((NMRSpectrum)spectrum).getPeakTable()[i].getPosition()[0]);
-				if(((NMRSpectrum)spectrum).getAssignments()!=null){
-					for(Assignment assignmentlocal : ((NMRSpectrum)spectrum).getAssignments()){
-						if(assignmentlocal.getPattern().getPosition()[0]==((NMRSpectrum)spectrum).getPeakTable()[i].getPosition()[0]){
-							for(IAssignmentTarget atomref : assignmentlocal.getTargets()){
-								IAtom atom = data.getMolecule().getAtom((((AtomReference)atomref)).getAtomNumber());
-								if(((NMRSpectrum)spectrum).getNucleus().equals("H") && !atom.getSymbol().equals("H")){
-									assignment.append(separator+"H"+(data.getMolecule().getAtomNumber(atom)+1));
-								}else {
-									assignment.append(separator+(data.getMolecule().getAtomNumber(atom)+1));
+			if(spectrum instanceof NMRSpectrum){
+				for(int i=0;i<((NMRSpectrum)spectrum).getPeakTable().length;i++){
+					peaklabelmap.put(((NMRSpectrum)spectrum).getPeakTable()[i].getPosition()[0],"s"+i);
+					assignment.append("s"+k+separator+((NMRSpectrum)spectrum).getPeakTable()[i].getPosition()[0]);
+					if(((NMRSpectrum)spectrum).getAssignments()!=null){
+						for(Assignment assignmentlocal : ((NMRSpectrum)spectrum).getAssignments()){
+							if(assignmentlocal.getPattern().getPosition()[0]==((NMRSpectrum)spectrum).getPeakTable()[i].getPosition()[0]){
+								for(IAssignmentTarget atomref : assignmentlocal.getTargets()){
+									IAtom atom = data.getMolecule().getAtom((((AtomReference)atomref)).getAtomNumber());
+									if(((NMRSpectrum)spectrum).getNucleus().equals("H") && !atom.getSymbol().equals("H")){
+										assignment.append(separator+"H"+(data.getMolecule().getAtomNumber(atom)+1));
+									}else {
+										assignment.append(separator+(data.getMolecule().getAtomNumber(atom)+1));
+									}
 								}
 							}
 						}
 					}
+					k++;
+					assignment.append("\\\r\n");
 				}
-				k++;
-				assignment.append("\\\r\n");
 			}
 		}
 		ac.setProperty("NMREDATA_ASSIGNMENT", assignment);
 		Map<String,Integer> types=new HashMap<>();
 		for(Spectrum spectrum : data.getSpectra()){
-			//we need to count how often each type of spectrum exists for numbering
-			if(!types.containsKey(((NMRSpectrum)spectrum).getNucleus()))
-				types.put(((NMRSpectrum)spectrum).getNucleus(),0);
-			types.put(((NMRSpectrum)spectrum).getNucleus(), types.get(((NMRSpectrum)spectrum).getNucleus()).intValue()+1);
 			StringBuffer spectrumbuffer=new StringBuffer();
-			spectrumbuffer.append("Larmor="+((NMRSpectrum)spectrum).getFrequency()+"\\\r\n");
 	        NoteDescriptor noteDescriptor=new NoteDescriptor("Spectrum_Location");
 			spectrumbuffer.append("Spectrum_Location="+((Note)spectrum.getNotes(noteDescriptor).get(0)).getValue()+"\\\r\n");//TODO
-			for(int i=0;i<((NMRSpectrum)spectrum).getPeakTable().length;i++){
-				spectrumbuffer.append(((NMRSpectrum)spectrum).getPeakTable()[i].getPosition()[0]+separator);
-				if(((NMRSpectrum)spectrum).getPatternTable()!=null && ((NMRSpectrum)spectrum).getPatternTable()[i]!=null)
-					spectrumbuffer.append("S="+((NMRSpectrum)spectrum).getPatternTable()[i].getLabel()+separator);
-				spectrumbuffer.append("L="+peaklabelmap.get(((NMRSpectrum)spectrum).getPeakTable()[i].getPosition()[0]));
-				spectrumbuffer.append("\\\r\n");
+			if(spectrum instanceof NMRSpectrum){
+				//we need to count how often each type of spectrum exists for numbering
+				if(!types.containsKey(((NMRSpectrum)spectrum).getNucleus()))
+					types.put(((NMRSpectrum)spectrum).getNucleus(),0);
+				types.put(((NMRSpectrum)spectrum).getNucleus(), types.get(((NMRSpectrum)spectrum).getNucleus()).intValue()+1);
+				spectrumbuffer.append("Larmor="+((NMRSpectrum)spectrum).getFrequency()+"\\\r\n");
+				for(int i=0;i<((NMRSpectrum)spectrum).getPeakTable().length;i++){
+					spectrumbuffer.append(((NMRSpectrum)spectrum).getPeakTable()[i].getPosition()[0]+separator);
+					if(((NMRSpectrum)spectrum).getPatternTable()!=null && ((NMRSpectrum)spectrum).getPatternTable()[i]!=null)
+						spectrumbuffer.append("S="+((NMRSpectrum)spectrum).getPatternTable()[i].getLabel()+separator);
+					spectrumbuffer.append("L="+peaklabelmap.get(((NMRSpectrum)spectrum).getPeakTable()[i].getPosition()[0]));
+					spectrumbuffer.append("\\\r\n");
+				}
+				ac.setProperty("NMREDATA_1D_"+((NMRSpectrum)spectrum).getNucleus()+(types.get(((NMRSpectrum)spectrum).getNucleus()).intValue()>1 ? "#"+types.get(((NMRSpectrum)spectrum).getNucleus()).intValue() : ""), spectrumbuffer.toString());
+			}else if(spectrum instanceof NMR2DSpectrum){
+				//we need to count how often each type of spectrum exists for numbering
+				if(!types.containsKey(((NMR2DSpectrum)spectrum).getXNucleus()+"_"+((NMR2DSpectrum)spectrum).getYNucleus()))
+					types.put(((NMR2DSpectrum)spectrum).getXNucleus()+"_"+((NMR2DSpectrum)spectrum).getYNucleus(),0);
+				types.put(((NMR2DSpectrum)spectrum).getXNucleus()+"_"+((NMR2DSpectrum)spectrum).getYNucleus(), types.get(((NMR2DSpectrum)spectrum).getXNucleus()+"_"+((NMR2DSpectrum)spectrum).getYNucleus()).intValue()+1);
+				spectrumbuffer.append("Larmor="+((NMR2DSpectrum)spectrum).getYFrequency()+"\\\r\n");
+				ac.setProperty("NMREDATA_2D_"+((NMR2DSpectrum)spectrum).getXNucleus()+"_NJ_"+((NMR2DSpectrum)spectrum).getYNucleus()+(types.get(((NMR2DSpectrum)spectrum).getXNucleus()+"_"+((NMR2DSpectrum)spectrum).getYNucleus()).intValue()>1 ? "#"+types.get(((NMR2DSpectrum)spectrum).getXNucleus()+"_"+((NMR2DSpectrum)spectrum).getYNucleus()).intValue() : ""), spectrumbuffer.toString());//TODO NJ
+				//TODO peaks
 			}
-			ac.setProperty("NMREDATA_"+(spectrum instanceof NMR2DSpectrum ? "2" : "1")+"D_"+((NMRSpectrum)spectrum).getNucleus()+(types.get(((NMRSpectrum)spectrum).getNucleus()).intValue()>1 ? "#"+types.get(((NMRSpectrum)spectrum).getNucleus()).intValue() : ""), spectrumbuffer.toString());
 		}
 		ac.setProperty("NMREDATA_SMILES", SmilesGenerator.generic().create(data.getMolecule()));
   	  	InChIGeneratorFactory factory = InChIGeneratorFactory.getInstance();

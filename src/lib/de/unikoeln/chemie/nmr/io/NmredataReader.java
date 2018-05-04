@@ -35,6 +35,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
 
 import de.unikoeln.chemie.nmr.data.NmreData;
+import de.unikoeln.chemie.nmr.data.Peak2D;
 
 public class NmredataReader {
 	BufferedReader input = null;
@@ -272,34 +273,52 @@ public class NmredataReader {
 	 * @param peaks Peak1D[]
 	 * @return double[][] array of {x,  y}
 	 */
-	public static double[][] peakTableToPeakSpectrum(Peak1D[] peaks)
+	public static double[][] peakTableToPeakSpectrum(Peak[] peaks)
 	    throws JCAMPException {
 	    int n = peaks.length;
 	    if (n == 0)
 	        throw new JCAMPException("empty peak table");
-	    Arrays.sort(peaks);    
+	    Arrays.sort(peaks);
+	    //this is for 1d and 2d - z is always intensity, y is only used for 2d
 	    ArrayList<Double> px = new ArrayList<>(n);
 	    ArrayList<Double> py = new ArrayList<>(n);
+	    ArrayList<Double> pz = new ArrayList<>(n);
 	    double x0 = peaks[0].getPosition()[0];
-	    double y0 = peaks[0].getHeight();
+	    double y0 =0;
+	    if(peaks[0] instanceof Peak2D)
+	    	y0 = peaks[0].getPosition()[1];
+	    double z0 = peaks[0].getHeight();
 	    for (int i = 1; i < n; i++) {
 	        double x = peaks[i].getPosition()[0];
-	        double y = peaks[i].getHeight();
+	        double y=0;
+		    if(peaks[i] instanceof Peak2D)
+		    	y = peaks[i].getPosition()[1];
+	        double z = peaks[i].getHeight();
 	        if (x - x0 > Double.MIN_VALUE) {
 	            px.add(new Double(x0));
-	            py.add(new Double(y0));
+	            if(peaks[i] instanceof Peak2D)
+	            	py.add(new Double(y0));
+	            pz.add(new Double(z0));
 	            x0 = x;
 	            y0 = y;
+	            z0 = z;
 	        } else {
 	            y0 += y;
 	        }
 	    }
 	    px.add(new Double(x0));
-	    py.add(new Double(y0));
+	    if(peaks[0] instanceof Peak2D)
+	    	py.add(new Double(y0));
+	    pz.add(new Double(z0));
 	    double[][] xy = new double[2][px.size()];
 	    for (int i = 0; i < px.size(); i++) {
 	        xy[0][i] = ((Double) px.get(i)).doubleValue();
-	        xy[1][i] = ((Double) py.get(i)).doubleValue();
+	        if(peaks[0] instanceof Peak2D){
+	        	xy[1][i] = ((Double) py.get(i)).doubleValue();
+	        	xy[2][i] = ((Double) pz.get(i)).doubleValue();
+	        }else{
+	        	xy[1][i] = ((Double) pz.get(i)).doubleValue();
+	        }
 	    }
 	    return xy;
 	}
