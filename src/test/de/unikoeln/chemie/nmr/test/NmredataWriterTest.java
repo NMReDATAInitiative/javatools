@@ -25,6 +25,8 @@ import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.tools.CDKHydrogenAdder;
+import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import de.unikoeln.chemie.nmr.data.NmreData;
 import de.unikoeln.chemie.nmr.io.NmredataReader;
@@ -78,7 +80,7 @@ public class NmredataWriterTest extends TestCase{
         fos.close();
 	}
 
-    public static IAtomContainer makeBenzene() {
+    public static IAtomContainer makeBenzene() throws CDKException {
         IAtomContainer mol = new AtomContainer();
         mol.addAtom(new Atom("C")); // 0
         mol.addAtom(new Atom("C")); // 1
@@ -93,6 +95,8 @@ public class NmredataWriterTest extends TestCase{
         mol.addBond(3, 4, IBond.Order.DOUBLE); // 4
         mol.addBond(4, 5, IBond.Order.SINGLE); // 5
         mol.addBond(5, 0, IBond.Order.DOUBLE); // 6
+        AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(mol);
+        CDKHydrogenAdder.getInstance(mol.getBuilder()).addImplicitHydrogens(mol);
         return mol;
     }
 }
