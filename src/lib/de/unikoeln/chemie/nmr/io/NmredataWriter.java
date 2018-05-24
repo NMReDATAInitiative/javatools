@@ -97,8 +97,13 @@ public class NmredataWriter {
 					types.put(((NMR2DSpectrum)spectrum).getXNucleus()+"_"+((NMR2DSpectrum)spectrum).getYNucleus(),0);
 				types.put(((NMR2DSpectrum)spectrum).getXNucleus()+"_"+((NMR2DSpectrum)spectrum).getYNucleus(), types.get(((NMR2DSpectrum)spectrum).getXNucleus()+"_"+((NMR2DSpectrum)spectrum).getYNucleus()).intValue()+1);
 				spectrumbuffer.append("Larmor="+((NMR2DSpectrum)spectrum).getYFrequency()+"\\\r\n");
+				for(int i=0;i<((NMR2DSpectrum)spectrum).getPeakTable().length;i++){
+					spectrumbuffer.append(peaklabelmap.get(((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[0])+"/"+peaklabelmap.get(((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[1]));
+					if(((NMR2DSpectrum)spectrum).getPeakTable()[i].getHeight()>0)
+						spectrumbuffer.append(separator).append("I=").append(((NMR2DSpectrum)spectrum).getPeakTable()[i].getHeight());
+					spectrumbuffer.append("\\\r\n");
+				}
 				ac.setProperty("NMREDATA_2D_"+((NMR2DSpectrum)spectrum).getXNucleus()+"_NJ_"+((NMR2DSpectrum)spectrum).getYNucleus()+(types.get(((NMR2DSpectrum)spectrum).getXNucleus()+"_"+((NMR2DSpectrum)spectrum).getYNucleus()).intValue()>1 ? "#"+types.get(((NMR2DSpectrum)spectrum).getXNucleus()+"_"+((NMR2DSpectrum)spectrum).getYNucleus()).intValue() : ""), spectrumbuffer.toString());//TODO NJ
-				//TODO peaks
 			}
 		}
 		ac.setProperty("NMREDATA_SMILES", SmilesGenerator.generic().create(data.getMolecule()));

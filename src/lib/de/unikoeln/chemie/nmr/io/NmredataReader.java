@@ -311,6 +311,9 @@ public class NmredataReader {
 	    	py.add(new Double(y0));
 	    pz.add(new Double(z0));
 	    double[][] xy = new double[2][px.size()];
+	    if(peaks[0] instanceof Peak2D){
+	    	xy = new double[3][px.size()];
+	    }
 	    for (int i = 0; i < px.size(); i++) {
 	        xy[0][i] = ((Double) px.get(i)).doubleValue();
 	        if(peaks[0] instanceof Peak2D){

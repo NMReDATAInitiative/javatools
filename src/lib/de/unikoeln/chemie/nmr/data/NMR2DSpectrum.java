@@ -238,4 +238,8 @@ public class NMR2DSpectrum extends Spectrum2D {
             }
         }
     }
+    
+    public Peak2D[] getPeakTable() {
+    	return peakTable;
+    }
 }
