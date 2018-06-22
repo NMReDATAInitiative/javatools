@@ -50,7 +50,7 @@ public class NmredataWriter {
 		for(Spectrum spectrum : data.getSpectra()){
 			if(spectrum instanceof NMRSpectrum){
 				for(int i=0;i<((NMRSpectrum)spectrum).getPeakTable().length;i++){
-					peaklabelmap.put(((NMRSpectrum)spectrum).getPeakTable()[i].getPosition()[0],"s"+i);
+					peaklabelmap.put(((NMRSpectrum)spectrum).getPeakTable()[i].getPosition()[0],"s"+k);
 					assignment.append("s"+k+separator+((NMRSpectrum)spectrum).getPeakTable()[i].getPosition()[0]);
 					if(((NMRSpectrum)spectrum).getAssignments()!=null){
 						for(Assignment assignmentlocal : ((NMRSpectrum)spectrum).getAssignments()){
