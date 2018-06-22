@@ -9,6 +9,7 @@ import org.jcamp.spectrum.Assignment;
 import org.jcamp.spectrum.IDataArray1D;
 import org.jcamp.spectrum.IOrderedDataArray1D;
 import org.jcamp.spectrum.ISpectrumIdentifier;
+import org.jcamp.spectrum.Peak1D;
 import org.jcamp.spectrum.Spectrum;
 import org.jcamp.spectrum.Spectrum2D;
 /**
@@ -213,6 +214,13 @@ public class NMR2DSpectrum extends Spectrum2D {
         zAxisMap = new LinearAxisMap(zData, dataRange);
     }
     /**
+     * return peak table.
+     * @return Peak1D[]
+     */
+    public Peak2D[] getPeakTable() {
+        return peakTable;
+    }
+    /**
      * sets a new peak table.
      * @param newPeakTable Peak1D[]
      */
@@ -237,9 +245,5 @@ public class NMR2DSpectrum extends Spectrum2D {
                 Arrays.sort(newAssignments);
             }
         }
-    }
-    
-    public Peak2D[] getPeakTable() {
-    	return peakTable;
     }
 }

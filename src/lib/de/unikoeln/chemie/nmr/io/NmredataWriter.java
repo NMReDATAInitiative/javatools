@@ -23,12 +23,14 @@ import org.openscience.cdk.smiles.SmilesGenerator;
 
 import de.unikoeln.chemie.nmr.data.NMR2DSpectrum;
 import de.unikoeln.chemie.nmr.data.NmreData;
+import de.unikoeln.chemie.nmr.data.Peak2D;
 import net.sf.jniinchi.INCHI_RET;
 
 public class NmredataWriter {
 	OutputStream os;
 	PrintWriter pw;
 	String separator=", ";
+	SDFWriter sdfwriter;
 
 	public NmredataWriter(OutputStream os){
 		this.os=os;
@@ -111,12 +113,14 @@ public class NmredataWriter {
   	  	InChIGenerator gen = factory.getInChIGenerator(data.getMolecule());
   	  	if (gen.getReturnStatus() == INCHI_RET.OKAY || gen.getReturnStatus() == INCHI_RET.WARNING)
   	  		ac.setProperty("NMREDATA_INCHI", gen.getInchi());
-		SDFWriter sdfwriter;
 		if(os!=null)
 			sdfwriter=new SDFWriter(os);
 		else
 			sdfwriter=new SDFWriter(pw);
 		sdfwriter.write(ac);
+	}
+	
+	public void close() throws IOException{
 		sdfwriter.close();
 	}
 }
