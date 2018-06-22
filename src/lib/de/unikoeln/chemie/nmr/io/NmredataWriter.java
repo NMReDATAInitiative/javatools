@@ -71,7 +71,7 @@ public class NmredataWriter {
 				}
 			}
 		}
-		ac.setProperty("NMREDATA_ASSIGNMENT", assignment);
+		ac.setProperty("NMR_ASSIGNMENT", assignment);
 		Map<String,Integer> types=new HashMap<>();
 		for(Spectrum spectrum : data.getSpectra()){
 			StringBuffer spectrumbuffer=new StringBuffer();

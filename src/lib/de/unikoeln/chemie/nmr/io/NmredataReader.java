@@ -68,7 +68,7 @@ public class NmredataReader {
 					property=property.substring(0, property.length()-1).trim();
 				if(((String)key).startsWith("NMREDATA_1D")){
 					spectra1d.put(((String)key).substring(9),property);
-				}else if(((String)key).equals("NMREDATA_ASSIGNMENT")){
+				}else if(((String)key).equals("NMR_ASSIGNMENT")){
 					signalblock=property;
 				}else if(((String)key).startsWith("NMREDATA_2D")){
 					spectra2d.put(((String)key).substring(9),property);
@@ -88,7 +88,7 @@ public class NmredataReader {
 		if(signalblock!=null)
 			analyzeSignals(data, signalblock);
 		else
-			throw new NmreDataException("There is no NMREDATA_ASSIGNMENT block in this file - required");
+			throw new NmreDataException("There is no NMR_ASSIGNMENT block in this file - required");
 		analyzeSpectra(data);
 		return data;
 	}
