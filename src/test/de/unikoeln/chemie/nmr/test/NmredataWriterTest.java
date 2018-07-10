@@ -31,6 +31,7 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import de.unikoeln.chemie.nmr.data.NMR2DSpectrum;
 import de.unikoeln.chemie.nmr.data.NmreData;
+import de.unikoeln.chemie.nmr.data.NmreData.NmredataVersion;
 import de.unikoeln.chemie.nmr.data.Peak2D;
 import de.unikoeln.chemie.nmr.io.NmredataReader;
 import de.unikoeln.chemie.nmr.io.NmredataWriter;
@@ -95,13 +96,13 @@ public class NmredataWriterTest extends TestCase{
         data.addSpectrum(spectrum);
         data.addSpectrum(cosy);
         data.setMolecule(makeBenzene());
-        File testfile=new File(System.getProperty("java.io.tmpdir")+"/test.nmredata.sdf");
+        File testfile=new File(System.getProperty("java.io.tmpdir")+"/test.nmredata.sd");
         if(testfile.exists())
         	testfile.delete();
         FileOutputStream fos=new FileOutputStream(testfile);
         NmredataWriter writer=new NmredataWriter(fos);
-        writer.write(data);
-        fos.close();
+        writer.write(data, NmredataVersion.ONEPOINTONE);
+        writer.close();
 	}
 
     public static IAtomContainer makeBenzene() throws CDKException {

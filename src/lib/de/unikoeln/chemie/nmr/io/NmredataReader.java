@@ -35,6 +35,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
 
 import de.unikoeln.chemie.nmr.data.NmreData;
+import de.unikoeln.chemie.nmr.data.NmreData.NmredataVersion;
 import de.unikoeln.chemie.nmr.data.Peak2D;
 
 public class NmredataReader {
@@ -75,7 +76,7 @@ public class NmredataReader {
 				}else if(((String)key).equals("NMREDATA_VERSION")){
 					if(!property.equals("1.0") && !property.equals("1.1"))
 						throw new NmreDataException("Currently 1.0 and 1.1 are the only supported NMReDATA versions");
-					data.setVersion(property);
+					data.setVersion(property.equals("1.0") ? NmredataVersion.ONE : NmredataVersion.ONEPOINTONE);
 					if(property.equals("1.1"))
 						lineseparator="\\";
 				}else if(((String)key).startsWith("NMREDATA_LEVEL")){

@@ -7,10 +7,11 @@ import org.jcamp.spectrum.Spectrum;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 public class NmreData {
+	public enum NmredataVersion {ONE,ONEPOINTONE};
 	
 	private IAtomContainer molecule;
 	private List<Spectrum> spectra;
-	private String version;
+	private NmredataVersion version;
 	private int level;
 	private String solvent;
 
@@ -38,11 +39,11 @@ public class NmreData {
 		spectra.add(spectrum);
 	}
 	
-	public String getVersion() {
+	public NmredataVersion getVersion() {
 		return version;
 	}
 	
-	public void setVersion(String version) {
+	public void setVersion(NmredataVersion version) {
 		this.version = version;
 	}
 

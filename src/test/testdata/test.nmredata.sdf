@@ -21,7 +21,7 @@ M  END
 > <NMREDATA_LEVEL>
 1\
 
-> <NMREDATA_ASSIGNMENT>
+> <NMR_ASSIGNMENT>
 s0, 5.0, 1, 2, 3, 4\
 s1, 10.0, 1, 2, 3, 4\
 s2, 15.0, 1, 2, 3, 4\

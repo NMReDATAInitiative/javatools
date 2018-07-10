@@ -14,6 +14,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.openscience.cdk.exception.CDKException;
 
+import de.unikoeln.chemie.nmr.data.NmreData.NmredataVersion;
 import de.unikoeln.chemie.nmr.data.NmreDataRecord;
 
 public class NmredataRecordWriter {
@@ -32,7 +33,7 @@ public class NmredataRecordWriter {
 	 * @throws CloneNotSupportedException
 	 * @throws CDKException
 	 */
-	public void write(NmreDataRecord data, String id) throws IOException, CloneNotSupportedException, CDKException{
+	public void write(NmreDataRecord data, String id, NmredataVersion version) throws IOException, CloneNotSupportedException, CDKException{
         ByteArrayOutputStream baos=new ByteArrayOutputStream();
         ZipOutputStream zipout=new ZipOutputStream(baos);
         for(File file : data.getFiles()){
@@ -40,7 +41,7 @@ public class NmredataRecordWriter {
         }
         zipout.putNextEntry(new ZipEntry(id+"/"+id+".sd"));
         NmredataWriter writer=new NmredataWriter(zipout);
-        writer.write(data.getData());
+        writer.write(data.getData(), version);
         writer.close();
         InputStream is =  new ByteArrayInputStream(baos.toByteArray());
         byte[] buf = new byte[32 * 1024]; // 32k buffer
@@ -59,48 +60,33 @@ public class NmredataRecordWriter {
 	   * @exception  IOException  Description of Exception
 	   */
 	  public static void zipDir(File zipDir, ZipOutputStream zos, File tempdir, String id) throws IOException {
-	    /*if(zipDir.isFile()){
-	    	int bytesIn = 0;
-	    	byte[] readBuffer = new byte[2156];
-        	FileInputStream fis = new FileInputStream(zipDir);
-            ZipEntry anEntry = new ZipEntry(id+"/"+zipDir.getPath());
-        	//place the zip entry in the ZipOutputStream object
-        	zos.putNextEntry(anEntry);
-        	//now write the content of the file to the ZipOutputStream
-        	while ((bytesIn = fis.read(readBuffer)) != -1) {
-        		zos.write(readBuffer, 0, bytesIn);
-        	}
-        	//close the Stream
-        	fis.close();
-        }else{*/
-		    //get a listing of the directory content
-		    String[] dirList = zipDir.list();
-		    byte[] readBuffer = new byte[2156];
-		    int bytesIn = 0;
-		    //loop through dirList, and zip the files
-		    for (int i = 0; i < dirList.length; i++) {
-		      File f = new File(zipDir, dirList[i]);
-		      if (f.isDirectory()) {
-		        //if the File object is a directory, call this
-		        //function again to add its content recursively
-		        String filePath = f.getPath();
-		        zipDir(new File(filePath), zos, tempdir, id);
-		        //loop again
-		        continue;
-		      }
-		      //if we reached here, the File object f was not a directory
-		      //create a FileInputStream on top of f
-		      FileInputStream fis = new FileInputStream(f);
-		      ZipEntry anEntry = new ZipEntry(id+"/"+getRelativePath(tempdir,f));
-		      //place the zip entry in the ZipOutputStream object
-		      zos.putNextEntry(anEntry);
-		      //now write the content of the file to the ZipOutputStream
-		      while ((bytesIn = fis.read(readBuffer)) != -1) {
-		        zos.write(readBuffer, 0, bytesIn);
-		      }
-		      //close the Stream
-		      fis.close();
-		  //}
+	    //get a listing of the directory content
+	    String[] dirList = zipDir.list();
+	    byte[] readBuffer = new byte[2156];
+	    int bytesIn = 0;
+	    //loop through dirList, and zip the files
+	    for (int i = 0; i < dirList.length; i++) {
+	      File f = new File(zipDir, dirList[i]);
+	      if (f.isDirectory()) {
+	        //if the File object is a directory, call this
+	        //function again to add its content recursively
+	        String filePath = f.getPath();
+	        zipDir(new File(filePath), zos, tempdir, id);
+	        //loop again
+	        continue;
+	      }
+	      //if we reached here, the File object f was not a directory
+	      //create a FileInputStream on top of f
+	      FileInputStream fis = new FileInputStream(f);
+	      ZipEntry anEntry = new ZipEntry(id+"/"+getRelativePath(tempdir,f));
+	      //place the zip entry in the ZipOutputStream object
+	      zos.putNextEntry(anEntry);
+	      //now write the content of the file to the ZipOutputStream
+	      while ((bytesIn = fis.read(readBuffer)) != -1) {
+	        zos.write(readBuffer, 0, bytesIn);
+	      }
+	      //close the Stream
+	      fis.close();
 	    }
 	  }
 
