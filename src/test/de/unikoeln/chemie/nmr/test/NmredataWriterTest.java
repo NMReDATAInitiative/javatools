@@ -42,6 +42,7 @@ public class NmredataWriterTest extends TestCase{
 		writeStandardFile();
         File testfile=new File(System.getProperty("java.io.tmpdir")+"/test.nmredata.sdf");
         assertTrue(testfile.exists());
+        assertTrue(testfile.length()>10);
 	}
 	
 	public static void writeStandardFile() throws JCAMPException, CloneNotSupportedException, CDKException, IOException{
@@ -101,7 +102,7 @@ public class NmredataWriterTest extends TestCase{
         FileOutputStream fos=new FileOutputStream(testfile);
         NmredataWriter writer=new NmredataWriter(fos);
         writer.write(data);
-        fos.close();
+        writer.close();
 	}
 
     public static IAtomContainer makeBenzene() throws CDKException {

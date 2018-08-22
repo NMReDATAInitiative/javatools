@@ -79,8 +79,8 @@ public class NmredataReader {
 					if(property.equals("1.1"))
 						lineseparator="\\";
 				}else if(((String)key).startsWith("NMREDATA_LEVEL")){
-					int level=Integer.parseInt(property);
-					if(level<0 || level>3)
+					data.setLevel(Integer.parseInt(property));
+					if(data.getLevel()<0 || data.getLevel()>3)
 						throw new NmreDataException("Level must be 0, 1, 2, or 3");
 				}
 			}
@@ -98,35 +98,41 @@ public class NmredataReader {
 		StringTokenizer st=new StringTokenizer(signalblock,lineseparator);
 		while(st.hasMoreTokens()){
 			String line = st.nextToken().trim();
-			StringTokenizer st2 = new StringTokenizer(line,",");
-			String label=st2.nextToken();
-			double shift = Double.parseDouble(st2.nextToken().trim());
-			Peak peak=new Peak1D(shift,0);
-			List<AtomReference> atoms = new ArrayList<AtomReference>();
-			while(st2.hasMoreTokens()){
-				String atom = st2.nextToken();
-				if(atom.indexOf("H")>-1){
-					int atomid=Integer.parseInt(atom.trim().substring(1))-1;
-					if(atomid>=data.getMolecule().getAtomCount())
-						throw new NmreDataException("Atom "+atomid+" specified in MREDATA_ASSIGNMENT block, but only "+data.getMolecule().getAtomCount()+" atoms are in Molecule");
-                    for(int k=0;k<data.getMolecule().getConnectedAtomsCount(data.getMolecule().getAtom(atomid));k++){
-                        if(data.getMolecule().getConnectedAtomsList(data.getMolecule().getAtom(atomid)).get(k).getSymbol().equals("H")){
-                        	atomid=data.getMolecule().getAtomNumber(data.getMolecule().getConnectedAtomsList(data.getMolecule().getAtom(atomid)).get(k));
-                        	break;
-                        }
-                    }
-					atoms.add(new AtomReference(null, atomid));
-				}else{
-					int atomid=Integer.parseInt(atom.trim())-1;
-					atoms.add(new AtomReference(null, atomid));
+			if(line.startsWith("Interchangeable=")){
+				if(data.getLevel()%2==0){
+					throw new NmreDataException("Interchangeable= only allowed in levels 1 and 3, the file is level "+data.getLevel());
 				}
-				IAssignmentTarget[] assigns = new IAssignmentTarget[atoms.size()];
-				for (int i=0;i<atoms.size();i++)
-					assigns[i] = (IAssignmentTarget) atoms.get(i);
-				if(atoms.size()>0)
-					assignments.put(label, assigns);
+			}else{
+				StringTokenizer st2 = new StringTokenizer(line,",");
+				String label=st2.nextToken();
+				double shift = Double.parseDouble(st2.nextToken().trim());
+				Peak peak=new Peak1D(shift,0);
+				List<AtomReference> atoms = new ArrayList<AtomReference>();
+				while(st2.hasMoreTokens()){
+					String atom = st2.nextToken();
+					if(atom.indexOf("H")>-1){
+						int atomid=Integer.parseInt(atom.trim().substring(1))-1;
+						if(atomid>=data.getMolecule().getAtomCount())
+							throw new NmreDataException("Atom "+atomid+" specified in MREDATA_ASSIGNMENT block, but only "+data.getMolecule().getAtomCount()+" atoms are in Molecule");
+	                    for(int k=0;k<data.getMolecule().getConnectedAtomsCount(data.getMolecule().getAtom(atomid));k++){
+	                        if(data.getMolecule().getConnectedAtomsList(data.getMolecule().getAtom(atomid)).get(k).getSymbol().equals("H")){
+	                        	atomid=data.getMolecule().getAtomNumber(data.getMolecule().getConnectedAtomsList(data.getMolecule().getAtom(atomid)).get(k));
+	                        	break;
+	                        }
+	                    }
+						atoms.add(new AtomReference(null, atomid));
+					}else{
+						int atomid=Integer.parseInt(atom.trim())-1;
+						atoms.add(new AtomReference(null, atomid));
+					}
+					IAssignmentTarget[] assigns = new IAssignmentTarget[atoms.size()];
+					for (int i=0;i<atoms.size();i++)
+						assigns[i] = (IAssignmentTarget) atoms.get(i);
+					if(atoms.size()>0)
+						assignments.put(label, assigns);
+				}
+				signals.put(label, peak);
 			}
-			signals.put(label, peak);
 		}
 	}
 
