@@ -62,7 +62,7 @@ public class NmredataReader {
 		mdlreader.close();
 		String signalblock=null;
 		for(Object key : ac.getProperties().keySet()){
-			if(ac.getProperties().get(key)!=null){
+			if(ac.getProperties().get(key)!=null && ac.getProperties().get(key) instanceof String){
 				String property=((String)ac.getProperties().get(key)).trim();
 				if(property.endsWith("\\"))
 					property=property.substring(0, property.length()-1).trim();
