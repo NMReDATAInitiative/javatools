@@ -20,7 +20,6 @@ import org.jcamp.spectrum.IAssignmentTarget;
 import org.jcamp.spectrum.IDataArray1D;
 import org.jcamp.spectrum.IOrderedDataArray1D;
 import org.jcamp.spectrum.Multiplicity;
-import org.jcamp.spectrum.NMR2DSpectrum;
 import org.jcamp.spectrum.NMRSpectrum;
 import org.jcamp.spectrum.OrderedArrayData;
 import org.jcamp.spectrum.Pattern;
@@ -31,9 +30,11 @@ import org.jcamp.spectrum.notes.NoteDescriptor;
 import org.jcamp.units.CommonUnit;
 import org.jcamp.units.Unit;
 import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
 
+import de.unikoeln.chemie.nmr.data.NMR2DSpectrum;
 import de.unikoeln.chemie.nmr.data.NmreData;
 import de.unikoeln.chemie.nmr.data.NmreData.NmredataVersion;
 import de.unikoeln.chemie.nmr.data.Peak2D;
@@ -55,7 +56,7 @@ public class NmredataReader {
 		this(new InputStreamReader(in));
 	}
 	
-	public NmreData read() throws IOException, NmreDataException, JCAMPException {
+	public NmreData read() throws IOException, NmreDataException, JCAMPException, CDKException {
 		NmreData data=new NmreData();
 		IteratingSDFReader mdlreader=new IteratingSDFReader(input, DefaultChemObjectBuilder.getInstance());
 		IAtomContainer ac = mdlreader.next();
@@ -155,6 +156,7 @@ public class NmredataReader {
 		double[] freq=null;
 		String location=null;
 		int peakcount=0;
+		String type=null;
 		while(st.hasMoreTokens()){
 			String line = st.nextToken().trim();
 			if(line.indexOf(";")>-1)
@@ -163,20 +165,25 @@ public class NmredataReader {
 				freq=new double[]{Double.parseDouble(line.substring(7)),Double.parseDouble(line.substring(7))};
 			}else if(line.startsWith("Spectrum_Location=")){
 				location=line.substring(line.indexOf("=")+1);
-			}else if(line.matches("^H*[0-9]*/H*[0-9]*")){
+			}else if(line.startsWith("CorType=")){
+				type=line.substring(line.indexOf("=")+1);
+			}else if(line.matches(".*/.*") && (!line.contains("=") || line.indexOf("=")>line.indexOf("/"))){
 				peakcount++;
 			}
 		}
 		double[] xdata=new double[peakcount];
 		double[] ydata=new double[peakcount];
+		Peak2D[] peakTable=new Peak2D[peakcount];
 		st=new StringTokenizer(spectrumblock,lineseparator);
 		int i=0;
 		while(st.hasMoreTokens()){
 			String line = st.nextToken().trim();
-			if(line.matches("^H*[0-9]*/H*[0-9]*")){
-				StringTokenizer st2=new StringTokenizer(line,"/");
+			if(line.matches(".*/.*") && (!line.contains("=") || line.indexOf("=")>line.indexOf("/"))){
+				StringTokenizer st2=new StringTokenizer(line,"/,");
 				xdata[i]=signals.get(st2.nextToken()).getPosition()[0];
 				ydata[i]=signals.get(st2.nextToken()).getPosition()[0];
+				peakTable[i]=new Peak2D(xdata[i],ydata[i],0);
+				i++;
 			}
 		}
 		if(freq==null)
@@ -192,8 +199,13 @@ public class NmredataReader {
 		IDataArray1D arraydataz=new ArrayData(new double[xdata.length], zUnit);
         double[] reference = new double[2];
         spectrum = new NMR2DSpectrum(arraydatax, arraydatay, arraydataz, nucleus, freq, reference);
+        spectrum.setPeakTable(peakTable);
         NoteDescriptor noteDescriptor=new NoteDescriptor("Spectrum_Location");
         spectrum.setNote(noteDescriptor, location);
+        if(type!=null) {
+            noteDescriptor=new NoteDescriptor("CorType");
+            spectrum.setNote(noteDescriptor, type);        	
+        }
         //spectrum.setAssignments((Assignment[]) tables[2]);
         data.addSpectrum(spectrum);
 	}

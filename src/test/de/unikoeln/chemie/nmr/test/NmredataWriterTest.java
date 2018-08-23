@@ -41,7 +41,7 @@ public class NmredataWriterTest extends TestCase{
 	
 	public void testWriteStandard() throws JCAMPException, CloneNotSupportedException, IOException, CDKException{
 		writeStandardFile();
-        File testfile=new File(System.getProperty("java.io.tmpdir")+"/test.nmredata.sdf");
+        File testfile=new File(System.getProperty("java.io.tmpdir")+"/test.nmredata.sd");
         assertTrue(testfile.exists());
 	}
 	
@@ -73,7 +73,7 @@ public class NmredataWriterTest extends TestCase{
         NoteDescriptor noteDescriptor=new NoteDescriptor("Spectrum_Location");
         spectrum.setNote(noteDescriptor, location);
         Peak2D[] peaks2d = new Peak2D[3];
-		peaks2d[0]=new Peak2D(5,3,0);
+		peaks2d[0]=new Peak2D(5,15,0);
 		peaks2d[1]=new Peak2D(10,5,0);
 		peaks2d[2]=new Peak2D(15,10,0);
         xUnit =  CommonUnit.hertz;

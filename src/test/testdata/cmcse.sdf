@@ -70,23 +70,23 @@ h5,  1.255, H6
 Larmor=500.130
 Spectrum_Location=file:D:/SciPrograms/Bruker/TopSpin3.5.b.91pl7/data/nes/nmr/nesEX9_CMCse_Test/1/pdata/1
 Pulseprogram=zg30
-6.94928
-5.84414
-4.17706
-1.85439
-1.25499
+6.94928, L=h1
+5.84414, L=h2
+4.17706, L=h3
+1.85439, L=h4
+1.25499, L=h5
 
 
 > <NMREDATA_1D_13C>
 Larmor=125.758
 Spectrum_Location=file:D:/SciPrograms/Bruker/TopSpin3.5.b.91pl7/data/nes/nmr/nesEX9_CMCse_Test/2/pdata/1
 Pulseprogram=zgdc30
-166.603
-144.493
-122.699
-60.1508
-17.9798
-14.1659
+166.603, L=c1
+144.493, L=c2
+122.699, L=c3
+60.1508, L=c4
+17.9798, L=c5
+14.1659, L=c6
 
 
 > <NMREDATA_2D_13C_NJ_1H>

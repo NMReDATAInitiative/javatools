@@ -4,7 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jcamp.spectrum.Spectrum;
+import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
+import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IAtomType;
+import org.openscience.cdk.tools.CDKHydrogenAdder;
+import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 
 public class NmreData {
 	public enum NmredataVersion {ONE,ONEPOINTONE};
@@ -24,8 +30,15 @@ public class NmreData {
 	public IAtomContainer getMolecule() {
 		return molecule;
 	}
-	public void setMolecule(IAtomContainer molecule) {
+	public void setMolecule(IAtomContainer molecule) throws CDKException {
 		this.molecule = molecule;
+		CDKAtomTypeMatcher matcher = CDKAtomTypeMatcher.getInstance(molecule.getBuilder());
+	    for (IAtom atom : molecule.atoms()) {
+	      IAtomType type = matcher.findMatchingAtomType(molecule, atom);
+	      AtomTypeManipulator.configure(atom, type);
+	    }
+	    CDKHydrogenAdder adder = CDKHydrogenAdder.getInstance(molecule.getBuilder());
+	    adder.addImplicitHydrogens(molecule);
 	}
 	public List<Spectrum> getSpectra() {
 		return spectra;
