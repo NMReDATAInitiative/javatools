@@ -8,6 +8,7 @@ import org.jcamp.spectrum.NMRSpectrum;
 import org.jcamp.spectrum.assignments.AtomReference;
 import org.openscience.cdk.exception.CDKException;
 
+import de.unikoeln.chemie.nmr.data.NMR2DSpectrum;
 import de.unikoeln.chemie.nmr.data.NmreData;
 import de.unikoeln.chemie.nmr.io.NmredataReader;
 import junit.framework.Assert;
@@ -46,8 +47,10 @@ public class NmredataReaderTest  extends TestCase{
         NmreData data = reader.read();
         Assert.assertEquals(8, data.getMolecule().getAtomCount());
         Assert.assertEquals(7, data.getMolecule().getBondCount());
-        Assert.assertEquals(4, data.getSpectra().size());
+        Assert.assertEquals(5, data.getSpectra().size());
         Assert.assertEquals(5, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
+        Assert.assertEquals(6, ((NMRSpectrum)data.getSpectra().get(1)).getPeakTable().length);
+        Assert.assertEquals(3, ((NMR2DSpectrum)data.getSpectra().get(2)).getPeakTable().length);
 	}
 	
 	public void testReadStandard() throws Exception, IOException{

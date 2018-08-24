@@ -104,6 +104,18 @@ c5/h2, w2=20.00, w1=80.00
 c5/h1, w2=20.00, w1=80.00
 
 
+> <NMREDATA_2D_13C_1J_1H>
+Larmor=500.130
+CorType=HSQC
+Spectrum_Location=file:D:/SciPrograms/Bruker/TopSpin3.5.b.91pl7/data/nes/nmr/nesEX9_CMCse_Test/3/pdata/1
+Pulseprogram=hsqcg
+c2/h1
+c3/h2
+c4/h3
+c5/h4
+c6/h5
+
+
 > <NMREDATA_2D_1H_NJ_1H>
 Larmor=500.130
 CorType=COSY
