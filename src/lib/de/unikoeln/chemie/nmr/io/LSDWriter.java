@@ -56,11 +56,11 @@ public class LSDWriter {
 			if(spectrum instanceof Spectrum1D) {
 				for(Assignment assignment : ((Spectrum1D) spectrum).getAssignments()) {
 					for(IAssignmentTarget atom : assignment.getTargets()) {
-						peaklabelmap.put(assignment.getPattern().getPosition()[0], ((AtomReference)atom).getAtomNumber());
+						peaklabelmap.put(assignment.getPattern().getPosition()[0], ((AtomReference)atom).getAtomNumber()+1);
 						if(((NMRSpectrum)spectrum).getNucleus().equals("1H"))
-							sdfwriter.write("SHIH "+((AtomReference)atom).getAtomNumber()+" "+assignment.getPattern().getPosition()[0]+"\r\n");
+							sdfwriter.write("SHIH "+(((AtomReference)atom).getAtomNumber()+1)+" "+assignment.getPattern().getPosition()[0]+"\r\n");
 						else
-							sdfwriter.write("SHIX "+((AtomReference)atom).getAtomNumber()+" "+assignment.getPattern().getPosition()[0]+"\r\n");
+							sdfwriter.write("SHIX "+(((AtomReference)atom).getAtomNumber()+1)+" "+assignment.getPattern().getPosition()[0]+"\r\n");
 					}
 				}
 				sdfwriter.write("\r\n");
