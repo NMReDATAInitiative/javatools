@@ -69,10 +69,14 @@ public class NmredataReader {
 				if(property.endsWith("\\"))
 					property=property.substring(0, property.length()-1).trim();
 				if(((String)key).startsWith("NMREDATA_1D")){
+					if(!((String)key).substring(11).matches("_[0-9a-zA-Z]*(#[0-9]*)?"))
+						throw new NmreDataException((String)key+" is not in the required format for 1D spectra, it should be like NMREDATA_1D_nucleus, with nucleus being 13C, 1H etc.");
 					spectra1d.put(((String)key).substring(9),property);
 				}else if(((String)key).equals("NMR_ASSIGNMENT")){
 					signalblock=property;
 				}else if(((String)key).startsWith("NMREDATA_2D")){
+					if(!((String)key).substring(11).matches("_[0-9a-zA-Z]*_[0-9a-zA-Z]*_[0-9a-zA-Z]*(#[0-9]*)?"))
+						throw new NmreDataException((String)key+" is not in the required format for 2D spectra, it should be like NMREDATA_2D_nucleus_coupling_nucleus, with nucleus being 13C, 1H etc.");
 					spectra2d.put(((String)key).substring(9),property);
 				}else if(((String)key).equals("NMREDATA_VERSION")){
 					if(!property.equals("1.0") && !property.equals("1.1"))
