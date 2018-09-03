@@ -11,6 +11,7 @@ import org.jcamp.parser.JCAMPException;
 import org.openscience.cdk.exception.CDKException;
 
 import de.unikoeln.chemie.nmr.data.NmreData;
+import de.unikoeln.chemie.nmr.data.NmreData.NmredataVersion;
 import de.unikoeln.chemie.nmr.io.NmreDataException;
 import de.unikoeln.chemie.nmr.io.NmredataReader;
 import de.unikoeln.chemie.nmr.io.NmredataWriter;
@@ -20,14 +21,14 @@ public class RoundtripTest  extends TestCase{
 	
 	public void testStandardRoundtrip() throws JCAMPException, CloneNotSupportedException, CDKException, IOException, NmreDataException{
 		NmredataWriterTest.writeStandardFile();
-        File testfile=new File(System.getProperty("java.io.tmpdir")+"/test.nmredata.sdf");
+        File testfile=new File(System.getProperty("java.io.tmpdir")+"/test.nmredata.sd");
         InputStream ins = new FileInputStream(testfile);
         NmredataReader reader = new NmredataReader(ins);
         NmreData data = reader.read();
-        File testfile2=new File(System.getProperty("java.io.tmpdir")+"/test2.nmredata.sdf");
+        File testfile2=new File(System.getProperty("java.io.tmpdir")+"/test2.nmredata.sd");
         FileOutputStream fos=new FileOutputStream(testfile2);
         NmredataWriter writer=new NmredataWriter(fos);
-        writer.write(data);
+        writer.write(data, NmredataVersion.ONEPOINTONE);
         fos.close();
         assertTrue(FileUtils.contentEquals(testfile, testfile2));
 	}
