@@ -33,4 +33,16 @@ public class LSDTest extends TestCase{
         Assert.assertTrue(testfile.exists());
 	}
 
+	public void testMRC() throws IOException, NmreDataException, JCAMPException, CDKException {
+		String filename = "testdata/MRC_Cyprinol_2018.nmredata.sdf";
+        InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
+        NmredataReader reader = new NmredataReader(ins);
+        NmreData data = reader.read();
+        File testfile=new File(System.getProperty("java.io.tmpdir")+"/MRC_Cyprinol_2018.lsd");
+        FileOutputStream pw = new FileOutputStream(testfile);
+        LSDWriter lsdwrtier=new LSDWriter(pw);
+        lsdwrtier.write(data);
+        lsdwrtier.close();
+        Assert.assertTrue(testfile.exists());
+	}
 }
