@@ -33,6 +33,9 @@ M  END
 > <B_ISOMAP>
 
 
+>  <NMREDATA_ID>
+Title=NMReDATA test file
+
 > <B_ISOBEST>
 0
 
@@ -52,7 +55,7 @@ CDCl3
 > <NMREDATA_SMILES>
 C(C=CC)(OCC)=O
 
-> <NMR_ASSIGNMENT>
+> <NMREDATA_ASSIGNMENT>
 c1, 166.603, 1
 c2, 144.493, 2
 c3, 122.699, 3

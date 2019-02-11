@@ -48,6 +48,7 @@ public class NmredataWriter {
 			endofline="\\";
 		ac.setProperty("NMREDATA_VERSION", version==NmredataVersion.ONE? "1.0" : "1.1\\");
 		ac.setProperty("NMREDATA_LEVEL", "1"+endofline);
+		ac.setProperty("NMREDATA_ID", data.getID()+endofline);
 		if(data.getSolvent()!=null)
 			ac.setProperty("NMREDATA_SOLVENT", data.getSolvent()+endofline);
 		StringBuffer assignment=new StringBuffer();

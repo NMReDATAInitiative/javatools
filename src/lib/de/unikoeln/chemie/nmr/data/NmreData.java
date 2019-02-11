@@ -9,6 +9,7 @@ import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomType;
+import org.openscience.cdk.interfaces.IMolecularFormula;
 import org.openscience.cdk.tools.CDKHydrogenAdder;
 import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 
@@ -18,9 +19,45 @@ public class NmreData {
 	private IAtomContainer molecule;
 	private List<Spectrum> spectra;
 	private NmredataVersion version;
-	private int level;
+	private int level=-1;
 	private String solvent;
+	private String ID;
+	private double ph;
+	private String smiles;
+	private IMolecularFormula molecularFormula;
+	private double concentration;
+	private double temperature;
 
+	public double getTemperature() {
+		return temperature;
+	}
+	public void setTemperature(double temperature) {
+		this.temperature = temperature;
+	}
+	public double getConcentration() {
+		return concentration;
+	}
+	public void setConcentration(double concentration) {
+		this.concentration = concentration;
+	}
+	public IMolecularFormula getMolecularFormula() {
+		return molecularFormula;
+	}
+	public void setMolecularFormula(IMolecularFormula molecularFormula) {
+		this.molecularFormula = molecularFormula;
+	}
+	public String getSmiles() {
+		return smiles;
+	}
+	public void setSmiles(String smiles) {
+		this.smiles = smiles;
+	}
+	public double getPh() {
+		return ph;
+	}
+	public void setPh(double ph) {
+		this.ph = ph;
+	}
 	public String getSolvent() {
 		return solvent;
 	}
@@ -66,5 +103,11 @@ public class NmreData {
 
 	public void setLevel(int level) {
 		this.level = level;
-	}	
+	}
+	public void setID(String property) {
+		this.ID=property;
+	}
+	public String getID(){
+		return ID;
+	}
 }

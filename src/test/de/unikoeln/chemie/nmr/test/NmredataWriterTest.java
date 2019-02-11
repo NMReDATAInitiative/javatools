@@ -97,6 +97,9 @@ public class NmredataWriterTest extends TestCase{
         data.addSpectrum(spectrum);
         data.addSpectrum(cosy);
         data.setMolecule(makeBenzene());
+        data.setID("Title=Title=NMReDATA test file");
+        data.setLevel(0);
+        data.setVersion(NmredataVersion.ONE);
         File testfile=new File(System.getProperty("java.io.tmpdir")+"/test.nmredata.sd");
         if(testfile.exists())
         	testfile.delete();

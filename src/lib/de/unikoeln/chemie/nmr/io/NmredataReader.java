@@ -31,8 +31,14 @@ import org.jcamp.units.CommonUnit;
 import org.jcamp.units.Unit;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.formula.MolecularFormulaChecker;
+import org.openscience.cdk.formula.rules.ElementRule;
+import org.openscience.cdk.formula.rules.IRule;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IMolecularFormula;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
+import org.openscience.cdk.smiles.SmilesParser;
+import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
 
 import de.unikoeln.chemie.nmr.data.NMR2DSpectrum;
 import de.unikoeln.chemie.nmr.data.NmreData;
@@ -72,7 +78,7 @@ public class NmredataReader {
 					if(!((String)key).substring(11).matches("_[0-9a-zA-Z]*(#[0-9]*)?"))
 						throw new NmreDataException((String)key+" is not in the required format for 1D spectra, it should be like NMREDATA_1D_nucleus, with nucleus being 13C, 1H etc.");
 					spectra1d.put(((String)key).substring(9),property);
-				}else if(((String)key).equals("NMR_ASSIGNMENT")){
+				}else if(((String)key).equals("NMREDATA_ASSIGNMENT")){
 					signalblock=property;
 				}else if(((String)key).startsWith("NMREDATA_2D")){
 					if(!((String)key).substring(11).matches("_[0-9a-zA-Z]*_[0-9a-zA-Z]*_[0-9a-zA-Z]*(#[0-9]*)?"))
@@ -88,13 +94,48 @@ public class NmredataReader {
 					data.setLevel(Integer.parseInt(property));
 					if(data.getLevel()<0 || data.getLevel()>3)
 						throw new NmreDataException("Level must be 0, 1, 2, or 3");
+				}else if(((String)key).startsWith("NMREDATA_ID")){
+					StringTokenizer st=new StringTokenizer(property,lineseparator);
+					while(st.hasMoreTokens())
+						if(st.nextToken().indexOf('=')<0)
+							throw new NmreDataException("Every line in NMREDATA_ID must be of the format key=value");
+					data.setID(property);
+				}else if(((String)key).startsWith("NMREDATA_FORMULA")){
+					IMolecularFormula mf=MolecularFormulaManipulator.getMolecularFormula(property,DefaultChemObjectBuilder.getInstance());
+					List<IRule> rules=new ArrayList<IRule>();
+					rules.add(new ElementRule());
+					MolecularFormulaChecker checker = new MolecularFormulaChecker(rules);
+					mf=checker.isValid(mf);
+					if(checker.isValidSum(mf)<0.5)
+						throw new NmreDataException(property+" is not a valid formula");
+					data.setMolecularFormula(mf);
+				}else if(((String)key).startsWith("NMREDATA_SMILES")){
+					SmilesParser sp = new SmilesParser(DefaultChemObjectBuilder.getInstance());
+					sp.parseSmiles(property);
+					data.setSmiles(property);
+				}else if(((String)key).startsWith("NMREDATA_ALATIS")){
+					//any checks possible?
+				}else if(((String)key).startsWith("NMREDATA_SOLVENT")){
+					//any checks possible?
+				}else if(((String)key).startsWith("NMREDATA_PH")){
+					data.setPh(Double.parseDouble(property));
+				}else if(((String)key).startsWith("NMREDATA_CONCENTRATION")){
+					if(!property.endsWith("mM"))
+						throw new NmreDataException("Concentration must be in mM");
+					data.setConcentration(Double.parseDouble(property.substring(0, property.length()-2).trim()));
+				}else if(((String)key).startsWith("NMREDATA_TEMPERATURE")){
+					if(!property.endsWith("K"))
+						throw new NmreDataException("Temperature must be in K");
+					data.setTemperature(Double.parseDouble(property.substring(0, property.length()-1).trim()));
 				}
 			}
 		}
+		if(data.getVersion()==null || data.getLevel()==-1 || data.getID()==null)
+			throw new NmreDataException("version, level, and ID are compulsory!");
 		if(signalblock!=null)
 			analyzeSignals(data, signalblock);
 		else
-			throw new NmreDataException("There is no NMR_ASSIGNMENT block in this file - required");
+			throw new NmreDataException("There is no NMREDATA_ASSIGNMENT block in this file - required");
 		analyzeSpectra(data);
 		return data;
 	}
