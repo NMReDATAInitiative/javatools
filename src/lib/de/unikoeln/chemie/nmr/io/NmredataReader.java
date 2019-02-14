@@ -69,6 +69,7 @@ public class NmredataReader {
 		data.setMolecule(ac);
 		mdlreader.close();
 		String signalblock=null;
+		String couplingblock=null;
 		for(Object key : ac.getProperties().keySet()){
 			if(ac.getProperties().get(key)!=null && ac.getProperties().get(key) instanceof String){
 				String property=((String)ac.getProperties().get(key)).trim();
@@ -127,6 +128,8 @@ public class NmredataReader {
 					if(!property.endsWith("K"))
 						throw new NmreDataException("Temperature must be in K");
 					data.setTemperature(Double.parseDouble(property.substring(0, property.length()-1).trim()));
+				}else if(((String)key).startsWith("NMREDATA_J")){
+					couplingblock=property;
 				}
 			}
 		}
@@ -136,19 +139,50 @@ public class NmredataReader {
 			analyzeSignals(data, signalblock);
 		else
 			throw new NmreDataException("There is no NMREDATA_ASSIGNMENT block in this file - required");
+		if(couplingblock!=null)
+			analyzeCouplings(data, couplingblock);
 		analyzeSpectra(data);
 		return data;
 	}
 	
 
+	private void analyzeCouplings(NmreData data, String couplingblock) throws NmreDataException {
+		StringTokenizer st=new StringTokenizer(couplingblock,lineseparator);
+		while(st.hasMoreTokens()){
+			String line = st.nextToken().trim();
+			if(line.indexOf(";")>-1)
+				line=line.substring(0, line.indexOf(";"));
+			StringTokenizer st2=new StringTokenizer(line,",");
+			String label1=st2.nextToken();
+			if(!signals.containsKey(label1))
+				throw new NmreDataException("Label "+label1+" in NMREDATA_J (line "+line+") is not in NMREDATA_ASSIGNMENT!");
+			String label2=st2.nextToken();
+			if(!signals.containsKey(label2))
+				throw new NmreDataException("Label "+label2+" in NMREDATA_J (line "+line+") is not in NMREDATA_ASSIGNMENT!");
+			Double.parseDouble(st2.nextToken());
+			if(st2.hasMoreTokens()) {
+				String coupling=st.nextToken();
+				if(!coupling.startsWith("nb="))
+					throw new NmreDataException("the third part in "+line+" does not start with nb= - if there is a third part in a coupling line, it must be nb=number");
+				Integer.parseInt(coupling.substring(3));
+			}
+			if(st2.hasMoreTokens())
+				throw new NmreDataException("line "+line+" has more than three ,-separated parts - only three are possible!");
+		}
+	}
+
 	private void analyzeSignals(NmreData data, String signalblock) throws NmreDataException {
 		StringTokenizer st=new StringTokenizer(signalblock,lineseparator);
 		while(st.hasMoreTokens()){
 			String line = st.nextToken().trim();
+			if(line.indexOf(";")>-1)
+				line=line.substring(0, line.indexOf(";"));
 			if(line.startsWith("Interchangeable=")){
 				if(data.getLevel()%2==0){
 					throw new NmreDataException("Interchangeable= only allowed in levels 1 and 3, the file is level "+data.getLevel());
 				}
+			}else if(line.startsWith("Equivalent")) {
+				//we only check this for existance for now
 			}else{
 				StringTokenizer st2 = new StringTokenizer(line,",");
 				String label=st2.nextToken();
@@ -286,8 +320,13 @@ public class NmredataReader {
 					if(token.indexOf("=")==-1){
 						//TODO use information - for now we use the assignment block via L
 					}else if(token.startsWith("L")){
-						peak=signals.get(token.substring(2).trim());
-						labels.add(token.substring(2).trim());
+						if(token.substring(2).matches("^\\(.*\\)$")){
+							if(!token.substring(2).matches("^\\([0-9]*(\\|[0-9]*)\\)$"))
+								throw new NmreDataException("It seems there is an ambiguous assignment intend in line "+token+", but it is not correct!");
+						}else {
+							peak=signals.get(token.substring(2).trim());
+							labels.add(token.substring(2).trim());
+						}
 					}else if(token.startsWith("S")){
 						multiplicity=token.substring(2).trim();
 					}
