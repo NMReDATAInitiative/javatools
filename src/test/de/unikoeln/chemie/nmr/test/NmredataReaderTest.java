@@ -23,7 +23,7 @@ public class NmredataReaderTest  extends TestCase{
         NmreData data = reader.read();
         Assert.assertEquals(32, data.getMolecule().getAtomCount());
         Assert.assertEquals(36, data.getMolecule().getBondCount());
-        Assert.assertEquals(1, data.getSpectra().size());
+        Assert.assertEquals(2, data.getSpectra().size());
         Assert.assertEquals(1.3, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable()[0].getPosition()[0]);
         Assert.assertEquals(17, ((AtomReference)((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[0].getTargets()[0]).getAtomNumber());
         Assert.assertEquals(6, ((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[0].getTargets().length);

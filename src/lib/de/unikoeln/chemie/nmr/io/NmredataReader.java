@@ -84,7 +84,7 @@ public class NmredataReader {
 				if(property.endsWith("\\"))
 					property=property.substring(0, property.length()-1).trim();
 				if(((String)key).startsWith("NMREDATA_1D")){
-					if(!((String)key).substring(11).matches("_[0-9a-zA-Z]*(#[0-9]*)?"))
+					if(!((String)key).substring(11).matches("_[0-9a-zA-Z]*(_[0-9a-zA-Z]*_[0-9a-zA-Z]*)?(#[0-9]*)?"))
 						throw new NmreDataException((String)key+" is not in the required format for 1D spectra, it should be like NMREDATA_1D_nucleus, with nucleus being 13C, 1H etc.");
 					spectra1d.put(((String)key).substring(9),property);
 				}else if(((String)key).equals("NMREDATA_ASSIGNMENT")){
@@ -176,6 +176,7 @@ public class NmredataReader {
 			}
 			if(st2.hasMoreTokens())
 				throw new NmreDataException("line "+line+" has more than three ,-separated parts - only three are possible!");
+			//TODO do something
 		}
 	}
 
@@ -256,8 +257,14 @@ public class NmredataReader {
 				line=line.substring(0, line.indexOf(";"));
 			if(line.startsWith("Larmor=")){
 				freq=new double[]{Double.parseDouble(line.substring(7)),Double.parseDouble(line.substring(7))};
+			}else if(line.startsWith("MD5")){
+				//TODO do something
 			}else if(line.startsWith("Spectrum_Location=")){
 				location=line.substring(line.indexOf("=")+1);
+			}else if(line.startsWith("Pulseprogram=")){
+				//TODO do something
+			}else if(line.startsWith("Nondecoupled=")){
+				//TODO do something
 			}else if(line.startsWith("CorType=")){
 				type=line.substring(line.indexOf("=")+1);
 			}else if(line.matches(".*/.*") && (!line.contains("=") || line.indexOf("=")>line.indexOf("/"))){
@@ -276,6 +283,30 @@ public class NmredataReader {
 				xdata[i]=signals.get(st2.nextToken()).getPosition()[0];
 				ydata[i]=signals.get(st2.nextToken()).getPosition()[0];
 				peakTable[i]=new Peak2D(xdata[i],ydata[i],0);
+				while(st2.hasMoreTokens()) {
+					String part=st2.nextToken().trim();
+					if(part.indexOf("=")<0)
+						throw new NmreDataException("The line "+ line +" is having an element not like 'x=y', only these are allowed behind the a/b start!");
+					if(part.substring(0, part.indexOf("=")).equals("I")){
+						//TODO do something
+					}else if(part.substring(0, part.indexOf("=")).equals("W1")){
+						//TODO do something						
+					}else if(part.substring(0, part.indexOf("=")).equals("W2")){
+						//TODO do something						
+					}else if(part.substring(0, part.indexOf("=")).equals("E")){
+						//TODO do something						
+					}else if(part.substring(0, part.indexOf("=")).equals("Ja")){
+						//TODO do something
+					}else if(part.substring(0, part.indexOf("=")).equals("J1")){
+						st2.nextToken();
+						//TODO do something
+					}else if(part.substring(0, part.indexOf("=")).equals("J2")){
+						st2.nextToken();
+						//TODO do something
+					}else {
+						throw new NmreDataException("The line "+line+" has an entry for "+part.substring(0, part.indexOf("="))+", only I, E, W1, W2, J1, J2, and Ja are allowed!");
+					}
+				}
 				i++;
 			}
 		}
@@ -309,6 +340,8 @@ public class NmredataReader {
 		List<String> labels=new ArrayList<>();
 		double freq=Double.NaN;
 		String location=null;
+		String sequence=null;
+		double intensity=Double.NaN;
 		while(st.hasMoreTokens()){
 			String line = st.nextToken().trim();
 			if(line.indexOf(";")>-1)
@@ -317,6 +350,16 @@ public class NmredataReader {
 				freq=Double.parseDouble(line.substring(7));
 			}else if(line.startsWith("Spectrum_Location=")){
 				location=line.substring(line.indexOf("=")+1);
+			}else if(line.startsWith("CorType=")){
+				//TODO do something
+			}else if(line.startsWith("Decoupled=")){
+				//TODO do something
+			}else if(line.startsWith("Pulseprogram=")){
+				//TODO do something
+			}else if(line.startsWith("MD5")){
+				//TODO do something
+			}else if(line.startsWith("Sequence=")){
+				sequence=line.substring(line.indexOf("=")+1);
 			}else if(line.matches("^[0-9]*\\.[0-9]*")){
 				peaks.add(new Peak1D(Double.parseDouble(line),0));
 			}else if(line.matches("^[0-9]*\\.[0-9].*")){
@@ -331,15 +374,37 @@ public class NmredataReader {
 						if(token.substring(2).matches("^\\(.*\\)$")){
 							if(!token.substring(2).matches("^\\([0-9]*(\\|[0-9]*)\\)$"))
 								throw new NmreDataException("It seems there is an ambiguous assignment intend in line "+token+", but it is not correct!");
+							//TODO do something
 						}else {
 							peak=signals.get(token.substring(2).trim());
 							labels.add(token.substring(2).trim());
 						}
+					}else if(token.startsWith("J")){
+						if(!token.substring(2).matches("^[0-9\\.]*(, [0-9\\.]*)*$"))
+							throw new NmreDataException("For L= we need a comma-separated list of floats, seems not to be the case in "+token);
+						//TODO do something
+					}else if(token.startsWith("N")){
+						//TODO do something
+					}else if(token.startsWith("E")){
+						//TODO do something
+					}else if(token.startsWith("I")){
+						intensity=Double.parseDouble(token.substring(2).trim());
+					}else if(token.startsWith("W")){
+						//TODO do something
+					}else if(token.startsWith("T1")){
+						//TODO do something
+					}else if(token.startsWith("T2")){
+						//TODO do something
+					}else if(token.startsWith("Diff")){
+						//TODO do something
 					}else if(token.startsWith("S")){
 						multiplicity=token.substring(2).trim();
+					}else {
+						throw new NmreDataException("Line "+line+" contains an entry "+token+", only S, J, N, L, E, I, W, T1, and T2 are allowed");
 					}
 				}
 				//TODO multiplicity
+				//TODO intensity
 				peaks.add(new Peak1D(peak.getPosition()[0],0));
 			}
 		}
@@ -370,6 +435,8 @@ public class NmredataReader {
         }
         spectrum = new NMRSpectrum(x, y, nucleus, freq, reference, false, JCAMPReader.RELAXED);
         spectrum.setPeakTable(peaks1d);
+        if(sequence!=null)
+        	spectrum.setNote("sequence", sequence);
         NoteDescriptor noteDescriptor=new NoteDescriptor("Spectrum_Location");
         spectrum.setNote(noteDescriptor, location);
         if(labels.size()==peaks.size())
