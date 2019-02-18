@@ -5,8 +5,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Map;
 
+import org.jcamp.spectrum.IAssignmentTarget;
 import org.jcamp.spectrum.NMRSpectrum;
+import org.jcamp.spectrum.Peak;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IMolecularFormula;
 import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
@@ -35,6 +38,8 @@ import javafx.stage.Stage;
 public class NMReDATAeditor extends Application {
 	Label label;
 	NmreData data;
+	Map<String,Peak> signals;
+	Map<String,IAssignmentTarget[]> assignments;
 	
     public static void main(String[] args) {
         launch(args);
@@ -81,6 +86,7 @@ public class NMReDATAeditor extends Application {
         			try{
         				saveas(file, chooser.getSelectedExtensionFilter());
         			}catch(Exception ex){
+        				System.out.println(ex.getMessage());
             			Alert alert = new Alert(AlertType.ERROR);
             			alert.setTitle("Error writing file");
             			alert.setHeaderText("Error writing file");
@@ -109,7 +115,7 @@ public class NMReDATAeditor extends Application {
 				file=new File(file.getPath()+".lsd");
 	        FileOutputStream pw = new FileOutputStream(file);
 	        LSDWriter lsdwrtier=new LSDWriter(pw);
-	        lsdwrtier.write(data);
+	        lsdwrtier.write(data, signals, assignments);
 	        lsdwrtier.close();
 		}else if(selectedExtensionFilter.getDescription().equals("NMReDATA 1.0 file (*.nmredata.sdf)")){
 			if(!file.getName().endsWith(".nmredata.sdf"))
@@ -132,6 +138,8 @@ public class NMReDATAeditor extends Application {
 		try{
 			NmredataReader reader = new NmredataReader(new FileInputStream(file));
 			data = reader.read();
+			this.signals=reader.getSignals();
+			this.assignments=reader.getAssignments();
 			StringBuffer text=new StringBuffer();
 			IMolecularFormula mfa = MolecularFormulaManipulator.getMolecularFormula(data.getMolecule());
 	        text.append("The molecule in your file has formula "+MolecularFormulaManipulator.getString(mfa)+"\n");
@@ -148,7 +156,9 @@ public class NMReDATAeditor extends Application {
 			alert.showAndWait();
 		}
 		catch(Exception ex){
+			System.out.println(ex.getMessage());
 			Alert alert = new Alert(AlertType.ERROR);
+			alert.getDialogPane().setMinWidth(300);
 			alert.setTitle("Error reading file");
 			alert.setHeaderText("Failure");
 			alert.setContentText("File could not be read. Reason: "+ex.getMessage());

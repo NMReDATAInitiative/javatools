@@ -62,6 +62,14 @@ public class NmredataReader {
 		this(new InputStreamReader(in));
 	}
 	
+	public Map<String,Peak> getSignals(){
+		return signals;
+	}
+	
+	public Map<String,IAssignmentTarget[]> getAssignments(){
+		return assignments;
+	}
+	
 	public NmreData read() throws IOException, NmreDataException, JCAMPException, CDKException {
 		NmreData data=new NmreData();
 		IteratingSDFReader mdlreader=new IteratingSDFReader(input, DefaultChemObjectBuilder.getInstance());
@@ -133,8 +141,8 @@ public class NmredataReader {
 				}
 			}
 		}
-		if(data.getVersion()==null || data.getLevel()==-1 || data.getID()==null)
-			throw new NmreDataException("version, level, and ID are compulsory!");
+		if(data.getVersion()==null || data.getLevel()==-1)
+			throw new NmreDataException("version and level are compulsory!");
 		if(signalblock!=null)
 			analyzeSignals(data, signalblock);
 		else
@@ -153,10 +161,10 @@ public class NmredataReader {
 			if(line.indexOf(";")>-1)
 				line=line.substring(0, line.indexOf(";"));
 			StringTokenizer st2=new StringTokenizer(line,",");
-			String label1=st2.nextToken();
+			String label1=st2.nextToken().trim();
 			if(!signals.containsKey(label1))
 				throw new NmreDataException("Label "+label1+" in NMREDATA_J (line "+line+") is not in NMREDATA_ASSIGNMENT!");
-			String label2=st2.nextToken();
+			String label2=st2.nextToken().trim();
 			if(!signals.containsKey(label2))
 				throw new NmreDataException("Label "+label2+" in NMREDATA_J (line "+line+") is not in NMREDATA_ASSIGNMENT!");
 			Double.parseDouble(st2.nextToken());
@@ -195,12 +203,12 @@ public class NmredataReader {
 						int atomid=Integer.parseInt(atom.trim().substring(1))-1;
 						if(atomid>=data.getMolecule().getAtomCount())
 							throw new NmreDataException("Atom "+atomid+" specified in MREDATA_ASSIGNMENT block, but only "+data.getMolecule().getAtomCount()+" atoms are in Molecule");
-	                    for(int k=0;k<data.getMolecule().getConnectedAtomsCount(data.getMolecule().getAtom(atomid));k++){
+	                    /*for(int k=0;k<data.getMolecule().getConnectedAtomsCount(data.getMolecule().getAtom(atomid));k++){
 	                        if(data.getMolecule().getConnectedAtomsList(data.getMolecule().getAtom(atomid)).get(k).getSymbol().equals("H")){
 	                        	atomid=data.getMolecule().getAtomNumber(data.getMolecule().getConnectedAtomsList(data.getMolecule().getAtom(atomid)).get(k));
 	                        	break;
 	                        }
-	                    }
+	                    }*/
 						atoms.add(new AtomReference(null, atomid));
 					}else{
 						int atomid=Integer.parseInt(atom.trim())-1;

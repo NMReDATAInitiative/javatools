@@ -14,6 +14,7 @@ import java.util.Map;
 import org.jcamp.spectrum.Assignment;
 import org.jcamp.spectrum.IAssignmentTarget;
 import org.jcamp.spectrum.NMRSpectrum;
+import org.jcamp.spectrum.Peak;
 import org.jcamp.spectrum.Spectrum;
 import org.jcamp.spectrum.Spectrum1D;
 import org.jcamp.spectrum.Spectrum2D;
@@ -43,7 +44,7 @@ public class LSDWriter {
 		this.pw=pw;
 	}
 	
-	public void write(NmreData data) throws IOException{
+	public void write(NmreData data, Map<String, Peak> signals, Map<String,IAssignmentTarget[]> assignments) throws IOException{
 		if(os!=null)
 			sdfwriter=new BufferedWriter(new OutputStreamWriter(os));
 		else
@@ -65,11 +66,16 @@ public class LSDWriter {
 		}
 		sdfwriter.write("\r\n");
 		Map<Double,Integer> peaklabelmap = new HashMap<Double, Integer>();
+		for(String key : signals.keySet()){
+			for(IAssignmentTarget assignment : assignments.get(key)){
+				peaklabelmap.put(signals.get(key).getPosition()[0], ((AtomReference)assignment).getAtomNumber());
+			}
+		}
 		for(Spectrum spectrum : data.getSpectra()) {
-			if(spectrum instanceof Spectrum1D) {
+			if(spectrum instanceof Spectrum1D && ((Spectrum1D) spectrum).getAssignments()!=null) {
 				for(Assignment assignment : ((Spectrum1D) spectrum).getAssignments()) {
 					for(IAssignmentTarget atom : assignment.getTargets()) {
-						peaklabelmap.put(assignment.getPattern().getPosition()[0], ((AtomReference)atom).getAtomNumber()+1);
+						//peaklabelmap.put(assignment.getPattern().getPosition()[0], ((AtomReference)atom).getAtomNumber()+1);
 						if(((NMRSpectrum)spectrum).getNucleus().equals("1H"))
 							sdfwriter.write("SHIH "+(((AtomReference)atom).getAtomNumber()+1)+" "+assignment.getPattern().getPosition()[0]+"\r\n");
 						else
@@ -85,7 +91,7 @@ public class LSDWriter {
 			if(spectrum instanceof Spectrum2D && (((Note)spectrum.getNotes(noteDescriptor).get(0)).getValue().equals("HSQC") || ((Note)spectrum.getNotes(noteDescriptor).get(0)).getValue().equals("COSY") || ((Note)spectrum.getNotes(noteDescriptor).get(0)).getValue().equals("HMBC"))) {
 				for(int i=0;i<((NMR2DSpectrum)spectrum).getPeakTable().length;i++){
 					if(!entries.contains(peaklabelmap.get(((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[0])+" "+peaklabelmap.get(((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[1])))
-					sdfwriter.write(((Note)spectrum.getNotes(noteDescriptor).get(0)).getValue()+" "+peaklabelmap.get(((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[0])+" "+peaklabelmap.get(((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[1])+"\r\n");
+					sdfwriter.write(((Note)spectrum.getNotes(noteDescriptor).get(0)).getValue()+" "+(peaklabelmap.get(((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[0])+1)+" "+(peaklabelmap.get(((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[1])+1)+"\r\n");
 					entries.add(peaklabelmap.get(((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[0])+" "+peaklabelmap.get(((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[1]));
 				}
 				sdfwriter.write("\r\n");

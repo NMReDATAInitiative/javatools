@@ -28,7 +28,7 @@ public class LSDTest extends TestCase{
         File testfile=new File(System.getProperty("java.io.tmpdir")+"/cmcse.lsd");
         FileOutputStream pw = new FileOutputStream(testfile);
         LSDWriter lsdwrtier=new LSDWriter(pw);
-        lsdwrtier.write(data);
+        lsdwrtier.write(data, reader.getSignals(), reader.getAssignments());
         lsdwrtier.close();
         Assert.assertTrue(testfile.exists());
 	}
@@ -41,7 +41,7 @@ public class LSDTest extends TestCase{
         File testfile=new File(System.getProperty("java.io.tmpdir")+"/MRC_Cyprinol_2018.lsd");
         FileOutputStream pw = new FileOutputStream(testfile);
         LSDWriter lsdwrtier=new LSDWriter(pw);
-        lsdwrtier.write(data);
+        lsdwrtier.write(data, reader.getSignals(), reader.getAssignments());
         lsdwrtier.close();
         Assert.assertTrue(testfile.exists());
 	}

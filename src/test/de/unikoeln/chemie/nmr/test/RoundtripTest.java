@@ -29,7 +29,7 @@ public class RoundtripTest  extends TestCase{
         FileOutputStream fos=new FileOutputStream(testfile2);
         NmredataWriter writer=new NmredataWriter(fos);
         writer.write(data, NmredataVersion.ONEPOINTONE);
-        fos.close();
+        writer.close();
         assertTrue(FileUtils.contentEquals(testfile, testfile2));
 	}
 
