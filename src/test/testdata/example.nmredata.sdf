@@ -115,6 +115,17 @@ Spectrum_Location=http://nmrshiftdb.nmr.uni-koeln.de/molecule/30001243
 7.3, S=dd, L=f
 7.2, S=dd, L=g
 
+>  <NMREDATA_1D_1H_D_1H>
+Larmor=400
+Spectrum_Location=http://nmrshiftdb.nmr.uni-koeln.de/molecule/30001243
+7.81, S=dd, L=a
+7.48, S=dd, L=b
+7.77, S=dd, L=c
+1.3, S=s, L=d
+7.6, S=dd, L=e
+7.3, S=dd, L=f
+7.2, S=dd, L=g
+
 >  <ORIGIN>
 Source=Literature
 Reference=no doi exists
