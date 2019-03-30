@@ -27,10 +27,6 @@ public class NMR2DSpectrum extends Spectrum2D {
     double[] reference = new double[] { 0.0, 0.0 };
     boolean fullSpectrum = true;
     /**
-     * array of assignments (peak (range) to atom number) 
-     */
-    protected Assignment[] assignments = null;
-    /**
      * peak table (array of peaks) 
      */
     protected Peak2D[] peakTable = null;
@@ -124,7 +120,7 @@ public class NMR2DSpectrum extends Spectrum2D {
     public int getIdentifier() {
         return ISpectrumIdentifier.NMR2D;
     }
-
+    
     /**
      * Insert the method's description here.
      * Creation date: (01/18/00 17:22:51)
@@ -230,20 +226,6 @@ public class NMR2DSpectrum extends Spectrum2D {
             if (peakTable != null)
                 for (int i = 0; i < peakTable.length; i++)
                     peakTable[i].setSpectrum(this);
-        }
-    }
-    /**
-     * sets assignment array.
-     * @param newAssignments Assignment[]
-     */
-    public void setAssignments(Assignment[] newAssignments) {
-        if (assignments != newAssignments) {
-            assignments = newAssignments;
-            if (assignments != null) {
-                for (int i = 0; i < assignments.length; i++)
-                    assignments[i].setSpectrum(this);
-                Arrays.sort(newAssignments);
-            }
         }
     }
 }

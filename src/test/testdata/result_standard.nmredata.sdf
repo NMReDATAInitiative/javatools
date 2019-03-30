@@ -1,5 +1,5 @@
 
-  CDK     0324181903
+  CDK     0330192302
 
   6  6  0  0  0  0  0  0  0  0999 V2000
     0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
@@ -22,21 +22,35 @@ M  END
 1\
 
 > <NMREDATA_ID>
-Title=NMReDATA test file\
+Title=Title=NMReDATA test file\
 
 > <NMREDATA_ASSIGNMENT>
-s0, 5.0, 1, 2, 3, 4\
-s1, 10.0, 1, 2, 3, 4\
-s2, 15.0, 1, 2, 3, 4\
-Interchangeable=s0, s1\
+s0, 5.0, 1\
+s1, 10.0, 2\
+s2, 15.0, 3, 4\
 
 
 > <NMREDATA_1D_C>
+Spectrum_Location=null\
 Larmor=400.0\
-Spectrum_Location=none\
-5.0, L=s0, \
-10.0, L=s1, \
-15.0, L=s2, \
+5.0, L=s0\
+10.0, L=s1\
+15.0, L=s2\
 
+
+> <NMREDATA_2D_1H_NJ_1H>
+Spectrum_Location=null\
+Larmor=400.0\
+CorType=cosy\
+s0/s2\
+s1/s0\
+s2/s1\
+
+
+> <NMREDATA_SMILES>
+C=1C=CC=CC1
+
+> <NMREDATA_INCHI>
+InChI=1S/C6H6/c1-2-4-6-5-3-1/h1-6H
 
 $$$$

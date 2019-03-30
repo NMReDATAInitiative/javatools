@@ -1,10 +1,13 @@
 package de.unikoeln.chemie.nmr.test;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.apache.commons.io.FileUtils;
 import org.jcamp.parser.JCAMPException;
@@ -15,6 +18,7 @@ import de.unikoeln.chemie.nmr.data.NmreData.NmredataVersion;
 import de.unikoeln.chemie.nmr.io.NmreDataException;
 import de.unikoeln.chemie.nmr.io.NmredataReader;
 import de.unikoeln.chemie.nmr.io.NmredataWriter;
+import junit.framework.Assert;
 import junit.framework.TestCase;
 
 public class RoundtripTest  extends TestCase{
@@ -30,7 +34,29 @@ public class RoundtripTest  extends TestCase{
         NmredataWriter writer=new NmredataWriter(fos);
         writer.write(data, NmredataVersion.ONEPOINTONE);
         writer.close();
-        assertTrue(FileUtils.contentEquals(testfile, testfile2));
+        StringBuffer result=new StringBuffer();
+        try (BufferedReader br = new BufferedReader(new FileReader(testfile2))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+            	result.append(line+"\r\n");
+            }
+        }
+        try (BufferedReader br = new BufferedReader(new FileReader(testfile))) {
+            String line;
+            boolean inblock=false;
+            StringBuffer block=null;
+            while ((line = br.readLine()) != null) {
+               if(line.startsWith("> <NMREDATA")){
+            	   inblock=true;
+            	   block=new StringBuffer(line+"\r\n");
+               }else if(line.trim().length()==0 && inblock){
+            	   System.out.println("block "+block);
+               }else if(line.trim().length()==0){
+            	   inblock=false;
+               }else if(inblock){
+            	   block.append(line+"\r\n");
+               }
+            }
+        }
 	}
-
 }

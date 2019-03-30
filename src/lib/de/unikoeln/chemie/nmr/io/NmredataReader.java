@@ -26,6 +26,7 @@ import org.jcamp.spectrum.Pattern;
 import org.jcamp.spectrum.Peak;
 import org.jcamp.spectrum.Peak1D;
 import org.jcamp.spectrum.assignments.AtomReference;
+import org.jcamp.spectrum.assignments.TwoAtomsReference;
 import org.jcamp.spectrum.notes.NoteDescriptor;
 import org.jcamp.units.CommonUnit;
 import org.jcamp.units.Unit;
@@ -60,14 +61,6 @@ public class NmredataReader {
 	
 	public NmredataReader(InputStream in){
 		this(new InputStreamReader(in));
-	}
-	
-	public Map<String,Peak> getSignals(){
-		return signals;
-	}
-	
-	public Map<String,IAssignmentTarget[]> getAssignments(){
-		return assignments;
 	}
 	
 	public NmreData read() throws IOException, NmreDataException, JCAMPException, CDKException {
@@ -267,14 +260,20 @@ public class NmredataReader {
 		double[] xdata=new double[peakcount];
 		double[] ydata=new double[peakcount];
 		Peak2D[] peakTable=new Peak2D[peakcount];
+		//List<String> labels1=new ArrayList<>();
+		//List<String> labels2=new ArrayList<>();
 		st=new StringTokenizer(spectrumblock,lineseparator);
 		int i=0;
 		while(st.hasMoreTokens()){
 			String line = st.nextToken().trim();
 			if(line.matches(".*/.*") && (!line.contains("=") || line.indexOf("=")>line.indexOf("/"))){
 				StringTokenizer st2=new StringTokenizer(line,"/,");
-				xdata[i]=signals.get(st2.nextToken()).getPosition()[0];
-				ydata[i]=signals.get(st2.nextToken()).getPosition()[0];
+				String label1=st2.nextToken();
+				xdata[i]=signals.get(label1).getPosition()[0];
+				//labels1.add(label1);
+				String label2=st2.nextToken();
+				ydata[i]=signals.get(label2).getPosition()[0];
+				//labels2.add(label2);
 				peakTable[i]=new Peak2D(xdata[i],ydata[i],0);
 				i++;
 			}
@@ -299,7 +298,14 @@ public class NmredataReader {
             noteDescriptor=new NoteDescriptor("CorType");
             spectrum.setNote(noteDescriptor, type);        	
         }
-        //spectrum.setAssignments((Assignment[]) tables[2]);
+		/*We do not use these, assignments are via the 1d peaks
+		Assignment[] assignmentslocal=new Assignment[labels1.size()];
+        for(i=0; i<labels1.size();i++){
+        	AtomReference t1=(AtomReference)assignments.get(labels1.get(i))[0];
+        	AtomReference t2=(AtomReference)assignments.get(labels2.get(i))[0];
+       		assignmentslocal[i]=new Assignment(new Pattern(peakTable[i].getPosition()[0], Multiplicity.UNKNOWN), new IAssignmentTarget[]{new TwoAtomsReference(null, t1.getAtomNumber(), t2.getAtomNumber())});
+        }
+        spectrum.setAssignments(assignmentslocal);*/
         data.addSpectrum(spectrum);
 	}
 

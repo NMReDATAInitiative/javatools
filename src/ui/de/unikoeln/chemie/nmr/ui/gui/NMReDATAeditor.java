@@ -38,8 +38,6 @@ import javafx.stage.Stage;
 public class NMReDATAeditor extends Application {
 	Label label;
 	NmreData data;
-	Map<String,Peak> signals;
-	Map<String,IAssignmentTarget[]> assignments;
 	
     public static void main(String[] args) {
         launch(args);
@@ -115,7 +113,7 @@ public class NMReDATAeditor extends Application {
 				file=new File(file.getPath()+".lsd");
 	        FileOutputStream pw = new FileOutputStream(file);
 	        LSDWriter lsdwrtier=new LSDWriter(pw);
-	        lsdwrtier.write(data, signals, assignments);
+	        lsdwrtier.write(data);
 	        lsdwrtier.close();
 		}else if(selectedExtensionFilter.getDescription().equals("NMReDATA 1.0 file (*.nmredata.sdf)")){
 			if(!file.getName().endsWith(".nmredata.sdf"))
@@ -138,8 +136,6 @@ public class NMReDATAeditor extends Application {
 		try{
 			NmredataReader reader = new NmredataReader(new FileInputStream(file));
 			data = reader.read();
-			this.signals=reader.getSignals();
-			this.assignments=reader.getAssignments();
 			StringBuffer text=new StringBuffer();
 			IMolecularFormula mfa = MolecularFormulaManipulator.getMolecularFormula(data.getMolecule());
 	        text.append("The molecule in your file has formula "+MolecularFormulaManipulator.getString(mfa)+"\n");

@@ -104,6 +104,8 @@ public class NmredataWriter {
 					types.put(((NMR2DSpectrum)spectrum).getXNucleus()+"_"+((NMR2DSpectrum)spectrum).getYNucleus(),0);
 				types.put(((NMR2DSpectrum)spectrum).getXNucleus()+"_"+((NMR2DSpectrum)spectrum).getYNucleus(), types.get(((NMR2DSpectrum)spectrum).getXNucleus()+"_"+((NMR2DSpectrum)spectrum).getYNucleus()).intValue()+1);
 				spectrumbuffer.append("Larmor="+((NMR2DSpectrum)spectrum).getYFrequency()+endofline+"\r\n");
+		        noteDescriptor=new NoteDescriptor("CorType");
+				spectrumbuffer.append("CorType="+((Note)spectrum.getNotes(noteDescriptor).get(0)).getValue()+endofline+"\r\n");
 				for(int i=0;i<((NMR2DSpectrum)spectrum).getPeakTable().length;i++){
 					spectrumbuffer.append(peaklabelmap.get(((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[0])+"/"+peaklabelmap.get(((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[1]));
 					if(((NMR2DSpectrum)spectrum).getPeakTable()[i].getHeight()>0)

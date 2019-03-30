@@ -1,10 +1,15 @@
 package de.unikoeln.chemie.nmr.test;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.jcamp.parser.JCAMPException;
 import org.jcamp.parser.JCAMPReader;
 import org.jcamp.spectrum.ArrayData;
@@ -35,6 +40,7 @@ import de.unikoeln.chemie.nmr.data.NmreData.NmredataVersion;
 import de.unikoeln.chemie.nmr.data.Peak2D;
 import de.unikoeln.chemie.nmr.io.NmredataReader;
 import de.unikoeln.chemie.nmr.io.NmredataWriter;
+import junit.framework.Assert;
 import junit.framework.TestCase;
 
 public class NmredataWriterTest extends TestCase{
@@ -44,6 +50,20 @@ public class NmredataWriterTest extends TestCase{
         File testfile=new File(System.getProperty("java.io.tmpdir")+"/test.nmredata.sd");
         assertTrue(testfile.exists());
         assertTrue(testfile.length()>10);
+		String filenamesample = "testdata/result_standard.nmredata.sdf";
+        InputStream inssample = this.getClass().getClassLoader().getResourceAsStream(filenamesample);
+        try (BufferedReader br = new BufferedReader(new FileReader(testfile)); BufferedReader brsample = new BufferedReader(new InputStreamReader(inssample, "UTF-8"))) {
+            String line;
+            String linesample;
+            //we ignore first two lines with date etc.
+            br.readLine();
+            br.readLine();
+            brsample.readLine();
+            brsample.readLine();
+            while ((line = br.readLine()) != null && (linesample = brsample.readLine()) != null) {
+               Assert.assertEquals(linesample, line);
+            }
+        }
 	}
 	
 	public static void writeStandardFile() throws JCAMPException, CloneNotSupportedException, CDKException, IOException{
@@ -93,6 +113,8 @@ public class NmredataWriterTest extends TestCase{
     	NMR2DSpectrum cosy = new NMR2DSpectrum(x2, y2, z2, new String[] {"1H","1H"}, new double[] { freq, freq}, new double[] {reference,reference});
     	cosy.setPeakTable(peaks2d);
 		cosy.setNote(noteDescriptor, location);
+        NoteDescriptor noteDescriptor2=new NoteDescriptor("CorType");
+        cosy.setNote(noteDescriptor2, "cosy");
         NmreData data=new NmreData();
         data.addSpectrum(spectrum);
         data.addSpectrum(cosy);
