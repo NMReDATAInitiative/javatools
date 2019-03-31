@@ -50,7 +50,7 @@ public class RoundtripTest  extends TestCase{
             	   inblock=true;
             	   block=new StringBuffer(line+"\r\n");
                }else if(line.trim().length()==0 && inblock){
-            	   System.out.println("block "+block);
+            	   Assert.assertTrue(result.toString().contains(block));
                }else if(line.trim().length()==0){
             	   inblock=false;
                }else if(inblock){
