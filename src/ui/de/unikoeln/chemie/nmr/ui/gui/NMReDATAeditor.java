@@ -1,42 +1,73 @@
 package de.unikoeln.chemie.nmr.ui.gui;
 
+import java.awt.Color;
+import java.awt.Rectangle;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Map;
+import java.io.OutputStreamWriter;
+import java.io.StringBufferInputStream;
+import java.io.StringReader;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
-import org.jcamp.spectrum.IAssignmentTarget;
+import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.transcoder.TranscoderInput;
 import org.jcamp.spectrum.NMRSpectrum;
-import org.jcamp.spectrum.Peak;
+import org.jcamp.spectrum.notes.Note;
+import org.jcamp.spectrum.notes.NoteDescriptor;
 import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IMolecularFormula;
+import org.openscience.cdk.renderer.AtomContainerRenderer;
+import org.openscience.cdk.renderer.RendererModel;
+import org.openscience.cdk.renderer.font.AWTFontManager;
+import org.openscience.cdk.renderer.generators.AtomNumberGenerator;
+import org.openscience.cdk.renderer.generators.BasicAtomGenerator;
+import org.openscience.cdk.renderer.generators.BasicBondGenerator;
+import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
+import org.openscience.cdk.renderer.generators.CouplingGenerator;
+import org.openscience.cdk.renderer.generators.IGenerator;
+import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
 import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
 
+import de.unikoeln.chemie.nmr.data.NMR2DSpectrum;
 import de.unikoeln.chemie.nmr.data.NmreData;
 import de.unikoeln.chemie.nmr.data.NmreData.NmredataVersion;
 import de.unikoeln.chemie.nmr.io.LSDWriter;
 import de.unikoeln.chemie.nmr.io.NmredataReader;
 import de.unikoeln.chemie.nmr.io.NmredataWriter;
 import javafx.application.Application;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 public class NMReDATAeditor extends Application {
-	Label label;
+	SplitPane splitPane;
+	ImageView imageView;
+	TabPane tabPane;
 	NmreData data;
 	
     public static void main(String[] args) {
@@ -95,14 +126,15 @@ public class NMReDATAeditor extends Application {
         		}
         	}
         });
-        VBox root=new VBox();
-        root.setAlignment(Pos.CENTER);
-        root.setSpacing(10);
         menuBar.getMenus().addAll(menuFile);
-        label=new Label();
-        label.setWrapText(true);
-        root.getChildren().addAll(label);
-        ((VBox)scene.getRoot()).getChildren().addAll(menuBar,root);
+        imageView=new ImageView();
+        splitPane = new SplitPane(); 
+        splitPane.getItems().add(new VBox(imageView));
+        tabPane=new TabPane();
+        splitPane.getItems().add(new VBox(tabPane));
+        splitPane.prefWidthProperty().bind(scene.widthProperty());
+        splitPane.prefHeightProperty().bind(scene.heightProperty());
+        ((VBox)scene.getRoot()).getChildren().addAll(menuBar,splitPane);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -141,13 +173,61 @@ public class NMReDATAeditor extends Application {
 	        text.append("The molecule in your file has formula "+MolecularFormulaManipulator.getString(mfa)+"\n");
 	        text.append("Your file contains "+data.getSpectra().size()+" spectra\n");
 			for(int i=0; i<data.getSpectra().size(); i++){
-				if(data.getSpectra().get(i) instanceof NMRSpectrum)
-					text.append("Spectrum "+i+" has "+((NMRSpectrum)data.getSpectra().get(i)).getPeakTable().length+" peaks\n");
+				if(data.getSpectra().get(i) instanceof NMR2DSpectrum){
+			        NoteDescriptor noteDescriptor=new NoteDescriptor("CorType");
+					tabPane.getTabs().add(new Tab("2D "+((Note)data.getSpectra().get(i).getNotes(noteDescriptor).get(0)).getValue()));
+				}else{
+					tabPane.getTabs().add(new Tab("1D "+((NMRSpectrum)data.getSpectra().get(i)).getNucleus()));
+				}
 			}
-			label.setText(text.toString());
+			//we generate mol image
+		    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		    List<IGenerator<IAtomContainer>> generators = new ArrayList<IGenerator<IAtomContainer>>();
+		    generators.add(new BasicBondGenerator());
+		    generators.add(new BasicAtomGenerator());
+		    generators.add(new CouplingGenerator());
+		    generators.add(new BasicSceneGenerator());
+		    AtomContainerRenderer renderer = new AtomContainerRenderer(generators,new AWTFontManager());
+		    RendererModel r2dm = renderer.getRenderer2DModel();
+		    r2dm.registerParameters(new AtomNumberGenerator());
+		    r2dm.set(BasicSceneGenerator.BackgroundColor.class,Color.WHITE);
+		    
+		    Rectangle drawArea = new Rectangle((int)((VBox)splitPane.getItems().get(0)).getWidth(),(int)((VBox)splitPane.getItems().get(0)).getHeight());
+		    renderer.setup(data.getMolecule(), drawArea);
+		    DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+		    Document document = domImpl.createDocument(null, "svg", null);
+		    SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+		    svgGenerator.setBackground(Color.WHITE);
+		    svgGenerator.setColor(Color.WHITE);
+		    svgGenerator.fill(new Rectangle(0, 0, drawArea.width, drawArea.height));
+		    renderer.paint(data.getMolecule(), new AWTDrawVisitor(svgGenerator), drawArea, false);
+		    boolean useCSS = false;
+		    baos = new ByteArrayOutputStream();
+		    Writer outwriter = new OutputStreamWriter(baos, "UTF-8");
+		    StringBuffer sb = new StringBuffer();
+		    svgGenerator.stream(outwriter, useCSS);
+		    StringTokenizer tokenizer = new StringTokenizer(baos.toString(), "\n");
+		    while (tokenizer.hasMoreTokens()) {
+		      String name = tokenizer.nextToken();
+		      if (name.length() > 4 && name.substring(0, 5).equals("<svg ")) {
+		        sb.append(name.substring(0, name.length())).append(" width=\"" + drawArea.width + "\" height=\"" + drawArea.height + "\"" + "\n\r");
+		      } else {
+		        sb.append(name + "\n\r");
+		      }
+		    }
+		    BufferedImageTranscoder trans = new BufferedImageTranscoder();
+
+		 // file may be an InputStream.
+		 // Consult Batik's documentation for more possibilities!
+		 TranscoderInput transIn = new TranscoderInput(new StringReader(sb.toString()));
+
+		 trans.transcode(transIn, null);
+		 Image img = SwingFXUtils.toFXImage(trans.getBufferedImage(), null);
+		    
+			imageView.setImage(img);
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle("File successfully read");
-			alert.setHeaderText("Success");
+			alert.setHeaderText(text.toString());
 			alert.setContentText("File was read and seems to be in correct format");
 			alert.showAndWait();
 		}

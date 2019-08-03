@@ -71,10 +71,15 @@ public class LSDWriter {
 				for(Assignment assignment : ((Spectrum1D) spectrum).getAssignments()) {
 					assignmenets1d.put(assignment.getPattern().getPosition()[0], assignment.getTargets());
 					for(IAssignmentTarget atom : assignment.getTargets()) {
-						if(((NMRSpectrum)spectrum).getNucleus().equals("1H"))
-							sdfwriter.write("SHIH "+(((AtomReference)atom).getAtomNumber()+1)+" "+assignment.getPattern().getPosition()[0]+"\r\n");
-						else
+						if(((NMRSpectrum)spectrum).getNucleus().equals("1H")){
+							int atomnumber=((AtomReference)atom).getAtomNumber();
+							if(data.getMolecule().getAtom(atomnumber).getSymbol().equals("H")){
+									atomnumber=data.getMolecule().getAtomNumber(data.getMolecule().getConnectedAtomsList(data.getMolecule().getAtom(atomnumber)).get(0));
+							}
+							sdfwriter.write("SHIH "+(atomnumber+1)+" "+assignment.getPattern().getPosition()[0]+"\r\n");
+						}else{
 							sdfwriter.write("SHIX "+(((AtomReference)atom).getAtomNumber()+1)+" "+assignment.getPattern().getPosition()[0]+"\r\n");
+						}
 					}
 				}
 				sdfwriter.write("\r\n");
@@ -89,6 +94,12 @@ public class LSDWriter {
 						for(IAssignmentTarget ass2 : assignmenets1d.get(peak.getPosition()[1])){
 							int firstatom=((AtomReference)ass1).getAtomNumber();
 							int secondatom=((AtomReference)ass2).getAtomNumber();
+							if(data.getMolecule().getAtom(firstatom).getSymbol().equals("H")){
+								firstatom=data.getMolecule().getAtomNumber(data.getMolecule().getConnectedAtomsList(data.getMolecule().getAtom(firstatom)).get(0));
+							}
+							if(data.getMolecule().getAtom(secondatom).getSymbol().equals("H")){
+								secondatom=data.getMolecule().getAtomNumber(data.getMolecule().getConnectedAtomsList(data.getMolecule().getAtom(secondatom)).get(0));
+							}
 							if(!entries.contains(firstatom+" "+secondatom))
 								sdfwriter.write(((Note)spectrum.getNotes(noteDescriptor).get(0)).getValue()+" "+(firstatom+1)+" "+(secondatom+1)+"\r\n");
 							entries.add(firstatom+" "+secondatom);							
