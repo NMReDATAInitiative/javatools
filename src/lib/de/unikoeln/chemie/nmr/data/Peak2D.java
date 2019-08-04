@@ -12,7 +12,20 @@ public class Peak2D extends Peak implements Cloneable {
     /** peak range */
     Range2D.Double range = new Range2D.Double();
     Range2D.Int irange = new Range2D.Int();
-    /** number format for peak label */
+    //This is for javfax
+    public double getFirstShift() {
+		return this.getPosition()[0];
+	}
+	public void setFirstShift(double firstShift) {
+		this.getPosition()[0]=firstShift;
+	}
+	public double getSecondShift() {
+		return this.getPosition()[1];
+	}
+	public void setSecondShift(double secondShift) {
+		this.getPosition()[1]=secondShift;
+	}
+	/** number format for peak label */
     static protected java.text.NumberFormat formatPeakPosition = java.text.NumberFormat.getInstance();
     static {
         formatPeakPosition.setMaximumFractionDigits(3);

@@ -24,7 +24,6 @@ import org.jcamp.spectrum.NMRSpectrum;
 import org.jcamp.spectrum.OrderedArrayData;
 import org.jcamp.spectrum.Pattern;
 import org.jcamp.spectrum.Peak;
-import org.jcamp.spectrum.Peak1D;
 import org.jcamp.spectrum.assignments.AtomReference;
 import org.jcamp.spectrum.assignments.TwoAtomsReference;
 import org.jcamp.spectrum.notes.NoteDescriptor;
@@ -45,6 +44,7 @@ import de.unikoeln.chemie.nmr.data.NMR2DSpectrum;
 import de.unikoeln.chemie.nmr.data.NmreData;
 import de.unikoeln.chemie.nmr.data.NmreData.NmredataVersion;
 import de.unikoeln.chemie.nmr.data.Peak2D;
+import de.unikoeln.chemie.nmr.data.Peak1D;
 
 public class NmredataReader {
 	BufferedReader input = null;

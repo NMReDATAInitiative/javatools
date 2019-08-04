@@ -19,6 +19,7 @@ import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.jcamp.spectrum.NMRSpectrum;
+import org.jcamp.spectrum.Peak;
 import org.jcamp.spectrum.notes.Note;
 import org.jcamp.spectrum.notes.NoteDescriptor;
 import org.openscience.cdk.exception.CDKException;
@@ -41,10 +42,13 @@ import org.w3c.dom.Document;
 import de.unikoeln.chemie.nmr.data.NMR2DSpectrum;
 import de.unikoeln.chemie.nmr.data.NmreData;
 import de.unikoeln.chemie.nmr.data.NmreData.NmredataVersion;
+import de.unikoeln.chemie.nmr.data.Peak1D;
+import de.unikoeln.chemie.nmr.data.Peak2D;
 import de.unikoeln.chemie.nmr.io.LSDWriter;
 import de.unikoeln.chemie.nmr.io.NmredataReader;
 import de.unikoeln.chemie.nmr.io.NmredataWriter;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -57,6 +61,9 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
@@ -175,9 +182,37 @@ public class NMReDATAeditor extends Application {
 			for(int i=0; i<data.getSpectra().size(); i++){
 				if(data.getSpectra().get(i) instanceof NMR2DSpectrum){
 			        NoteDescriptor noteDescriptor=new NoteDescriptor("CorType");
-					tabPane.getTabs().add(new Tab("2D "+((Note)data.getSpectra().get(i).getNotes(noteDescriptor).get(0)).getValue()));
+			        Tab tab=new Tab("2D "+((Note)data.getSpectra().get(i).getNotes(noteDescriptor).get(0)).getValue());
+			        TableView<Peak2D> table=new TableView<Peak2D>();
+			        //TableColumn<Peak2D, Integer> firstAtomCol = new TableColumn<Peak2D, Integer>("Atom Number");
+			        TableColumn<Peak2D, Double> firstShiftCol = new TableColumn<Peak2D, Double>("Shift");
+			        firstShiftCol.setCellValueFactory(new PropertyValueFactory<>("firstShift"));
+			        //TableColumn<Peak2D, Integer> secondAtomCol = new TableColumn<Peak2D, Integer>("Atom Number");
+			        TableColumn<Peak2D, Double> secondShiftCol = new TableColumn<Peak2D, Double>("Shift");
+			        secondShiftCol.setCellValueFactory(new PropertyValueFactory<>("secondShift"));
+			        table.getColumns().add(firstShiftCol);
+			        table.getColumns().add(secondShiftCol);
+			        ArrayList<Peak2D> al=new ArrayList<Peak2D>();
+			        for(Peak2D peak : ((NMR2DSpectrum)data.getSpectra().get(i)).getPeakTable())
+			        	al.add(peak);
+			        table.setItems(FXCollections.observableArrayList(al));
+			        tab.setContent(table);
+					tabPane.getTabs().add(tab);
 				}else{
-					tabPane.getTabs().add(new Tab("1D "+((NMRSpectrum)data.getSpectra().get(i)).getNucleus()));
+					Tab tab = new Tab("1D "+((NMRSpectrum)data.getSpectra().get(i)).getNucleus());
+			        TableView<Peak1D> table=new TableView<Peak1D>();
+			        TableColumn<Peak1D, Double> shiftCol = new TableColumn<Peak1D, Double>("Shift");
+			        shiftCol.setCellValueFactory(new PropertyValueFactory<>("shift"));
+			        TableColumn<Peak1D, Double> intensityCol = new TableColumn<Peak1D, Double>("Intensity");
+			        intensityCol.setCellValueFactory(new PropertyValueFactory<>("height"));
+			        table.getColumns().add(shiftCol);
+			        table.getColumns().add(intensityCol);
+			        ArrayList<Peak1D> al=new ArrayList<Peak1D>();
+			        for(org.jcamp.spectrum.Peak1D peak : ((NMRSpectrum)data.getSpectra().get(i)).getPeakTable())
+			        	al.add((Peak1D)peak);
+			        table.setItems(FXCollections.observableArrayList(al));
+			        tab.setContent(table);
+					tabPane.getTabs().add(tab);
 				}
 			}
 			//we generate mol image
