@@ -55,6 +55,20 @@ public class NmredataReader {
 	Map<String,IAssignmentTarget[]> assignments=new HashMap<String,IAssignmentTarget[]>();
 	String lineseparator="\n\r";
 	
+	private static final List<String> specctrum1dproperties=new ArrayList<String>();
+	private static final List<String> specctrum2dproperties=new ArrayList<String>();
+	
+	static{
+		specctrum1dproperties.add("CorType");
+		specctrum1dproperties.add("Decoupled=");
+		specctrum1dproperties.add("Pulseprogram=");
+		specctrum1dproperties.add("MD5");
+		specctrum2dproperties.add("MD5");
+		specctrum2dproperties.add("Pulseprogram=");
+		specctrum2dproperties.add("Nondecoupled=");
+		specctrum2dproperties.add("CorType");
+	}
+	
 	public NmredataReader(Reader in){
         input = new BufferedReader(in);
 	}
@@ -243,25 +257,25 @@ public class NmredataReader {
 		double[] freq=null;
 		String location=null;
 		int peakcount=0;
-		String type=null;
+		Map<NoteDescriptor, String> descriptors=new HashMap<>();
 		while(st.hasMoreTokens()){
 			String line = st.nextToken().trim();
 			if(line.indexOf(";")>-1)
 				line=line.substring(0, line.indexOf(";"));
 			if(line.startsWith("Larmor=")){
 				freq=new double[]{Double.parseDouble(line.substring(7)),Double.parseDouble(line.substring(7))};
-			}else if(line.startsWith("MD5")){
-				//TODO do something
 			}else if(line.startsWith("Spectrum_Location=")){
 				location=line.substring(line.indexOf("=")+1);
-			}else if(line.startsWith("Pulseprogram=")){
-				//TODO do something
-			}else if(line.startsWith("Nondecoupled=")){
-				//TODO do something
-			}else if(line.startsWith("CorType=")){
-				type=line.substring(line.indexOf("=")+1);
 			}else if(line.matches(".*/.*") && (!line.contains("=") || line.indexOf("=")>line.indexOf("/"))){
 				peakcount++;
+			}else{
+				String keyfile=line.substring(0, line.indexOf("="));
+				for(String key : specctrum1dproperties ){
+					if(keyfile.equals(key)){
+						NoteDescriptor noteDescriptor=new NoteDescriptor(key);
+						descriptors.put(noteDescriptor, line.substring(line.indexOf("=")+1));
+					}
+				}				
 			}
 		}
 		double[] xdata=new double[peakcount];
@@ -325,9 +339,8 @@ public class NmredataReader {
         spectrum.setPeakTable(peakTable);
         NoteDescriptor noteDescriptor=new NoteDescriptor("Spectrum_Location");
         spectrum.setNote(noteDescriptor, location);
-        if(type!=null) {
-            noteDescriptor=new NoteDescriptor("CorType");
-            spectrum.setNote(noteDescriptor, type);        	
+        for(NoteDescriptor descriptor : descriptors.keySet()){
+        	spectrum.setNote(descriptor, descriptors.get(descriptor));
         }
 		/*We do not use these, assignments are via the 1d peaks
 		Assignment[] assignmentslocal=new Assignment[labels1.size()];
@@ -348,6 +361,7 @@ public class NmredataReader {
 		String location=null;
 		String sequence=null;
 		double intensity=Double.NaN;
+		Map<NoteDescriptor, String> descriptors=new HashMap<>();
 		while(st.hasMoreTokens()){
 			String line = st.nextToken().trim();
 			if(line.indexOf(";")>-1)
@@ -356,14 +370,6 @@ public class NmredataReader {
 				freq=Double.parseDouble(line.substring(7));
 			}else if(line.startsWith("Spectrum_Location=")){
 				location=line.substring(line.indexOf("=")+1);
-			}else if(line.startsWith("CorType=")){
-				//TODO do something
-			}else if(line.startsWith("Decoupled=")){
-				//TODO do something
-			}else if(line.startsWith("Pulseprogram=")){
-				//TODO do something
-			}else if(line.startsWith("MD5")){
-				//TODO do something
 			}else if(line.startsWith("Sequence=")){
 				sequence=line.substring(line.indexOf("=")+1);
 			}else if(line.matches("^[0-9]*\\.[0-9]*")){
@@ -412,6 +418,14 @@ public class NmredataReader {
 				//TODO multiplicity
 				//TODO intensity
 				peaks.add(new Peak1D(peak.getPosition()[0],0));
+			}else{
+				String keyfile=line.substring(0, line.indexOf("="));
+				for(String key : specctrum1dproperties ){
+					if(keyfile.equals(key)){
+						NoteDescriptor noteDescriptor=new NoteDescriptor(key);
+						descriptors.put(noteDescriptor, line.substring(line.indexOf("=")+1));
+					}
+				}				
 			}
 		}
 		if(Double.isNaN(freq))
@@ -441,6 +455,9 @@ public class NmredataReader {
         }
         spectrum = new NMRSpectrum(x, y, nucleus, freq, reference, false, JCAMPReader.RELAXED);
         spectrum.setPeakTable(peaks1d);
+        for(NoteDescriptor descriptor : descriptors.keySet()){
+        	spectrum.setNote(descriptor, descriptors.get(descriptor));
+        }
         if(sequence!=null)
         	spectrum.setNote("sequence", sequence);
         NoteDescriptor noteDescriptor=new NoteDescriptor("Spectrum_Location");

@@ -20,6 +20,7 @@ import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.jcamp.spectrum.NMRSpectrum;
 import org.jcamp.spectrum.Peak;
+import org.jcamp.spectrum.Spectrum;
 import org.jcamp.spectrum.notes.Note;
 import org.jcamp.spectrum.notes.NoteDescriptor;
 import org.openscience.cdk.exception.CDKException;
@@ -48,13 +49,17 @@ import de.unikoeln.chemie.nmr.io.LSDWriter;
 import de.unikoeln.chemie.nmr.io.NmredataReader;
 import de.unikoeln.chemie.nmr.io.NmredataWriter;
 import javafx.application.Application;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -63,10 +68,14 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -136,11 +145,21 @@ public class NMReDATAeditor extends Application {
         menuBar.getMenus().addAll(menuFile);
         imageView=new ImageView();
         splitPane = new SplitPane(); 
-        splitPane.getItems().add(new VBox(imageView));
+        VBox vbox=new VBox(imageView);
+        splitPane.getItems().add(vbox);
+        vbox.heightProperty().addListener(new javafx.beans.value.ChangeListener<Number>() {
+            @Override public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneWidth, Number newSceneWidth) {
+                System.out.println("Width: " + newSceneWidth);
+            }
+        });
         tabPane=new TabPane();
         splitPane.getItems().add(new VBox(tabPane));
         splitPane.prefWidthProperty().bind(scene.widthProperty());
         splitPane.prefHeightProperty().bind(scene.heightProperty());
+        tabPane.prefWidthProperty().bind(scene.widthProperty());
+        tabPane.prefHeightProperty().bind(scene.heightProperty());
+        vbox.prefWidthProperty().bind(scene.widthProperty());
+        vbox.prefHeightProperty().bind(scene.heightProperty());
         ((VBox)scene.getRoot()).getChildren().addAll(menuBar,splitPane);
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -180,9 +199,13 @@ public class NMReDATAeditor extends Application {
 	        text.append("The molecule in your file has formula "+MolecularFormulaManipulator.getString(mfa)+"\n");
 	        text.append("Your file contains "+data.getSpectra().size()+" spectra\n");
 			for(int i=0; i<data.getSpectra().size(); i++){
-				if(data.getSpectra().get(i) instanceof NMR2DSpectrum){
+				SplitPane splitPaneSpectrum=new SplitPane();
+		        splitPaneSpectrum.prefWidthProperty().bind(tabPane.widthProperty());
+		        splitPaneSpectrum.prefHeightProperty().bind(tabPane.heightProperty());
+		        Tab tab;
+		        if(data.getSpectra().get(i) instanceof NMR2DSpectrum){
 			        NoteDescriptor noteDescriptor=new NoteDescriptor("CorType");
-			        Tab tab=new Tab("2D "+((Note)data.getSpectra().get(i).getNotes(noteDescriptor).get(0)).getValue());
+			        tab=new Tab("2D "+((Note)data.getSpectra().get(i).getNotes(noteDescriptor).get(0)).getValue());
 			        TableView<Peak2D> table=new TableView<Peak2D>();
 			        //TableColumn<Peak2D, Integer> firstAtomCol = new TableColumn<Peak2D, Integer>("Atom Number");
 			        TableColumn<Peak2D, Double> firstShiftCol = new TableColumn<Peak2D, Double>("Shift");
@@ -196,10 +219,9 @@ public class NMReDATAeditor extends Application {
 			        for(Peak2D peak : ((NMR2DSpectrum)data.getSpectra().get(i)).getPeakTable())
 			        	al.add(peak);
 			        table.setItems(FXCollections.observableArrayList(al));
-			        tab.setContent(table);
-					tabPane.getTabs().add(tab);
+			        splitPaneSpectrum.getItems().add(table);
 				}else{
-					Tab tab = new Tab("1D "+((NMRSpectrum)data.getSpectra().get(i)).getNucleus());
+					tab = new Tab("1D "+((NMRSpectrum)data.getSpectra().get(i)).getNucleus());
 			        TableView<Peak1D> table=new TableView<Peak1D>();
 			        TableColumn<Peak1D, Double> shiftCol = new TableColumn<Peak1D, Double>("Shift");
 			        shiftCol.setCellValueFactory(new PropertyValueFactory<>("shift"));
@@ -211,9 +233,35 @@ public class NMReDATAeditor extends Application {
 			        for(org.jcamp.spectrum.Peak1D peak : ((NMRSpectrum)data.getSpectra().get(i)).getPeakTable())
 			        	al.add((Peak1D)peak);
 			        table.setItems(FXCollections.observableArrayList(al));
-			        tab.setContent(table);
-					tabPane.getTabs().add(tab);
+			        splitPaneSpectrum.getItems().add(table);
 				}
+		        GridPane gridPane = new GridPane();
+		        gridPane.setPadding(new Insets(10, 10, 10, 10)); 
+		        gridPane.setVgap(5); 
+		        gridPane.setHgap(5);       
+		        gridPane.setAlignment(Pos.CENTER); 
+		        Text text1 = new Text("Frequency");
+		        TextField text2;
+		        if(data.getSpectra().get(i) instanceof NMR2DSpectrum)
+		        	text2 = new TextField(Double.toString(((NMR2DSpectrum)data.getSpectra().get(i)).getYFrequency()));
+		        else
+		        	text2 = new TextField(Double.toString(((NMRSpectrum)data.getSpectra().get(i)).getFrequency()));
+		        text2.setMaxWidth(100);
+		        gridPane.add(text1, 0, 0); 
+		        gridPane.add(text2, 1, 0);
+		        int k=1;
+		        for(Object descriptor : ((Spectrum)data.getSpectra().get(i)).getNotes()){
+					Note note = (Note)descriptor;
+			        text1 = new Text(note.getDescriptor().getKey());
+			        text2 = new TextField((String)note.getValue());
+			        text2.setMaxWidth(100);
+			        gridPane.add(text1, 0, k); 
+			        gridPane.add(text2, 1, k);
+			        k++;
+		        }
+		        splitPaneSpectrum.getItems().add(gridPane);
+		        tab.setContent(splitPaneSpectrum);
+				tabPane.getTabs().add(tab);
 			}
 			//we generate mol image
 		    ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -226,7 +274,6 @@ public class NMReDATAeditor extends Application {
 		    RendererModel r2dm = renderer.getRenderer2DModel();
 		    r2dm.registerParameters(new AtomNumberGenerator());
 		    r2dm.set(BasicSceneGenerator.BackgroundColor.class,Color.WHITE);
-		    
 		    Rectangle drawArea = new Rectangle((int)((VBox)splitPane.getItems().get(0)).getWidth(),(int)((VBox)splitPane.getItems().get(0)).getHeight());
 		    renderer.setup(data.getMolecule(), drawArea);
 		    DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
@@ -250,16 +297,12 @@ public class NMReDATAeditor extends Application {
 		        sb.append(name + "\n\r");
 		      }
 		    }
+		    //and set it on the image view
 		    BufferedImageTranscoder trans = new BufferedImageTranscoder();
-
-		 // file may be an InputStream.
-		 // Consult Batik's documentation for more possibilities!
-		 TranscoderInput transIn = new TranscoderInput(new StringReader(sb.toString()));
-
-		 trans.transcode(transIn, null);
-		 Image img = SwingFXUtils.toFXImage(trans.getBufferedImage(), null);
-		    
-			imageView.setImage(img);
+		    TranscoderInput transIn = new TranscoderInput(new StringReader(sb.toString()));
+		    trans.transcode(transIn, null);
+		    Image img = SwingFXUtils.toFXImage(trans.getBufferedImage(), null);
+		    imageView.setImage(img);
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle("File successfully read");
 			alert.setHeaderText(text.toString());
