@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringBufferInputStream;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,8 @@ import java.util.StringTokenizer;
 
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.svggen.SVGGraphics2DIOException;
+import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.jcamp.spectrum.NMRSpectrum;
 import org.jcamp.spectrum.Peak;
@@ -49,6 +52,7 @@ import de.unikoeln.chemie.nmr.io.LSDWriter;
 import de.unikoeln.chemie.nmr.io.NmredataReader;
 import de.unikoeln.chemie.nmr.io.NmredataWriter;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.embed.swing.SwingFXUtils;
@@ -149,7 +153,24 @@ public class NMReDATAeditor extends Application {
         splitPane.getItems().add(vbox);
         vbox.heightProperty().addListener(new javafx.beans.value.ChangeListener<Number>() {
             @Override public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneWidth, Number newSceneWidth) {
-                System.out.println("Width: " + newSceneWidth);
+            	try {
+            		if(data!=null)
+            			setMolImage();
+				} catch (UnsupportedEncodingException | SVGGraphics2DIOException | TranscoderException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
+        });
+        vbox.widthProperty().addListener(new javafx.beans.value.ChangeListener<Number>() {
+            @Override public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneWidth, Number newSceneWidth) {
+            	try {
+            		if(data!=null)
+            			setMolImage();
+				} catch (UnsupportedEncodingException | SVGGraphics2DIOException | TranscoderException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
             }
         });
         tabPane=new TabPane();
@@ -158,7 +179,8 @@ public class NMReDATAeditor extends Application {
         splitPane.prefHeightProperty().bind(scene.heightProperty());
         tabPane.prefWidthProperty().bind(scene.widthProperty());
         tabPane.prefHeightProperty().bind(scene.heightProperty());
-        vbox.prefWidthProperty().bind(scene.widthProperty());
+        vbox.prefWidthProperty().bind(scene.widthProperty().multiply(splitPane.getDividers().get(0).positionProperty()));
+        imageView.fitWidthProperty().bind(scene.widthProperty().multiply(splitPane.getDividers().get(0).positionProperty()));
         vbox.prefHeightProperty().bind(scene.heightProperty());
         ((VBox)scene.getRoot()).getChildren().addAll(menuBar,splitPane);
         primaryStage.setScene(scene);
@@ -263,46 +285,7 @@ public class NMReDATAeditor extends Application {
 		        tab.setContent(splitPaneSpectrum);
 				tabPane.getTabs().add(tab);
 			}
-			//we generate mol image
-		    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		    List<IGenerator<IAtomContainer>> generators = new ArrayList<IGenerator<IAtomContainer>>();
-		    generators.add(new BasicBondGenerator());
-		    generators.add(new BasicAtomGenerator());
-		    generators.add(new CouplingGenerator());
-		    generators.add(new BasicSceneGenerator());
-		    AtomContainerRenderer renderer = new AtomContainerRenderer(generators,new AWTFontManager());
-		    RendererModel r2dm = renderer.getRenderer2DModel();
-		    r2dm.registerParameters(new AtomNumberGenerator());
-		    r2dm.set(BasicSceneGenerator.BackgroundColor.class,Color.WHITE);
-		    Rectangle drawArea = new Rectangle((int)((VBox)splitPane.getItems().get(0)).getWidth(),(int)((VBox)splitPane.getItems().get(0)).getHeight());
-		    renderer.setup(data.getMolecule(), drawArea);
-		    DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
-		    Document document = domImpl.createDocument(null, "svg", null);
-		    SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
-		    svgGenerator.setBackground(Color.WHITE);
-		    svgGenerator.setColor(Color.WHITE);
-		    svgGenerator.fill(new Rectangle(0, 0, drawArea.width, drawArea.height));
-		    renderer.paint(data.getMolecule(), new AWTDrawVisitor(svgGenerator), drawArea, false);
-		    boolean useCSS = false;
-		    baos = new ByteArrayOutputStream();
-		    Writer outwriter = new OutputStreamWriter(baos, "UTF-8");
-		    StringBuffer sb = new StringBuffer();
-		    svgGenerator.stream(outwriter, useCSS);
-		    StringTokenizer tokenizer = new StringTokenizer(baos.toString(), "\n");
-		    while (tokenizer.hasMoreTokens()) {
-		      String name = tokenizer.nextToken();
-		      if (name.length() > 4 && name.substring(0, 5).equals("<svg ")) {
-		        sb.append(name.substring(0, name.length())).append(" width=\"" + drawArea.width + "\" height=\"" + drawArea.height + "\"" + "\n\r");
-		      } else {
-		        sb.append(name + "\n\r");
-		      }
-		    }
-		    //and set it on the image view
-		    BufferedImageTranscoder trans = new BufferedImageTranscoder();
-		    TranscoderInput transIn = new TranscoderInput(new StringReader(sb.toString()));
-		    trans.transcode(transIn, null);
-		    Image img = SwingFXUtils.toFXImage(trans.getBufferedImage(), null);
-		    imageView.setImage(img);
+			setMolImage();
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle("File successfully read");
 			alert.setHeaderText(text.toString());
@@ -318,5 +301,48 @@ public class NMReDATAeditor extends Application {
 			alert.setContentText("File could not be read. Reason: "+ex.getMessage());
 			alert.showAndWait();
 		}		
+	}
+
+	private void setMolImage() throws UnsupportedEncodingException, SVGGraphics2DIOException, TranscoderException {
+		//we generate mol image
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    List<IGenerator<IAtomContainer>> generators = new ArrayList<IGenerator<IAtomContainer>>();
+	    generators.add(new BasicBondGenerator());
+	    generators.add(new BasicAtomGenerator());
+	    generators.add(new CouplingGenerator());
+	    generators.add(new BasicSceneGenerator());
+	    AtomContainerRenderer renderer = new AtomContainerRenderer(generators,new AWTFontManager());
+	    RendererModel r2dm = renderer.getRenderer2DModel();
+	    r2dm.registerParameters(new AtomNumberGenerator());
+	    r2dm.set(BasicSceneGenerator.BackgroundColor.class,Color.WHITE);
+	    Rectangle drawArea = new Rectangle((int)((VBox)splitPane.getItems().get(0)).getWidth(),(int)((VBox)splitPane.getItems().get(0)).getHeight());
+	    renderer.setup(data.getMolecule(), drawArea);
+	    DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+	    Document document = domImpl.createDocument(null, "svg", null);
+	    SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+	    svgGenerator.setBackground(Color.WHITE);
+	    svgGenerator.setColor(Color.WHITE);
+	    svgGenerator.fill(new Rectangle(0, 0, drawArea.width, drawArea.height));
+	    renderer.paint(data.getMolecule(), new AWTDrawVisitor(svgGenerator), drawArea, false);
+	    boolean useCSS = false;
+	    baos = new ByteArrayOutputStream();
+	    Writer outwriter = new OutputStreamWriter(baos, "UTF-8");
+	    StringBuffer sb = new StringBuffer();
+	    svgGenerator.stream(outwriter, useCSS);
+	    StringTokenizer tokenizer = new StringTokenizer(baos.toString(), "\n");
+	    while (tokenizer.hasMoreTokens()) {
+	      String name = tokenizer.nextToken();
+	      if (name.length() > 4 && name.substring(0, 5).equals("<svg ")) {
+	        sb.append(name.substring(0, name.length())).append(" width=\"" + drawArea.width + "\" height=\"" + drawArea.height + "\"" + "\n\r");
+	      } else {
+	        sb.append(name + "\n\r");
+	      }
+	    }
+	    //and set it on the image view
+	    BufferedImageTranscoder trans = new BufferedImageTranscoder();
+	    TranscoderInput transIn = new TranscoderInput(new StringReader(sb.toString()));
+	    trans.transcode(transIn, null);
+	    Image img = SwingFXUtils.toFXImage(trans.getBufferedImage(), null);
+	    imageView.setImage(img);
 	}
 }
