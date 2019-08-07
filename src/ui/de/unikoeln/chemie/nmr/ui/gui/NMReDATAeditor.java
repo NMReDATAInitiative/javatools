@@ -1,6 +1,7 @@
 package de.unikoeln.chemie.nmr.ui.gui;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Rectangle;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -13,6 +14,7 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -21,12 +23,14 @@ import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
+import org.jcamp.spectrum.Assignment;
 import org.jcamp.spectrum.NMRSpectrum;
 import org.jcamp.spectrum.Peak;
 import org.jcamp.spectrum.Spectrum;
 import org.jcamp.spectrum.notes.Note;
 import org.jcamp.spectrum.notes.NoteDescriptor;
 import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IMolecularFormula;
 import org.openscience.cdk.renderer.AtomContainerRenderer;
@@ -38,6 +42,7 @@ import org.openscience.cdk.renderer.generators.BasicBondGenerator;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.CouplingGenerator;
 import org.openscience.cdk.renderer.generators.IGenerator;
+import org.openscience.cdk.renderer.generators.standard.StandardGenerator;
 import org.openscience.cdk.renderer.visitor.AWTDrawVisitor;
 import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
 import org.w3c.dom.DOMImplementation;
@@ -220,6 +225,12 @@ public class NMReDATAeditor extends Application {
 			IMolecularFormula mfa = MolecularFormulaManipulator.getMolecularFormula(data.getMolecule());
 	        text.append("The molecule in your file has formula "+MolecularFormulaManipulator.getString(mfa)+"\n");
 	        text.append("Your file contains "+data.getSpectra().size()+" spectra\n");
+	        List<Assignment> assignments=new ArrayList<>();
+			for(int i=0; i<data.getSpectra().size(); i++){
+				if(data.getSpectra().get(i) instanceof NMRSpectrum){
+					assignments.addAll(Arrays.asList(((NMRSpectrum)data.getSpectra().get(i)).getAssignments()));
+				}
+			}
 			for(int i=0; i<data.getSpectra().size(); i++){
 				SplitPane splitPaneSpectrum=new SplitPane();
 		        splitPaneSpectrum.prefWidthProperty().bind(tabPane.widthProperty());
@@ -229,17 +240,23 @@ public class NMReDATAeditor extends Application {
 			        NoteDescriptor noteDescriptor=new NoteDescriptor("CorType");
 			        tab=new Tab("2D "+((Note)data.getSpectra().get(i).getNotes(noteDescriptor).get(0)).getValue());
 			        TableView<Peak2D> table=new TableView<Peak2D>();
-			        //TableColumn<Peak2D, Integer> firstAtomCol = new TableColumn<Peak2D, Integer>("Atom Number");
+			        TableColumn<Peak2D, String> firstAtomCol = new TableColumn<Peak2D, String>("Assignment");
+			        firstAtomCol.setCellValueFactory(new PropertyValueFactory<>("atoms1"));
 			        TableColumn<Peak2D, Double> firstShiftCol = new TableColumn<Peak2D, Double>("Shift");
 			        firstShiftCol.setCellValueFactory(new PropertyValueFactory<>("firstShift"));
-			        //TableColumn<Peak2D, Integer> secondAtomCol = new TableColumn<Peak2D, Integer>("Atom Number");
+			        TableColumn<Peak2D, String> secondAtomCol = new TableColumn<Peak2D, String>("Assignment");
+			        secondAtomCol.setCellValueFactory(new PropertyValueFactory<>("atoms2"));
 			        TableColumn<Peak2D, Double> secondShiftCol = new TableColumn<Peak2D, Double>("Shift");
 			        secondShiftCol.setCellValueFactory(new PropertyValueFactory<>("secondShift"));
 			        table.getColumns().add(firstShiftCol);
+			        table.getColumns().add(firstAtomCol);
 			        table.getColumns().add(secondShiftCol);
+			        table.getColumns().add(secondAtomCol);
 			        ArrayList<Peak2D> al=new ArrayList<Peak2D>();
-			        for(Peak2D peak : ((NMR2DSpectrum)data.getSpectra().get(i)).getPeakTable())
+			        for(Peak2D peak : ((NMR2DSpectrum)data.getSpectra().get(i)).getPeakTable()){
+			        	((Peak2D)peak).assignments=assignments;
 			        	al.add(peak);
+			        }
 			        table.setItems(FXCollections.observableArrayList(al));
 			        splitPaneSpectrum.getItems().add(table);
 				}else{
@@ -249,11 +266,16 @@ public class NMReDATAeditor extends Application {
 			        shiftCol.setCellValueFactory(new PropertyValueFactory<>("shift"));
 			        TableColumn<Peak1D, Double> intensityCol = new TableColumn<Peak1D, Double>("Intensity");
 			        intensityCol.setCellValueFactory(new PropertyValueFactory<>("height"));
+			        TableColumn<Peak1D, String> atomCol = new TableColumn<Peak1D, String>("Assignment");
+			        atomCol.setCellValueFactory(new PropertyValueFactory<>("atoms"));
 			        table.getColumns().add(shiftCol);
 			        table.getColumns().add(intensityCol);
+			        table.getColumns().add(atomCol);
 			        ArrayList<Peak1D> al=new ArrayList<Peak1D>();
-			        for(org.jcamp.spectrum.Peak1D peak : ((NMRSpectrum)data.getSpectra().get(i)).getPeakTable())
+			        for(org.jcamp.spectrum.Peak1D peak : ((NMRSpectrum)data.getSpectra().get(i)).getPeakTable()){
+			        	((Peak1D)peak).assignments=((NMRSpectrum)data.getSpectra().get(i)).getAssignments();
 			        	al.add((Peak1D)peak);
+			        }
 			        table.setItems(FXCollections.observableArrayList(al));
 			        splitPaneSpectrum.getItems().add(table);
 				}
@@ -305,12 +327,16 @@ public class NMReDATAeditor extends Application {
 
 	private void setMolImage() throws UnsupportedEncodingException, SVGGraphics2DIOException, TranscoderException {
 		//we generate mol image
+		for(IAtom atom : data.getMolecule().atoms()){
+			String label = Integer.toString(1 + data.getMolecule().getAtomNumber(atom));
+		    atom.setProperty(StandardGenerator.ANNOTATION_LABEL, label);
+		}
 	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    Font font = new Font("Verdana", Font.PLAIN, 18);
 	    List<IGenerator<IAtomContainer>> generators = new ArrayList<IGenerator<IAtomContainer>>();
-	    generators.add(new BasicBondGenerator());
-	    generators.add(new BasicAtomGenerator());
-	    generators.add(new CouplingGenerator());
+	    generators.add(new StandardGenerator(font));
 	    generators.add(new BasicSceneGenerator());
+	    generators.add(new CouplingGenerator());
 	    AtomContainerRenderer renderer = new AtomContainerRenderer(generators,new AWTFontManager());
 	    RendererModel r2dm = renderer.getRenderer2DModel();
 	    r2dm.registerParameters(new AtomNumberGenerator());

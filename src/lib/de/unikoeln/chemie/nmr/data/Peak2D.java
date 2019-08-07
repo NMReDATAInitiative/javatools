@@ -1,9 +1,14 @@
 package de.unikoeln.chemie.nmr.data;
 
+import java.util.List;
+
 import org.jcamp.math.Range2D;
+import org.jcamp.spectrum.Assignment;
+import org.jcamp.spectrum.IAssignmentTarget;
 import org.jcamp.spectrum.IOrderedDataArray1D;
 import org.jcamp.spectrum.ISpectrumLabel;
 import org.jcamp.spectrum.Peak;
+import org.jcamp.spectrum.assignments.AtomReference;
 /**
  * peak for 2D spectra.
  * @author Stefan Kuhn
@@ -12,6 +17,7 @@ public class Peak2D extends Peak implements Cloneable {
     /** peak range */
     Range2D.Double range = new Range2D.Double();
     Range2D.Int irange = new Range2D.Int();
+    public List<Assignment> assignments;
     //This is for javfax
     public double getFirstShift() {
 		return this.getPosition()[0];
@@ -24,6 +30,42 @@ public class Peak2D extends Peak implements Cloneable {
 	}
 	public void setSecondShift(double secondShift) {
 		this.getPosition()[1]=secondShift;
+	}
+    public String getAtoms1() {
+    	StringBuffer atoms=new StringBuffer();
+    	if(assignments!=null){
+    		for(Assignment assignment : assignments){
+    			if(assignment.getPattern().getPosition()[0]==getFirstShift()){
+    				for(IAssignmentTarget atom : assignment.getTargets()){
+    					atoms.append((((AtomReference)atom).getAtomNumber()+1));
+    					atoms.append(", ");
+    				}
+    				return atoms.toString().substring(0, atoms.toString().length()-2);
+    			}
+    		}
+    	}
+		return "";
+	}
+    public String getAtoms2() {
+    	StringBuffer atoms=new StringBuffer();
+    	if(assignments!=null){
+    		for(Assignment assignment : assignments){
+    			if(assignment.getPattern().getPosition()[0]==getSecondShift()){
+    				for(IAssignmentTarget atom : assignment.getTargets()){
+    					atoms.append((((AtomReference)atom).getAtomNumber()+1));
+    					atoms.append(", ");
+    				}
+    				return atoms.toString().substring(0, atoms.toString().length()-2);
+    			}
+    		}
+    	}
+		return "";
+	}
+	public void setAtoms1(String atoms) {
+		//TODO for edit
+	}
+	public void setAtoms2(String atoms) {
+		//TODO for edit
 	}
 	/** number format for peak label */
     static protected java.text.NumberFormat formatPeakPosition = java.text.NumberFormat.getInstance();
