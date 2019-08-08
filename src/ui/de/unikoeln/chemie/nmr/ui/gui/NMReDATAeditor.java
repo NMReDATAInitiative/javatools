@@ -9,13 +9,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.StringBufferInputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.batik.dom.GenericDOMImplementation;
@@ -24,21 +25,21 @@ import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.jcamp.spectrum.Assignment;
+import org.jcamp.spectrum.IAssignmentTarget;
 import org.jcamp.spectrum.NMRSpectrum;
-import org.jcamp.spectrum.Peak;
 import org.jcamp.spectrum.Spectrum;
+import org.jcamp.spectrum.assignments.AtomReference;
 import org.jcamp.spectrum.notes.Note;
 import org.jcamp.spectrum.notes.NoteDescriptor;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IMolecularFormula;
 import org.openscience.cdk.renderer.AtomContainerRenderer;
 import org.openscience.cdk.renderer.RendererModel;
 import org.openscience.cdk.renderer.font.AWTFontManager;
 import org.openscience.cdk.renderer.generators.AtomNumberGenerator;
-import org.openscience.cdk.renderer.generators.BasicAtomGenerator;
-import org.openscience.cdk.renderer.generators.BasicBondGenerator;
 import org.openscience.cdk.renderer.generators.BasicSceneGenerator;
 import org.openscience.cdk.renderer.generators.CouplingGenerator;
 import org.openscience.cdk.renderer.generators.IGenerator;
@@ -57,9 +58,9 @@ import de.unikoeln.chemie.nmr.io.LSDWriter;
 import de.unikoeln.chemie.nmr.io.NmredataReader;
 import de.unikoeln.chemie.nmr.io.NmredataWriter;
 import javafx.application.Application;
-import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -68,17 +69,16 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -94,6 +94,9 @@ public class NMReDATAeditor extends Application {
 	ImageView imageView;
 	TabPane tabPane;
 	NmreData data;
+	ObservableList<Peak2D> selection2d=null;
+	ObservableList<Peak1D> selection1d=null;
+	List<Assignment> assignments;
 	
     public static void main(String[] args) {
         launch(args);
@@ -102,7 +105,7 @@ public class NMReDATAeditor extends Application {
     @Override
     public void start(final Stage primaryStage) {
         primaryStage.setTitle("NMReData editor");
-        Scene scene = new Scene(new VBox(), 500, 500);
+        Scene scene = new Scene(new VBox(), 800, 800);
         MenuBar menuBar = new MenuBar();
         Menu menuFile=new Menu("File");
         MenuItem open = new MenuItem("Open File...");
@@ -184,9 +187,10 @@ public class NMReDATAeditor extends Application {
         splitPane.prefHeightProperty().bind(scene.heightProperty());
         tabPane.prefWidthProperty().bind(scene.widthProperty());
         tabPane.prefHeightProperty().bind(scene.heightProperty());
-        vbox.prefWidthProperty().bind(scene.widthProperty().multiply(splitPane.getDividers().get(0).positionProperty()));
-        imageView.fitWidthProperty().bind(scene.widthProperty().multiply(splitPane.getDividers().get(0).positionProperty()));
+        vbox.prefWidthProperty().bind(scene.widthProperty().multiply(splitPane.getDividers().get(0).positionProperty().subtract(30)));
+        imageView.fitWidthProperty().bind(scene.widthProperty().multiply(splitPane.getDividers().get(0).positionProperty().subtract(30)));
         vbox.prefHeightProperty().bind(scene.heightProperty());
+        vbox.setMinWidth(10);
         ((VBox)scene.getRoot()).getChildren().addAll(menuBar,splitPane);
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -225,7 +229,7 @@ public class NMReDATAeditor extends Application {
 			IMolecularFormula mfa = MolecularFormulaManipulator.getMolecularFormula(data.getMolecule());
 	        text.append("The molecule in your file has formula "+MolecularFormulaManipulator.getString(mfa)+"\n");
 	        text.append("Your file contains "+data.getSpectra().size()+" spectra\n");
-	        List<Assignment> assignments=new ArrayList<>();
+	        assignments=new ArrayList<>();
 			for(int i=0; i<data.getSpectra().size(); i++){
 				if(data.getSpectra().get(i) instanceof NMRSpectrum){
 					assignments.addAll(Arrays.asList(((NMRSpectrum)data.getSpectra().get(i)).getAssignments()));
@@ -259,7 +263,18 @@ public class NMReDATAeditor extends Application {
 			        }
 			        table.setItems(FXCollections.observableArrayList(al));
 			        splitPaneSpectrum.getItems().add(table);
-				}else{
+			        table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+			            selection2d=table.getSelectionModel().getSelectedItems();
+			            selection1d=null;
+			            try {
+							setMolImage();
+						} catch (UnsupportedEncodingException | SVGGraphics2DIOException | TranscoderException e) {
+							// TODO Auto-generated catch bloc(((AtomReference)atom).getAtomNumber()k
+							e.printStackTrace();
+						}
+			        });
+			        table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		        }else{
 					tab = new Tab("1D "+((NMRSpectrum)data.getSpectra().get(i)).getNucleus());
 			        TableView<Peak1D> table=new TableView<Peak1D>();
 			        TableColumn<Peak1D, Double> shiftCol = new TableColumn<Peak1D, Double>("Shift");
@@ -278,6 +293,17 @@ public class NMReDATAeditor extends Application {
 			        }
 			        table.setItems(FXCollections.observableArrayList(al));
 			        splitPaneSpectrum.getItems().add(table);
+			        table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+			            selection1d=table.getSelectionModel().getSelectedItems();
+			            selection2d=null;
+			            try {
+							setMolImage();
+						} catch (UnsupportedEncodingException | SVGGraphics2DIOException | TranscoderException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+			        });
+			        table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 				}
 		        GridPane gridPane = new GridPane();
 		        gridPane.setPadding(new Insets(10, 10, 10, 10)); 
@@ -341,6 +367,47 @@ public class NMReDATAeditor extends Application {
 	    RendererModel r2dm = renderer.getRenderer2DModel();
 	    r2dm.registerParameters(new AtomNumberGenerator());
 	    r2dm.set(BasicSceneGenerator.BackgroundColor.class,Color.WHITE);
+	    r2dm.set(RendererModel.SelectionColor.class, Color.BLUE);
+	    if(selection1d!=null){
+	    	IAtomContainer hightlightcontainer=data.getMolecule().getBuilder().newAtomContainer();
+	    	for(Peak1D peak : selection1d){
+	    		for(Assignment assignment : assignments){
+	    			if(assignment.getPattern().getPosition()[0]==peak.getShift()){
+	    				for(IAssignmentTarget target : assignment.getTargets()){
+	    					hightlightcontainer.addAtom(data.getMolecule().getAtom((((AtomReference)target).getAtomNumber())));
+	    				}
+	    			}
+	    		}
+	    	}
+	    	Selection selection=new Selection();
+	    	selection.ac=hightlightcontainer;
+	    	r2dm.setSelection(selection);
+	    }else{
+	    	r2dm.setSelection(null);
+	    }
+	    if(selection2d!=null){
+	    	Map<Color,List<IBond>> couplings=new HashMap<>();
+	        couplings.put(Color.BLUE, new ArrayList<IBond>());	        
+	    	for(Peak2D peak : selection2d){
+    			IBond bond=data.getMolecule().getBuilder().newBond();
+	    		for(Assignment assignment : assignments){
+	    			if(assignment.getPattern().getPosition()[0]==peak.getFirstShift() || assignment.getPattern().getPosition()[1]==peak.getFirstShift()){
+	    				for(IAssignmentTarget target : assignment.getTargets()){
+	    					bond.setAtom(data.getMolecule().getAtom((((AtomReference)target).getAtomNumber())),0);
+	    				}
+	    			}
+	    			if(assignment.getPattern().getPosition()[0]==peak.getSecondShift() || assignment.getPattern().getPosition()[1]==peak.getSecondShift()){
+	    				for(IAssignmentTarget target : assignment.getTargets()){
+	    					bond.setAtom(data.getMolecule().getAtom((((AtomReference)target).getAtomNumber())),1);
+	    				}
+	    			}
+	    		}
+	    		couplings.get(Color.BLUE).add(bond);
+	    	}
+	        data.getMolecule().setProperty("couplings", couplings);
+	    }else{
+	    	data.getMolecule().setProperty("couplings", null);
+	    }
 	    Rectangle drawArea = new Rectangle((int)((VBox)splitPane.getItems().get(0)).getWidth(),(int)((VBox)splitPane.getItems().get(0)).getHeight());
 	    renderer.setup(data.getMolecule(), drawArea);
 	    DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
