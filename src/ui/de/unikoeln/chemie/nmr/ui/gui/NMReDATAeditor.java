@@ -60,6 +60,7 @@ import de.unikoeln.chemie.nmr.io.NmredataWriter;
 import javafx.application.Application;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -163,7 +164,7 @@ public class NMReDATAeditor extends Application {
             @Override public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneWidth, Number newSceneWidth) {
             	try {
             		if(data!=null)
-            			setMolImage();
+            			updateMolImage();
 				} catch (UnsupportedEncodingException | SVGGraphics2DIOException | TranscoderException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -174,7 +175,7 @@ public class NMReDATAeditor extends Application {
             @Override public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneWidth, Number newSceneWidth) {
             	try {
             		if(data!=null)
-            			setMolImage();
+            			updateMolImage();
 				} catch (UnsupportedEncodingException | SVGGraphics2DIOException | TranscoderException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -263,11 +264,11 @@ public class NMReDATAeditor extends Application {
 			        }
 			        table.setItems(FXCollections.observableArrayList(al));
 			        splitPaneSpectrum.getItems().add(table);
-			        table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+			        table.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Peak2D> c)  -> {
 			            selection2d=table.getSelectionModel().getSelectedItems();
 			            selection1d=null;
 			            try {
-							setMolImage();
+							updateMolImage();
 						} catch (UnsupportedEncodingException | SVGGraphics2DIOException | TranscoderException e) {
 							// TODO Auto-generated catch bloc(((AtomReference)atom).getAtomNumber()k
 							e.printStackTrace();
@@ -293,11 +294,11 @@ public class NMReDATAeditor extends Application {
 			        }
 			        table.setItems(FXCollections.observableArrayList(al));
 			        splitPaneSpectrum.getItems().add(table);
-			        table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+			        table.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends Peak1D> c) -> {
 			            selection1d=table.getSelectionModel().getSelectedItems();
 			            selection2d=null;
 			            try {
-							setMolImage();
+							updateMolImage();
 						} catch (UnsupportedEncodingException | SVGGraphics2DIOException | TranscoderException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -333,7 +334,7 @@ public class NMReDATAeditor extends Application {
 		        tab.setContent(splitPaneSpectrum);
 				tabPane.getTabs().add(tab);
 			}
-			setMolImage();
+			updateMolImage();
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle("File successfully read");
 			alert.setHeaderText(text.toString());
@@ -351,7 +352,7 @@ public class NMReDATAeditor extends Application {
 		}		
 	}
 
-	private void setMolImage() throws UnsupportedEncodingException, SVGGraphics2DIOException, TranscoderException {
+	private void updateMolImage() throws UnsupportedEncodingException, SVGGraphics2DIOException, TranscoderException {
 		//we generate mol image
 		for(IAtom atom : data.getMolecule().atoms()){
 			String label = Integer.toString(1 + data.getMolecule().getAtomNumber(atom));
@@ -387,7 +388,8 @@ public class NMReDATAeditor extends Application {
 	    }
 	    if(selection2d!=null){
 	    	Map<Color,List<IBond>> couplings=new HashMap<>();
-	        couplings.put(Color.BLUE, new ArrayList<IBond>());	        
+	        couplings.put(Color.BLUE, new ArrayList<IBond>());
+	        IAtomContainer hightlightcontainer=data.getMolecule().getBuilder().newAtomContainer();
 	    	for(Peak2D peak : selection2d){
     			IBond bond=data.getMolecule().getBuilder().newBond();
 	    		for(Assignment assignment : assignments){
@@ -402,9 +404,23 @@ public class NMReDATAeditor extends Application {
 	    				}
 	    			}
 	    		}
-	    		couplings.get(Color.BLUE).add(bond);
+	    		if(bond.getAtom(0)==bond.getAtom(1)){
+	    			hightlightcontainer.addAtom(bond.getAtom(0));
+	    		}else{
+	    			couplings.get(Color.BLUE).add(bond);
+	    		}
 	    	}
-	        data.getMolecule().setProperty("couplings", couplings);
+	    	if(couplings.get(Color.BLUE).size()>0)
+	    		data.getMolecule().setProperty("couplings", couplings);
+	    	else
+	    		data.getMolecule().setProperty("couplings", null);
+	    	if(hightlightcontainer.getAtomCount()>0){
+		    	Selection selection=new Selection();
+		    	selection.ac=hightlightcontainer;
+		    	r2dm.setSelection(selection);	    		
+	    	}else{
+	    		r2dm.setSelection(new Selection());
+	    	}
 	    }else{
 	    	data.getMolecule().setProperty("couplings", null);
 	    }

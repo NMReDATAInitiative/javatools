@@ -13,7 +13,7 @@ public class Selection extends AbstractSelection {
 
 	@Override
 	public boolean contains(IChemObject arg0) {
-		if(arg0 instanceof IAtom)
+		if(arg0 instanceof IAtom && ac!=null)
 			return ac.contains((IAtom)arg0);
 		else
 			return false;
