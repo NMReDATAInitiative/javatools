@@ -67,4 +67,15 @@ public class NmredataReaderTest  extends TestCase{
         Assert.assertEquals(1, data.getSpectra().size());
         Assert.assertEquals(3, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
 	}
+
+	public void testReadMnova() throws Exception, IOException{
+		String filename = "testdata/4-picolin_108-89-4.nmredata_korr.sdf";
+        InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
+        NmredataReader reader = new NmredataReader(ins);
+        NmreData data = reader.read();
+        Assert.assertEquals(7, data.getMolecule().getAtomCount());
+        Assert.assertEquals(7, data.getMolecule().getBondCount());
+        Assert.assertEquals(6, data.getSpectra().size());
+        Assert.assertEquals(3, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
+	}
 }

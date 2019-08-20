@@ -290,10 +290,16 @@ public class NmredataReader {
 			if(line.matches(".*/.*") && (!line.contains("=") || line.indexOf("=")>line.indexOf("/"))){
 				StringTokenizer st2=new StringTokenizer(line,"/,");
 				String label1=st2.nextToken();
-				xdata[i]=signals.get(label1).getPosition()[0];
+				if(signals.get(label1)!=null)
+					xdata[i]=signals.get(label1).getPosition()[0];
+				else
+					xdata[i]=Double.parseDouble(label1);
 				//labels1.add(label1);
 				String label2=st2.nextToken();
-				ydata[i]=signals.get(label2).getPosition()[0];
+				if(signals.get(label2)!=null)
+					ydata[i]=signals.get(label2).getPosition()[0];
+				else
+					ydata[i]=Double.parseDouble(label2);
 				//labels2.add(label2);
 				peakTable[i]=new Peak2D(xdata[i],ydata[i],0);
 				while(st2.hasMoreTokens()) {
@@ -378,10 +384,11 @@ public class NmredataReader {
 				StringTokenizer st2 = new StringTokenizer(line,",");
 				Peak peak=null;
 				String multiplicity;
+				double shift=0;
 				while(st2.hasMoreTokens()){
 					String token=st2.nextToken().trim();
 					if(token.indexOf("=")==-1){
-						//TODO use information - for now we use the assignment block via L
+						shift=Double.parseDouble(token);
 					}else if(token.startsWith("L")){
 						if(token.substring(2).matches("^\\(.*\\)$")){
 							if(!token.substring(2).matches("^\\([0-9]*(\\|[0-9]*)\\)$"))
@@ -417,7 +424,10 @@ public class NmredataReader {
 				}
 				//TODO multiplicity
 				//TODO intensity
-				peaks.add(new Peak1D(peak.getPosition()[0],0));
+				if(peak!=null)
+					peaks.add(new Peak1D(peak.getPosition()[0],0));
+				else
+					peaks.add(new Peak1D(shift,0));
 			}else{
 				String keyfile=line.substring(0, line.indexOf("="));
 				for(String key : specctrum1dproperties ){
