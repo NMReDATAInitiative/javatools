@@ -385,10 +385,11 @@ public class NmredataReader {
 				Peak peak=null;
 				String multiplicity;
 				double shift=0;
+				shift=Double.parseDouble(st2.nextToken());
 				while(st2.hasMoreTokens()){
 					String token=st2.nextToken().trim();
 					if(token.indexOf("=")==-1){
-						shift=Double.parseDouble(token);
+						throw new NmreDataException(token+" is not a valid element in line "+line+", there must be a shift values and labels of the format X=Y only!");
 					}else if(token.startsWith("L")){
 						if(token.substring(2).matches("^\\(.*\\)$")){
 							if(!token.substring(2).matches("^\\([0-9]*(\\|[0-9]*)\\)$"))
