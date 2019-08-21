@@ -77,5 +77,18 @@ public class NmredataReaderTest  extends TestCase{
         Assert.assertEquals(7, data.getMolecule().getBondCount());
         Assert.assertEquals(6, data.getSpectra().size());
         Assert.assertEquals(3, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
+        Assert.assertEquals(3, ((AtomReference)((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[2].getTargets()[0]).getAtomNumber());
+        Assert.assertEquals(5, ((AtomReference)((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[2].getTargets()[1]).getAtomNumber());
+	}
+	
+	public void testReadDamien() throws Exception, IOException{
+		String filename = "testdata/compound1_with_jcamp.nmredata.sdf";
+        InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
+        NmredataReader reader = new NmredataReader(ins);
+        NmreData data = reader.read();
+        Assert.assertEquals(17, data.getMolecule().getAtomCount());
+        Assert.assertEquals(17, data.getMolecule().getBondCount());
+        Assert.assertEquals(1, data.getSpectra().size());
+        Assert.assertEquals(14, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
 	}
 }

@@ -362,11 +362,10 @@ public class NmredataReader {
 	private void analyze1DSpectrum(String spectrumblock, String nucleus, NmreData data) throws NmreDataException, JCAMPException {
 		StringTokenizer st=new StringTokenizer(spectrumblock,lineseparator);
 		List<Peak> peaks=new ArrayList<>();
-		List<String> labels=new ArrayList<>();
+		Map<Double,String> labels=new HashMap<>();
 		double freq=Double.NaN;
 		String location=null;
 		String sequence=null;
-		double intensity=Double.NaN;
 		Map<NoteDescriptor, String> descriptors=new HashMap<>();
 		while(st.hasMoreTokens()){
 			String line = st.nextToken().trim();
@@ -386,50 +385,72 @@ public class NmredataReader {
 				String multiplicity;
 				double shift=0;
 				shift=Double.parseDouble(st2.nextToken());
-				while(st2.hasMoreTokens()){
-					String token=st2.nextToken().trim();
-					if(token.indexOf("=")==-1){
-						throw new NmreDataException(token+" is not a valid element in line "+line+", there must be a shift values and labels of the format X=Y only!");
-					}else if(token.startsWith("L")){
-						if(token.substring(2).matches("^\\(.*\\)$")){
-							if(!token.substring(2).matches("^\\([0-9]*(\\|[0-9]*)\\)$"))
-								throw new NmreDataException("It seems there is an ambiguous assignment intend in line "+token+", but it is not correct!");
+				String label="";
+				double intensity=Double.NaN;
+				while(st2.hasMoreTokens() || !label.isEmpty()){
+					String token="X=";
+					if(st2.hasMoreTokens())
+						token=st2.nextToken().trim();
+					if(token.indexOf("=")>-1 && !label.isEmpty()){
+						if(label.startsWith("L")){
+							if(label.substring(2).matches("^\\(.*\\)$")){
+								if(!label.substring(2).matches("^\\([0-9]*(\\|[0-9]*)\\)$"))
+									throw new NmreDataException("It seems there is an ambiguous assignment intend in line "+label+", but it is not correct!");
+								//TODO do something
+							}else {
+								peak=signals.get(label.substring(2).trim());
+								labels.put(shift, label.substring(2).trim());
+							}
+						}else if(label.startsWith("J")){
+							StringTokenizer st3=new StringTokenizer(label.substring(2),",");
+							while(st3.hasMoreTokens()){
+								String token3=st3.nextToken().trim();
+								String number="";
+								String coupling="";
+								if(token3.contains("(") && token3.contains(")")) {
+									number=token3.substring(0,token3.indexOf("(")).trim();
+									coupling=token3.substring(token3.indexOf("(")+1,token3.length()-1);
+									if(!signals.containsKey(coupling.trim()))
+										throw new NmreDataException("The coupling "+label+" contains an assignment to "+coupling+", but there is no such signal!");
+								}else {
+									number=token3;
+								}								
+								if(!number.matches("^[0-9\\.]*$"))
+									throw new NmreDataException("For J= we need a comma-separated list of floats, seems not to be the case in "+label);
+								//TODO do something
+							}
+						}else if(label.startsWith("N")){
 							//TODO do something
+						}else if(label.startsWith("E")){
+							//TODO do something
+						}else if(label.startsWith("I")){
+							intensity=Double.parseDouble(label.substring(2).trim());
+						}else if(label.startsWith("W")){
+							//TODO do something
+						}else if(label.startsWith("T1")){
+							//TODO do something
+						}else if(label.startsWith("T2")){
+							//TODO do something
+						}else if(label.startsWith("Diff")){
+							//TODO do something
+						}else if(label.startsWith("S")){
+							multiplicity=label.substring(2).trim();
 						}else {
-							peak=signals.get(token.substring(2).trim());
-							labels.add(token.substring(2).trim());
+							throw new NmreDataException("Line "+line+" contains an entry "+label+", only S, J, N, L, E, I, W, T1, and T2 are allowed");
 						}
-					}else if(token.startsWith("J")){
-						if(!token.substring(2).matches("^[0-9\\.]*(, [0-9\\.]*)*$"))
-							throw new NmreDataException("For L= we need a comma-separated list of floats, seems not to be the case in "+token);
-						//TODO do something
-					}else if(token.startsWith("N")){
-						//TODO do something
-					}else if(token.startsWith("E")){
-						//TODO do something
-					}else if(token.startsWith("I")){
-						intensity=Double.parseDouble(token.substring(2).trim());
-					}else if(token.startsWith("W")){
-						//TODO do something
-					}else if(token.startsWith("T1")){
-						//TODO do something
-					}else if(token.startsWith("T2")){
-						//TODO do something
-					}else if(token.startsWith("Diff")){
-						//TODO do something
-					}else if(token.startsWith("S")){
-						multiplicity=token.substring(2).trim();
-					}else {
-						throw new NmreDataException("Line "+line+" contains an entry "+token+", only S, J, N, L, E, I, W, T1, and T2 are allowed");
+						label="";
 					}
+					if(!label.isEmpty())
+						label=label+",";
+					if(!token.equals("X="))
+						label=label+token;
 				}
 				//TODO multiplicity
-				//TODO intensity
 				if(peak!=null)
-					peaks.add(new Peak1D(peak.getPosition()[0],0));
+					peaks.add(new Peak1D(peak.getPosition()[0],Double.isNaN(intensity) ? 0 : intensity));
 				else
 					peaks.add(new Peak1D(shift,0));
-			}else{
+			}else if(!line.isEmpty()){
 				String keyfile=line.substring(0, line.indexOf("="));
 				for(String key : specctrum1dproperties ){
 					if(keyfile.equals(key)){
@@ -448,12 +469,32 @@ public class NmredataReader {
         Unit yUnit = CommonUnit.intensity;
         double reference = 0;
         Peak1D[] peaks1d = new Peak1D[peaks.size()];
-		Assignment[] assignmentslocal=new Assignment[peaks.size()];
+		List<Assignment> assignmentslocal=new ArrayList<>();
         int i=0;
         for(Peak peak : peaks){
         	peaks1d[i]=(Peak1D)peak;
-        	if(labels.size()==peaks.size())
-        		assignmentslocal[i]=new Assignment(new Pattern(peaks1d[i].getPosition()[0], Multiplicity.UNKNOWN), assignments.get(labels.get(i)));
+        	if(labels.containsKey(peak.getPosition()[0])) {
+	        	StringTokenizer st2=new StringTokenizer(labels.get((peak.getPosition()[0])),",");
+	        	int size=0;
+	        	while(st2.hasMoreTokens()) {
+	        		String token=st2.nextToken().trim();
+	        		if(!assignments.containsKey(token)){
+	        			throw new NmreDataException("There is an assignment to "+token+", but there is no such peak in NMREDATA_ASSIGNMENTS!");
+	        		}
+	        		size+=assignments.get(token).length;
+	        	}
+	        	IAssignmentTarget[] targets=new IAssignmentTarget[size];
+	        	int l=0;
+	        	st2=new StringTokenizer(labels.get((peak.getPosition()[0])),",");
+	        	while(st2.hasMoreTokens()) {
+	        		String token=st2.nextToken().trim();
+	        		for(int k=0;k<assignments.get(token).length;k++) {
+	        			targets[l]=assignments.get(token)[k];
+	        			l++;
+	        		}
+	        	}
+	       		assignmentslocal.add(new Assignment(new Pattern(peaks1d[i].getPosition()[0], Multiplicity.UNKNOWN), targets));
+        	}
         	i++;
         }
         double[][] xy=new double[0][];
@@ -473,8 +514,8 @@ public class NmredataReader {
         	spectrum.setNote("sequence", sequence);
         NoteDescriptor noteDescriptor=new NoteDescriptor("Spectrum_Location");
         spectrum.setNote(noteDescriptor, location);
-        if(labels.size()==peaks.size())
-        	spectrum.setAssignments(assignmentslocal);
+        if(assignmentslocal.size()>0)
+        	spectrum.setAssignments(assignmentslocal.toArray(new Assignment[assignmentslocal.size()]));
         data.addSpectrum(spectrum);
 	}
 

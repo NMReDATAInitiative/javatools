@@ -69,8 +69,8 @@ Larmor=600.133706048414\
 Spectrum_Location=E:/Users/liermann/Seafile/NMR-Archiv/chemikalienlager/4-picolin_108-89-4/1/fid\
 MD5=34b1e4b7d676b7f458432244caa00ca6\
 Pulseprogram=zg30\
-8.4216, S=m, L=H2, N=1, 1, E=314684.63, J=\
-7.0619, S=m, L=H5, N=1, 1, E=318688.09, J=\
+8.4216, S=m, L=H2, H6, N=1, 1, E=314684.63, J=\
+7.0619, S=m, L=H5, H3, N=1, 1, E=318688.09, J=\
 2.3077, S=s, L=H7, N=3, E=492991.91, J=\
 
 >  <NMREDATA_1D_13C>
