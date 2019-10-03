@@ -268,7 +268,7 @@ public class NmredataReader {
 				location=line.substring(line.indexOf("=")+1);
 			}else if(line.matches(".*/.*") && (!line.contains("=") || line.indexOf("=")>line.indexOf("/"))){
 				peakcount++;
-			}else{
+			}else if(!line.isEmpty()){
 				String keyfile=line.substring(0, line.indexOf("="));
 				for(String key : specctrum1dproperties ){
 					if(keyfile.equals(key)){
