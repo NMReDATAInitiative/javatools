@@ -18,6 +18,7 @@ import org.jcamp.spectrum.Spectrum;
 import org.jcamp.spectrum.Spectrum1D;
 import org.jcamp.spectrum.Spectrum2D;
 import org.jcamp.spectrum.assignments.AtomReference;
+import org.jcamp.spectrum.assignments.TwoAtomsReference;
 import org.jcamp.spectrum.notes.Note;
 import org.jcamp.spectrum.notes.NoteDescriptor;
 import org.openscience.cdk.interfaces.IAtom;
@@ -89,23 +90,19 @@ public class LSDWriter {
             NoteDescriptor noteDescriptor=new NoteDescriptor("CorType");
             List<String> entries = new ArrayList<String>();
 			if(spectrum instanceof Spectrum2D && (((Note)spectrum.getNotes(noteDescriptor).get(0)).getValue().equals("HSQC") || ((Note)spectrum.getNotes(noteDescriptor).get(0)).getValue().equals("COSY") || ((Note)spectrum.getNotes(noteDescriptor).get(0)).getValue().equals("HMBC"))) {
-				for(Peak2D peak : ((NMR2DSpectrum)spectrum).getPeakTable()){
-					for(IAssignmentTarget ass1 : assignmenets1d.get(peak.getPosition()[0])){
-						for(IAssignmentTarget ass2 : assignmenets1d.get(peak.getPosition()[1])){
-							int firstatom=((AtomReference)ass1).getAtomNumber();
-							int secondatom=((AtomReference)ass2).getAtomNumber();
-							if(data.getMolecule().getAtom(firstatom).getSymbol().equals("H")){
-								firstatom=data.getMolecule().getAtomNumber(data.getMolecule().getConnectedAtomsList(data.getMolecule().getAtom(firstatom)).get(0));
-							}
-							if(data.getMolecule().getAtom(secondatom).getSymbol().equals("H")){
-								secondatom=data.getMolecule().getAtomNumber(data.getMolecule().getConnectedAtomsList(data.getMolecule().getAtom(secondatom)).get(0));
-							}
-							if(!entries.contains(firstatom+" "+secondatom))
-								sdfwriter.write(((Note)spectrum.getNotes(noteDescriptor).get(0)).getValue()+" "+(firstatom+1)+" "+(secondatom+1)+"\r\n");
-							entries.add(firstatom+" "+secondatom);							
-						}
-					}
-				}
+			    for(Assignment ass : ((NMR2DSpectrum)spectrum).getAssignments()) {
+                    int firstatom=((TwoAtomsReference)ass.getTargets()[0]).getAtomNumber1()[0];
+                    int secondatom=((TwoAtomsReference)ass.getTargets()[0]).getAtomNumber2()[0];
+                    if(data.getMolecule().getAtom(firstatom).getSymbol().equals("H")){
+                        firstatom=data.getMolecule().getAtomNumber(data.getMolecule().getConnectedAtomsList(data.getMolecule().getAtom(firstatom)).get(0));
+                    }
+                    if(data.getMolecule().getAtom(secondatom).getSymbol().equals("H")){
+                        secondatom=data.getMolecule().getAtomNumber(data.getMolecule().getConnectedAtomsList(data.getMolecule().getAtom(secondatom)).get(0));
+                    }
+                    if(!entries.contains(firstatom+" "+secondatom))
+                        sdfwriter.write(((Note)spectrum.getNotes(noteDescriptor).get(0)).getValue()+" "+(firstatom+1)+" "+(secondatom+1)+"\r\n");
+                    entries.add(firstatom+" "+secondatom);                          
+			    }
 				sdfwriter.write("\r\n");
 			}
 		}

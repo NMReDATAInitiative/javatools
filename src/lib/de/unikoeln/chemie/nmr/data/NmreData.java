@@ -17,6 +17,7 @@ public class NmreData {
 	public enum NmredataVersion {ONE,ONEPOINTONE};
 	
 	private IAtomContainer molecule;
+	private IAtomContainer moleculeOriginal;
 	private List<Spectrum> spectra;
 	private NmredataVersion version;
 	private int level=-1;
@@ -67,15 +68,20 @@ public class NmreData {
 	public IAtomContainer getMolecule() {
 		return molecule;
 	}
-	public void setMolecule(IAtomContainer molecule) throws CDKException {
-		this.molecule = molecule;
+	public IAtomContainer getMoleculeOriginal() {
+		return moleculeOriginal;
+	}
+	public void setMolecule(IAtomContainer molecule) throws CDKException, CloneNotSupportedException {
 		CDKAtomTypeMatcher matcher = CDKAtomTypeMatcher.getInstance(molecule.getBuilder());
 	    for (IAtom atom : molecule.atoms()) {
 	      IAtomType type = matcher.findMatchingAtomType(molecule, atom);
 	      AtomTypeManipulator.configure(atom, type);
 	    }
+	    this.moleculeOriginal=molecule.clone();
 	    CDKHydrogenAdder adder = CDKHydrogenAdder.getInstance(molecule.getBuilder());
 	    adder.addImplicitHydrogens(molecule);
+	    this.molecule = molecule;
+		
 	}
 	public List<Spectrum> getSpectra() {
 		return spectra;
