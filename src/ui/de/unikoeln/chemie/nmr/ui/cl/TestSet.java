@@ -50,12 +50,13 @@ public class TestSet {
 					ex.printStackTrace();
 				}
 				try {
+					String filename=file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(File.separator)+1,file.getAbsolutePath().length()-13);
 					File javafile=new File(file.getAbsolutePath().substring(0,file.getAbsolutePath().length()-12)+"java");
 					if(javafile.exists()) {
 						JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 						int compilationResult =	compiler.run(null, null, null, javafile.getAbsolutePath());
 						if(compilationResult == 0){
-							File dirde=new File(file.getParent()+"/de/unikoeln/chemie/nmr/ui/gui");
+							File dirde=new File(file.getParent()+"/de/unikoeln/chemie/nmr/ui/cl");
 							if(!dirde.exists())
 								dirde.mkdirs();					
 							File classfile=new File(file.getAbsolutePath().substring(0,file.getAbsolutePath().length()-12)+"class");
@@ -63,8 +64,8 @@ public class TestSet {
 							classfile.delete();
 							URL[] classpath= {new File(javafile.getParent()).toURL()};
 							URLClassLoader classLoader = new URLClassLoader(classpath, TestSet.class.getClassLoader());
-							Class<?> testclass = Class.forName("de.unikoeln.chemie.nmr.ui.gui.Asunepravir",true,classLoader);
-							Object testclassobj=classLoader.loadClass("de.unikoeln.chemie.nmr.ui.gui.Asunepravir").getConstructor().newInstance();
+							Class<?> testclass = Class.forName("de.unikoeln.chemie.nmr.ui.cl."+filename,true,classLoader);
+							Object testclassobj=classLoader.loadClass("de.unikoeln.chemie.nmr.ui.cl."+filename).getConstructor().newInstance();
 							Method method = testclass.getMethod("setNmreData", NmreData.class);
 							method.invoke(testclassobj,data);
 							System.out.println("Performing java tests for "+file.getName()+" using "+javafile.getAbsolutePath());
