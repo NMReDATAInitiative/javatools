@@ -5,13 +5,12 @@ import java.io.FileInputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.List;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
 import org.apache.commons.io.FileUtils;
-
-import com.google.common.io.Files;
 
 import de.unikoeln.chemie.nmr.data.NmreData;
 import de.unikoeln.chemie.nmr.io.NmredataReader;
@@ -40,9 +39,10 @@ public class TestSet {
 				parseDirectory(file);
 			}else if(file.getName().endsWith("nmredata.sdf")) {
 				NmreData data = null;
+				NmredataReader reader = null;
 				try {
 					System.out.println("Testing "+file.getName());
-					NmredataReader reader = new NmredataReader(new FileInputStream(file));
+					reader = new NmredataReader(new FileInputStream(file));
 					data = reader.read();
 				}catch(Exception ex){
 					System.out.println("Problems parsing "+file.getName());
@@ -66,8 +66,8 @@ public class TestSet {
 							URLClassLoader classLoader = new URLClassLoader(classpath, TestSet.class.getClassLoader());
 							Class<?> testclass = Class.forName("de.unikoeln.chemie.nmr.ui.cl."+filename,true,classLoader);
 							Object testclassobj=classLoader.loadClass("de.unikoeln.chemie.nmr.ui.cl."+filename).getConstructor().newInstance();
-							Method method = testclass.getMethod("setNmreData", NmreData.class);
-							method.invoke(testclassobj,data);
+							Method method = testclass.getMethod("setNmreData", NmreData.class, List.class);
+							method.invoke(testclassobj,data,reader.couplings);
 							System.out.println("Performing java tests for "+file.getName()+" using "+javafile.getAbsolutePath());
 							method = testclass.getMethod("test");
 							method.invoke(testclassobj);

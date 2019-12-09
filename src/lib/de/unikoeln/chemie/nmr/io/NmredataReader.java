@@ -25,7 +25,6 @@ import org.jcamp.spectrum.OrderedArrayData;
 import org.jcamp.spectrum.Pattern;
 import org.jcamp.spectrum.Peak;
 import org.jcamp.spectrum.assignments.AtomReference;
-import org.jcamp.spectrum.assignments.TwoAtomsReference;
 import org.jcamp.spectrum.notes.NoteDescriptor;
 import org.jcamp.units.CommonUnit;
 import org.jcamp.units.Unit;
@@ -40,6 +39,7 @@ import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
 
+import de.unikoeln.chemie.nmr.data.Coupling;
 import de.unikoeln.chemie.nmr.data.NMR2DSpectrum;
 import de.unikoeln.chemie.nmr.data.NmreData;
 import de.unikoeln.chemie.nmr.data.NmreData.NmredataVersion;
@@ -53,6 +53,7 @@ public class NmredataReader {
 	Map<String,String> spectra2d=new HashMap<String,String>();
 	Map<String,Peak> signals=new HashMap<String,Peak>();
 	Map<String,IAssignmentTarget[]> assignments=new HashMap<String,IAssignmentTarget[]>();
+	public List<Coupling> couplings = new ArrayList<Coupling>();
 	String lineseparator="\n\r";
 	
 	private static final List<String> specctrum1dproperties=new ArrayList<String>();
@@ -174,7 +175,7 @@ public class NmredataReader {
 			String label2=st2.nextToken().trim();
 			if(!signals.containsKey(label2))
 				throw new NmreDataException("Label "+label2+" in NMREDATA_J (line "+line+") is not in NMREDATA_ASSIGNMENT!");
-			Double.parseDouble(st2.nextToken());
+			double constant=Double.parseDouble(st2.nextToken());
 			if(st2.hasMoreTokens()) {
 				String coupling=st.nextToken();
 				if(!coupling.startsWith("nb="))
@@ -183,7 +184,8 @@ public class NmredataReader {
 			}
 			if(st2.hasMoreTokens())
 				throw new NmreDataException("line "+line+" has more than three ,-separated parts - only three are possible!");
-			//TODO do something
+			Coupling coupling=new Coupling(constant, assignments.get(label1), assignments.get(label2));
+			couplings.add(coupling);
 		}
 	}
 
