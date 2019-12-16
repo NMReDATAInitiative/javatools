@@ -129,6 +129,7 @@ public class NmredataWriterTest extends TestCase{
         NmredataWriter writer=new NmredataWriter(fos);
         writer.write(data, NmredataVersion.ONEPOINTONE);
         writer.close();
+        fos.close();
 	}
 
     public static IAtomContainer makeBenzene() throws CDKException {

@@ -26,7 +26,8 @@ public class NMR2DSpectrum extends Spectrum2D {
     double[] frequency = new double[] { 300.0, 300.0 };
     double[] reference = new double[] { 0.0, 0.0 };
     boolean fullSpectrum = true;
-    /**
+    protected Assignment[] assignments = null;
+	/**
      * peak table (array of peaks) 
      */
     protected Peak2D[] peakTable = null;
@@ -228,4 +229,11 @@ public class NMR2DSpectrum extends Spectrum2D {
                     peakTable[i].setSpectrum(this);
         }
     }
+    public Assignment[] getAssignments() {
+		return assignments;
+	}
+
+	public void setAssignments(Assignment[] assignments) {
+		this.assignments = assignments;
+	}
 }

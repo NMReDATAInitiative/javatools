@@ -20,7 +20,7 @@ import junit.framework.TestCase;
 
 public class LSDTest extends TestCase{
 	
-	public void testSimple() throws IOException, NmreDataException, JCAMPException, CDKException {
+	public void testSimple() throws IOException, NmreDataException, JCAMPException, CDKException, CloneNotSupportedException {
 		String filename = "testdata/cmcse.sdf";
         InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
         NmredataReader reader = new NmredataReader(ins);
@@ -47,7 +47,7 @@ public class LSDTest extends TestCase{
         }
 	}
 
-	public void testMRC() throws IOException, NmreDataException, JCAMPException, CDKException {
+	public void testMRC() throws IOException, NmreDataException, JCAMPException, CDKException, CloneNotSupportedException {
 		String filename = "testdata/MRC_Cyprinol_2018.nmredata.sdf";
         InputStream ins = this.getClass().getClassLoader().getResourceAsStream(filename);
         NmredataReader reader = new NmredataReader(ins);

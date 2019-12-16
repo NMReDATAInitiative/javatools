@@ -78,7 +78,7 @@ public class NmredataReader {
 		this(new InputStreamReader(in));
 	}
 	
-	public NmreData read() throws IOException, NmreDataException, JCAMPException, CDKException {
+	public NmreData read() throws IOException, NmreDataException, JCAMPException, CDKException, CloneNotSupportedException {
 		NmreData data=new NmreData();
 		IteratingSDFReader mdlreader=new IteratingSDFReader(input, DefaultChemObjectBuilder.getInstance());
 		IAtomContainer ac = mdlreader.next();
@@ -133,6 +133,7 @@ public class NmredataReader {
 				}else if(((String)key).startsWith("NMREDATA_ALATIS")){
 					//any checks possible?
 				}else if(((String)key).startsWith("NMREDATA_SOLVENT")){
+					data.setSolvent(property);
 					//any checks possible?
 				}else if(((String)key).startsWith("NMREDATA_PH")){
 					data.setPh(Double.parseDouble(property));
@@ -283,8 +284,8 @@ public class NmredataReader {
 		double[] xdata=new double[peakcount];
 		double[] ydata=new double[peakcount];
 		Peak2D[] peakTable=new Peak2D[peakcount];
-		//List<String> labels1=new ArrayList<>();
-		//List<String> labels2=new ArrayList<>();
+		List<String> labels1=new ArrayList<>();
+		List<String> labels2=new ArrayList<>();
 		st=new StringTokenizer(spectrumblock,lineseparator);
 		int i=0;
 		while(st.hasMoreTokens()){
@@ -296,13 +297,13 @@ public class NmredataReader {
 					xdata[i]=signals.get(label1).getPosition()[0];
 				else
 					xdata[i]=Double.parseDouble(label1);
-				//labels1.add(label1);
+				labels1.add(label1);
 				String label2=st2.nextToken();
 				if(signals.get(label2)!=null)
 					ydata[i]=signals.get(label2).getPosition()[0];
 				else
 					ydata[i]=Double.parseDouble(label2);
-				//labels2.add(label2);
+				labels2.add(label2);
 				peakTable[i]=new Peak2D(xdata[i],ydata[i],0);
 				while(st2.hasMoreTokens()) {
 					String part=st2.nextToken().trim();
@@ -350,14 +351,21 @@ public class NmredataReader {
         for(NoteDescriptor descriptor : descriptors.keySet()){
         	spectrum.setNote(descriptor, descriptors.get(descriptor));
         }
-		/*We do not use these, assignments are via the 1d peaks
-		Assignment[] assignmentslocal=new Assignment[labels1.size()];
+		Assignment[] assignmentslocal=new Assignment[i];
         for(i=0; i<labels1.size();i++){
-        	AtomReference t1=(AtomReference)assignments.get(labels1.get(i))[0];
-        	AtomReference t2=(AtomReference)assignments.get(labels2.get(i))[0];
-       		assignmentslocal[i]=new Assignment(new Pattern(peakTable[i].getPosition()[0], Multiplicity.UNKNOWN), new IAssignmentTarget[]{new TwoAtomsReference(null, t1.getAtomNumber(), t2.getAtomNumber())});
+        	IAssignmentTarget[] t1=(IAssignmentTarget[])assignments.get(labels1.get(i));
+        	IAssignmentTarget[] t2=(IAssignmentTarget[])assignments.get(labels2.get(i));
+        	if(t1!=null && t2!=null) {
+            	int[] atomnumbers1=new int[t1.length];
+            	for(int k=0;k<t1.length;k++)
+            		atomnumbers1[k]=((AtomReference)t1[k]).getAtomNumber();
+            	int[] atomnumbers2=new int[t2.length];
+            	for(int k=0;k<t2.length;k++)
+            		atomnumbers2[k]=((AtomReference)t2[k]).getAtomNumber();
+            	assignmentslocal[i]=new Assignment(new Pattern(peakTable[i].getPosition()[0], Multiplicity.UNKNOWN), new IAssignmentTarget[]{new TwoAtomsReference(null, atomnumbers1, atomnumbers2)});
+        	}
         }
-        spectrum.setAssignments(assignmentslocal);*/
+        spectrum.setAssignments(assignmentslocal);
         data.addSpectrum(spectrum);
 	}
 
@@ -448,10 +456,10 @@ public class NmredataReader {
 						label=label+token;
 				}
 				//TODO multiplicity
-				if(peak!=null)
-					peaks.add(new Peak1D(peak.getPosition()[0],Double.isNaN(intensity) ? 0 : intensity));
-				else
-					peaks.add(new Peak1D(shift,0));
+				//if(peak!=null)
+				//	peaks.add(new Peak1D(peak.getPosition()[0],Double.isNaN(intensity) ? 0 : intensity));
+				//else
+				peaks.add(new Peak1D(shift,Double.isNaN(intensity) ? 0 : intensity));
 			}else if(!line.isEmpty()){
 				String keyfile=line.substring(0, line.indexOf("="));
 				for(String key : specctrum1dproperties ){
