@@ -1,5 +1,6 @@
 package de.unikoeln.chemie.nmr.data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jcamp.math.Range2D;
@@ -46,6 +47,20 @@ public class Peak2D extends Peak implements Cloneable {
     	}
 		return "";
 	}
+    public List<String> getAtoms1List() {
+    	List<String> atoms=new ArrayList<>();
+    	if(assignments!=null){
+    		for(Assignment assignment : assignments){
+    			if(assignment.getPattern().getPosition()[0]==getFirstShift()){
+    				for(IAssignmentTarget atom : assignment.getTargets()){
+    					atoms.add("a"+(((AtomReference)atom).getAtomNumber()+1));
+    				}
+    				return atoms;
+    			}
+    		}
+    	}
+		return atoms;
+	}
     public String getAtoms2() {
     	StringBuffer atoms=new StringBuffer();
     	if(assignments!=null){
@@ -61,7 +76,21 @@ public class Peak2D extends Peak implements Cloneable {
     	}
 		return "";
 	}
-	public void setAtoms1(String atoms) {
+    public List<String> getAtoms2List() {
+    	List<String> atoms=new ArrayList<>();
+    	if(assignments!=null){
+    		for(Assignment assignment : assignments){
+    			if(assignment.getPattern().getPosition()[0]==getSecondShift()){
+    				for(IAssignmentTarget atom : assignment.getTargets()){
+    					atoms.add("a"+(((AtomReference)atom).getAtomNumber()+1));
+    				}
+    				return atoms;
+    			}
+    		}
+    	}
+		return atoms;
+	}
+    public void setAtoms1(String atoms) {
 		//TODO for edit
 	}
 	public void setAtoms2(String atoms) {

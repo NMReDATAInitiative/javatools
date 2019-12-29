@@ -25,6 +25,7 @@ import org.jcamp.spectrum.OrderedArrayData;
 import org.jcamp.spectrum.Pattern;
 import org.jcamp.spectrum.Peak;
 import org.jcamp.spectrum.assignments.AtomReference;
+import org.jcamp.spectrum.assignments.TwoAtomsReference;
 import org.jcamp.spectrum.notes.NoteDescriptor;
 import org.jcamp.units.CommonUnit;
 import org.jcamp.units.Unit;
