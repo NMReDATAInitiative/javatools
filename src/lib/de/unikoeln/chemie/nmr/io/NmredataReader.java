@@ -168,8 +168,7 @@ public class NmredataReader {
 		StringTokenizer st=new StringTokenizer(couplingblock,lineseparator);
 		while(st.hasMoreTokens()){
 			String line = st.nextToken().trim();
-			if(line.indexOf(";")>-1)
-				line=line.substring(0, line.indexOf(";"));
+			line=processLine(line);
 			StringTokenizer st2=new StringTokenizer(line,",");
 			String label1=st2.nextToken().trim();
 			if(!signals.containsKey(label1))
@@ -195,8 +194,7 @@ public class NmredataReader {
 		StringTokenizer st=new StringTokenizer(signalblock,lineseparator);
 		while(st.hasMoreTokens()){
 			String line = st.nextToken().trim();
-			if(line.indexOf(";")>-1)
-				line=line.substring(0, line.indexOf(";"));
+			line=processLine(line);
 			if(line.startsWith("Interchangeable=")){
 				if(data.getLevel()%2==0){
 					throw new NmreDataException("Interchangeable= only allowed in levels 1 and 3, the file is level "+data.getLevel());
@@ -264,9 +262,8 @@ public class NmredataReader {
 		Map<NoteDescriptor, String> descriptors=new HashMap<>();
 		while(st.hasMoreTokens()){
 			String line = st.nextToken().trim();
-			if(line.indexOf(";")>-1)
-				line=line.substring(0, line.indexOf(";"));
-			if(line.startsWith("Larmor=")){
+			line=processLine(line);
+;			if(line.startsWith("Larmor=")){
 				freq=new double[]{Double.parseDouble(line.substring(7)),Double.parseDouble(line.substring(7))};
 			}else if(line.startsWith("Spectrum_Location=")){
 				location=line.substring(line.indexOf("=")+1);
@@ -380,8 +377,7 @@ public class NmredataReader {
 		Map<NoteDescriptor, String> descriptors=new HashMap<>();
 		while(st.hasMoreTokens()){
 			String line = st.nextToken().trim();
-			if(line.indexOf(";")>-1)
-				line=line.substring(0, line.indexOf(";"));
+			line=processLine(line);
 			if(line.startsWith("Larmor=")){
 				freq=Double.parseDouble(line.substring(7));
 			}else if(line.startsWith("Spectrum_Location=")){
@@ -531,6 +527,14 @@ public class NmredataReader {
 	}
 
 	
+	private String processLine(String line) {
+		if(line.indexOf(";")>-1)
+			line=line.substring(0, line.indexOf(";"));
+		line=line.replace("\n", "");
+		line=line.replace("\r", "");
+		return line;
+	}
+
 	/**
 	 * create peak spectrum from peak table.
 	 * adds all intensities belonging to the same x-position up
