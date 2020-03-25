@@ -395,7 +395,11 @@ public class NmredataReader {
 				Peak peak=null;
 				String multiplicity;
 				double shift=0;
-				shift=Double.parseDouble(st2.nextToken());
+				String shiftstring=st2.nextToken();
+				//TODO handle range
+				if(shiftstring.contains("-"))
+					shiftstring=shiftstring.substring(0,shiftstring.indexOf('-'));
+				shift=Double.parseDouble(shiftstring);
 				String label="";
 				double intensity=Double.NaN;
 				while(st2.hasMoreTokens() || !label.isEmpty()){
@@ -426,7 +430,7 @@ public class NmredataReader {
 								}else {
 									number=token3;
 								}								
-								if(!number.matches("^[0-9\\.]*$"))
+								if(!number.matches("^-?[0-9\\.]*$"))
 									throw new NmreDataException("For J= we need a comma-separated list of floats, seems not to be the case in "+label);
 								//TODO do something
 							}
