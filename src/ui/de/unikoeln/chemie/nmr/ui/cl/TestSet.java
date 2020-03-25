@@ -51,7 +51,9 @@ public class TestSet {
 				}
 				try {
 					String filename=file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(File.separator)+1,file.getAbsolutePath().length()-13);
-					File javafile=new File(file.getAbsolutePath().substring(0,file.getAbsolutePath().length()-12)+"java");
+					if(Character.isDigit(filename.charAt(0)))
+						filename="c"+filename;
+					File javafile=new File(file.getAbsolutePath().substring(0,file.getAbsolutePath().lastIndexOf(File.separator)+1)+filename+".java");
 					if(javafile.exists()) {
 						JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 						int compilationResult =	compiler.run(null, null, null, javafile.getAbsolutePath());
@@ -59,7 +61,7 @@ public class TestSet {
 							File dirde=new File(file.getParent()+"/de/unikoeln/chemie/nmr/ui/cl");
 							if(!dirde.exists())
 								dirde.mkdirs();					
-							File classfile=new File(file.getAbsolutePath().substring(0,file.getAbsolutePath().length()-12)+"class");
+							File classfile=new File(file.getAbsolutePath().substring(0,file.getAbsolutePath().lastIndexOf(File.separator)+1)+filename+".class");
 							FileUtils.copyFileToDirectory(classfile, dirde);
 							classfile.delete();
 							URL[] classpath= {new File(javafile.getParent()).toURL()};
