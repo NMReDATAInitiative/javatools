@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
@@ -24,6 +25,8 @@ import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
+import org.jcamp.parser.JCAMPException;
+import org.jcamp.parser.JCAMPWriter;
 import org.jcamp.spectrum.Assignment;
 import org.jcamp.spectrum.IAssignmentTarget;
 import org.jcamp.spectrum.NMRSpectrum;
@@ -134,10 +137,11 @@ public class NMReDATAeditor extends Application {
         			return;
         		}
         		FileChooser chooser = new FileChooser();
-        		FileChooser.ExtensionFilter extFilter1 = new FileChooser.ExtensionFilter("NMReDATA 1.0 file (*.nmredata.sdf)", "*.nmredata.sdf");
-        		FileChooser.ExtensionFilter extFilter2 = new FileChooser.ExtensionFilter("NMReDATA 1.1 file (*.nmredata.sdf)", "*.nmredata.sdf");
-        		FileChooser.ExtensionFilter extFilter3 = new FileChooser.ExtensionFilter("LSD file (*.lsd)", "*.lsd");
-        		chooser.getExtensionFilters().addAll(extFilter2, extFilter1, extFilter3);
+        		FileChooser.ExtensionFilter extFilter1 = new FileChooser.ExtensionFilter("NMReDATA 1.0 (*.nmredata.sdf)", "*.nmredata.sdf");
+        		FileChooser.ExtensionFilter extFilter2 = new FileChooser.ExtensionFilter("NMReDATA 1.1 (*.nmredata.sdf)", "*.nmredata.sdf");
+        		FileChooser.ExtensionFilter extFilter3 = new FileChooser.ExtensionFilter("LSD (*.lsd)", "*.lsd");
+        		FileChooser.ExtensionFilter extFilter4 = new FileChooser.ExtensionFilter("jcamp-dx (*.jdx)", "*.jdx");
+        		chooser.getExtensionFilters().addAll(extFilter2, extFilter1, extFilter3, extFilter4);
         		chooser.setTitle("Save spectrum file");
         		File file = chooser.showSaveDialog(primaryStage);
         		if(file!=null){
@@ -145,7 +149,7 @@ public class NMReDATAeditor extends Application {
         				saveas(file, chooser.getSelectedExtensionFilter());
         			}catch(Exception ex){
         				System.out.println(ex.getMessage());
-            			Alert alert = new Alert(AlertType.ERROR);
+        				Alert alert = new Alert(AlertType.ERROR);
             			alert.setTitle("Error writing file");
             			alert.setHeaderText("Error writing file");
             			alert.setContentText(ex.getMessage());
@@ -197,7 +201,7 @@ public class NMReDATAeditor extends Application {
         primaryStage.show();
     }
 
-	protected void saveas(File file, ExtensionFilter selectedExtensionFilter) throws IOException, CloneNotSupportedException, CDKException {
+	protected void saveas(File file, ExtensionFilter selectedExtensionFilter) throws IOException, CloneNotSupportedException, CDKException, JCAMPException {
 		if(selectedExtensionFilter.getExtensions().get(0).equals("*.lsd")){
 			if(!file.getName().endsWith(".lsd"))
 				file=new File(file.getPath()+".lsd");
@@ -205,12 +209,20 @@ public class NMReDATAeditor extends Application {
 	        LSDWriter lsdwrtier=new LSDWriter(pw);
 	        lsdwrtier.write(data);
 	        lsdwrtier.close();
-		}else if(selectedExtensionFilter.getDescription().equals("NMReDATA 1.0 file (*.nmredata.sdf)")){
+		}else if(selectedExtensionFilter.getDescription().equals("NMReDATA 1.0 (*.nmredata.sdf)")){
 			if(!file.getName().endsWith(".nmredata.sdf"))
 				file=new File(file.getPath()+".nmredata.sdf");
 	        FileOutputStream fos=new FileOutputStream(file);
 	        NmredataWriter writer=new NmredataWriter(fos);
 	        writer.write(data, NmredataVersion.ONE);
+	        writer.close();
+		}else if(selectedExtensionFilter.getDescription().equals("jcamp-dx (*.jdx)")){
+			if(!file.getName().endsWith(".jdx"))
+				file=new File(file.getPath()+".jdx");
+	        Spectrum spectrum = data.getSpectra().get(tabPane.getSelectionModel().getSelectedIndex());
+	        JCAMPWriter jwriter=JCAMPWriter.getInstance();
+	        FileWriter writer = new FileWriter(file);
+	        writer.write(jwriter.toJCAMP(spectrum));
 	        writer.close();
 		}else{
 			if(!file.getName().endsWith(".nmredata.sdf"))
