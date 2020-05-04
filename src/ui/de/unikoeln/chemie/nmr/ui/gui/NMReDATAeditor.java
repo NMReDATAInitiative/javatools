@@ -233,7 +233,8 @@ public class NMReDATAeditor extends Application {
 	        assignments=new ArrayList<>();
 			for(int i=0; i<data.getSpectra().size(); i++){
 				if(data.getSpectra().get(i) instanceof NMRSpectrum){
-					assignments.addAll(Arrays.asList(((NMRSpectrum)data.getSpectra().get(i)).getAssignments()));
+					if(((NMRSpectrum)data.getSpectra().get(i)).getAssignments()!=null)
+						assignments.addAll(Arrays.asList(((NMRSpectrum)data.getSpectra().get(i)).getAssignments()));
 				}
 			}
 			for(int i=0; i<data.getSpectra().size(); i++){
@@ -243,7 +244,10 @@ public class NMReDATAeditor extends Application {
 		        Tab tab;
 		        if(data.getSpectra().get(i) instanceof NMR2DSpectrum){
 			        NoteDescriptor noteDescriptor=new NoteDescriptor("CorType");
-			        tab=new Tab("2D "+((Note)data.getSpectra().get(i).getNotes(noteDescriptor).get(0)).getValue());
+			        if(data.getSpectra().get(i).getNotes(noteDescriptor)==null)
+			        	tab=new Tab("2D - Unknown Type");
+			        else
+			        	tab=new Tab("2D "+((Note)data.getSpectra().get(i).getNotes(noteDescriptor).get(0)).getValue());
 			        TableView<Peak2D> table=new TableView<Peak2D>();
 			        TableColumn<Peak2D, String> firstAtomCol = new TableColumn<Peak2D, String>("Assignment");
 			        firstAtomCol.setCellValueFactory(new PropertyValueFactory<>("atoms1"));
