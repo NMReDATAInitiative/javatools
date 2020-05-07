@@ -65,9 +65,9 @@ public class NmredataWriter {
 								for(IAssignmentTarget atomref : assignmentlocal.getTargets()){
 									IAtom atom = data.getMolecule().getAtom((((AtomReference)atomref)).getAtomNumber());
 									if(((NMRSpectrum)spectrum).getNucleus().equals("H") && !atom.getSymbol().equals("H")){
-										assignment.append(separator+"H"+(data.getMolecule().getAtomNumber(atom)+1));
+										assignment.append(separator+"H"+(data.getMolecule().indexOf(atom)+1));
 									}else {
-										assignment.append(separator+(data.getMolecule().getAtomNumber(atom)+1));
+										assignment.append(separator+(data.getMolecule().indexOf(atom)+1));
 									}
 								}
 							}
