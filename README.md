@@ -14,7 +14,7 @@ The class takes the file name as a parameter. In Eclipse right-click on the the 
 
 ## Installation
 
-Upload the [nmredata-editor](http://nmr-sdbtest.nmr.uni-koeln.de/nmredata-editor.jar) (which is just a visualizer for now).
+Upload  [nmredata-editor](http://nmr-sdbtest.nmr.uni-koeln.de/nmredata-editor.jar).
 http://nmr-sdbtest.nmr.uni-koeln.de/nmredata-editor.jar
 ```
 weget http://nmr-sdbtest.nmr.uni-koeln.de/nmredata-editor.jar
@@ -27,7 +27,7 @@ The nmredata.sdf file : [isoflavone.nmredata.sdf](https://github.com/NMReDATAIni
 wget https://github.com/NMReDATAInitiative/Examples-of-NMR-records/blob/master/isoflavone/isoflavone1_02.nmredata.sdf
 ```
 ## Usage
-Double click on the .jar file or 
+Double click on the .jar file and open the .dsf file. 
 ```
 java -jar nmredata-editor.jar
 ```
