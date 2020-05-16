@@ -139,7 +139,7 @@ public class NMReDATAeditor extends Application {
         		FileChooser chooser = new FileChooser();
         		FileChooser.ExtensionFilter extFilter1 = new FileChooser.ExtensionFilter("NMReDATA 1.0 (*.nmredata.sdf)", "*.nmredata.sdf");
         		FileChooser.ExtensionFilter extFilter2 = new FileChooser.ExtensionFilter("NMReDATA 1.1 (*.nmredata.sdf)", "*.nmredata.sdf");
-        		FileChooser.ExtensionFilter extFilter3 = new FileChooser.ExtensionFilter("LSD file (*.lsd)", "*.lsd");
+        		FileChooser.ExtensionFilter extFilter3 = new FileChooser.ExtensionFilter("LSD (*.lsd)", "*.lsd");
         		FileChooser.ExtensionFilter extFilter4 = new FileChooser.ExtensionFilter("jcamp-dx (*.jdx)", "*.jdx");
         		chooser.getExtensionFilters().addAll(extFilter2, extFilter1, extFilter3, extFilter4);
         		chooser.setTitle("Save spectrum file");
@@ -149,7 +149,7 @@ public class NMReDATAeditor extends Application {
         				saveas(file, chooser.getSelectedExtensionFilter());
         			}catch(Exception ex){
         				System.out.println(ex.getMessage());
-            			Alert alert = new Alert(AlertType.ERROR);
+        				Alert alert = new Alert(AlertType.ERROR);
             			alert.setTitle("Error writing file");
             			alert.setHeaderText("Error writing file");
             			alert.setContentText(ex.getMessage());
@@ -224,7 +224,7 @@ public class NMReDATAeditor extends Application {
 	        FileWriter writer = new FileWriter(file);
 	        writer.write(jwriter.toJCAMP(spectrum));
 	        writer.close();
-	    }else{
+		}else{
 			if(!file.getName().endsWith(".nmredata.sdf"))
 				file=new File(file.getPath()+".nmredata.sdf");
 	        FileOutputStream fos=new FileOutputStream(file);
@@ -245,7 +245,8 @@ public class NMReDATAeditor extends Application {
 	        assignments=new ArrayList<>();
 			for(int i=0; i<data.getSpectra().size(); i++){
 				if(data.getSpectra().get(i) instanceof NMRSpectrum){
-					assignments.addAll(Arrays.asList(((NMRSpectrum)data.getSpectra().get(i)).getAssignments()));
+					if(((NMRSpectrum)data.getSpectra().get(i)).getAssignments()!=null)
+						assignments.addAll(Arrays.asList(((NMRSpectrum)data.getSpectra().get(i)).getAssignments()));
 				}
 			}
 			for(int i=0; i<data.getSpectra().size(); i++){
