@@ -1,39 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/lib"/>
-	<classpathentry kind="src" path="src/test"/>
-	<classpathentry kind="src" path="src/ui"/>
-	<classpathentry kind="lib" path="lib/cdk-data.jar"/>
-	<classpathentry kind="lib" path="lib/cdk-interfaces.jar"/>
-	<classpathentry kind="lib" path="lib/JCampParser.jar"/>
-	<classpathentry kind="lib" path="lib/cdk-io.jar"/>
-	<classpathentry kind="lib" path="lib/cdk-core.jar"/>
-	<classpathentry kind="lib" path="lib/junit.jar"/>
-	<classpathentry kind="lib" path="lib/cdk-ioformats.jar"/>
-	<classpathentry kind="lib" path="lib/vecmath1.2-1.14.jar"/>
-	<classpathentry kind="lib" path="lib/google-collections-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/cdk-standard.jar"/>
-	<classpathentry kind="lib" path="lib/cdk-formula.jar"/>
-	<classpathentry kind="lib" path="lib/cdk-isomorphism.jar"/>
-	<classpathentry kind="lib" path="lib/commons-io-1.3.1.jar"/>
-	<classpathentry kind="lib" path="lib/cdk-inchi.jar"/>
-	<classpathentry kind="lib" path="lib/cdk-smiles.jar"/>
-	<classpathentry kind="lib" path="lib/jni-inchi-0.8.jar"/>
-	<classpathentry kind="lib" path="lib/cdk-valencycheck.jar"/>
-	<classpathentry kind="lib" path="lib/jnati-core-0.4.jar"/>
-	<classpathentry kind="lib" path="lib/jnati-deploy-0.4.jar"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.17.jar"/>
-	<classpathentry kind="lib" path="lib/cdk-render.jar"/>
-	<classpathentry kind="lib" path="lib/cdk-renderawt.jar"/>
-	<classpathentry kind="lib" path="lib/cdk-renderbasic.jar"/>
-	<classpathentry kind="lib" path="lib/cdk-renderextra.jar"/>
-	<classpathentry kind="lib" path="lib/batik-all-1.8.jar"/>
-	<classpathentry kind="lib" path="lib/guava-17.0.jar"/>
-	<classpathentry kind="lib" path="lib/cdk-ctab.jar"/>
-	<classpathentry kind="lib" path="lib/beam-core-1.3.3.jar"/>
-	<classpathentry kind="lib" path="lib/xml-apis-ext-1.3.04.jar"/>
-	<classpathentry kind="lib" path="lib/xmlgraphics-commons-2.1.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/cdk-atomtype.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,0 +1,350 @@
+
+  Mnova   12201710372D
+
+ 24 24  0  0  0  0  0  0  0  0999 V2000
+   43.9165   97.6674    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   47.9190   95.3566    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   55.9236   90.7351    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   51.9210   88.4237    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   51.9210   97.6674    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   51.9210   93.0458    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   39.9140   81.4914    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   43.9165   83.8022    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   47.9190   81.4914    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   51.9210   83.8022    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   43.9165   88.4237    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+   47.9190   90.7351    0.0000 Si  0  0  0  0  0  0  0  0  0  0  0  0
+   35.9114   83.8022    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   31.9089   81.4914    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   39.9140   76.8699    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0
+   35.9114   88.4237    0.0000 B   0  0  0  0  0  0  0  0  0  0  0  0
+   39.6507   91.1406    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+   38.2222   95.5359    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   33.6007   95.5359    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   32.1728   91.1406    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+   39.4182  100.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   42.6863   96.7319    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   32.4047  100.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   29.1366   96.7319    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+  1  2  1  0  0  0  0
+  3  4  1  0  0  0  0
+  5  6  1  0  0  0  0
+ 12  2  1  0  0  0  0
+ 12  4  1  0  0  0  0
+ 12  6  1  0  0  0  0
+  7  8  1  0  0  0  0
+  8  9  1  0  0  0  0
+  9 10  1  0  0  0  0
+  8 11  1  0  0  0  0
+ 11 12  1  0  0  0  0
+  7 13  2  0  0  0  0
+ 13 14  1  0  0  0  0
+  7 15  1  0  0  0  0
+ 13 16  1  0  0  0  0
+ 16 17  1  0  0  0  0
+ 17 18  1  0  0  0  0
+ 18 19  1  0  0  0  0
+ 19 20  1  0  0  0  0
+ 20 16  1  0  0  0  0
+ 18 21  1  0  0  0  0
+ 18 22  1  0  0  0  0
+ 19 23  1  0  0  0  0
+ 19 24  1  0  0  0  0
+M  ZZC   1 11
+M  ZZC   2 10
+M  ZZC   3 11''
+M  ZZC   4 10''
+M  ZZC   5 11'
+M  ZZC   6 10'
+M  ZZC   7 3
+M  ZZC   8 4
+M  ZZC   9 5
+M  ZZC  10 6
+M  ZZC  11 101
+M  ZZC  12 30
+M  ZZC  13 2
+M  ZZC  14 1
+M  ZZC  15 3H
+M  ZZC  16 20
+M  ZZC  17 100'
+M  ZZC  18 7'
+M  ZZC  19 7
+M  ZZC  20 100
+M  ZZC  21 8'
+M  ZZC  22 9'
+M  ZZC  23 9
+M  ZZC  24 8
+M  END
+>  <ID>
+99999
+
+>  <Formula>
+C18H37BO3Si
+
+>  <FW>
+340.3811
+
+>  <KOFO_P-ID>
+CF00134
+
+>  <KOFO_CHIFFRE>
+LOM-LA-288-01
+
+>  <KOFO_ELNANUM>
+1816
+
+>  <KOFO_AUFTRAGGEBER>
+Longobardi
+
+>  <KOFO_ARBEITSGRUPPE>
+F�rstner
+
+>  <KOFO_LM>
+CDCl3
+
+>  <KOFO_REF>
+solvent
+
+>  <KOFO_TEMP>
+298
+
+>  <KOFO_SPEKTROMETER>
+AV500as
+
+>  <KOFO_PROBENKOPF>
+5 mm PABBO BB-1H/D Z-GRD Z119470/0004
+
+
+>  <KOFO_MESSUNGSDATUM>
+19/12/2017
+
+>  <KOFO_SPEKTROSKOPIKER>
+Fares
+
+>  <KOFO_ANALYSEDATUM>
+20/12/2017
+
+>  <KOFO_ANALYTIKER>
+Fares
+
+>  <KOFO_DATENBANKEINTRAGSDATUM>
+20/12/2017
+
+>  <KOFO_DATENBANKEINTRAG_VON>
+Fares
+
+>  <KOFO_EXPERIMENTE>
+1H-zg30, 13C-zgdc30, [13C, 1H]-hsqcedetgpsisp2.3, [13C, 1H]-hsqcedetgpsisp2.3, [13C, 1H]-hmbcgpndqf, [1H, 1H]-noesygpph, 11B-zgdc30, 29Si-dept, 13C-zgdc30
+
+>  <KOFO_MENGE>
+10
+
+>  <ext file>
+
+
+>  <NMREDATA_VERSION>
+1.1
+
+>  <NMREDATA_SOLVENT>
+CDCl3
+
+
+>  <NMREDATA_TEMPERATURE>
+298 K
+
+>  <NMREDATA_CONCENTRATION>
+58.75767242997173 mM
+
+
+>  <NMREDATA_LEVEL>
+1
+
+>  <NMREDATA_FORMULA>
+C18H37BO3Si
+
+>  <NMREDATA_INCHI>
+
+
+>  <NMREDATA_ALATIS>
+
+
+>  <CNMR_SHIFTS>
+0:11[1]|12.878;1:10[2]|10.982;2:3[7]|156.553;4:4[8]|78.372;5:5[9]|37.404;6:5[9]|37.404;7:6[10]|15.882;9:2[13]|131.121;10:1[14]|28.172;13:7'[18]|88.973;14:7[19]|88.973;15:9[23]|30.813;16:8[24]|30.949;
+
+
+>  <HNMR_SHIFTS>
+0:11[1]|0.93;1:10[2]|0.58<'>;3:3H[15]|5.941;4:4[8]|4.73;5:5[9]|1.52<'>;6:5[9]|1.37<''>;7:6[10]|0.82;10:1[14]|1.76;15:9[23]|1.25;16:8[24]|1.25;
+
+
+>  <NMREDATA_ASSIGNMENT>
+11, 12.878, 1\
+H11, 0.93, H1\
+10, 10.982, 2\
+H10, 0.58, H2\
+3, 156.553, 7\
+4, 78.372, 8\
+H4, 4.73, H8\
+5, 37.404, 9\
+H5a, 1.52, H9\
+H5b, 1.37, H9\
+6, 15.882, 10\
+H6, 0.82, H10\
+30, 18.533, 12\
+2, 131.121, 13\
+1, 28.172, 14\
+H1, 1.76, H14\
+3H, 5.941, 15\
+20, 30.035, 16\
+7', 88.973, 18\
+7, 88.973, 19\
+9, 30.813, 23\
+H9, 1.25, H23\
+8, 30.949, 24\
+H8, 1.25, H24\
+
+
+
+>  <NMR_CONSTANTS>
+
+
+
+>  <NMREDATA_J>
+
+>  <NMREDATA_1D_1H>
+Larmor=499.870021059999\
+Pulseprogram=zg30\
+Spectrum_Location=file:lom-la-288-01/1/pdata/1/\
+0.9298, S=t, L=H11, E=407882.0660, J=7.95\
+0.5814, S=q, L=H10, E=268227.3796, J=7.88\
+4.7318, S=dt, L=H4, E=48396.8785, J=6.56,8.84\
+;1.5214, L=H5a\
+;1.3729, L=H5b\
+0.8243, S=t, L=H6, E=137545.8885, J=7.44\
+1.7558, S=d, L=H1, E=131377.0942, J=1.59\
+5.9413, S=dd, L=3H, E=43103.5692, J=9.09,1.59; found multiplet by label chem shifts differ by -0.000614 ppm\
+5.9413, S=dd, L=H6, E=43103.5692, J=9.09,1.59\
+1.2549, S=s, L=H9, E=331006.9402\
+1.2496, S=s, L=H8, E=380162.1833\
+
+>  <NMREDATA_1D_13C>
+Larmor=125.71503563398\
+Pulseprogram=zgdc30\
+Spectrum_Location=file:lom-la-288-01/2/pdata/1/\
+12.8781, S=s, N=3, L=11, E=4.4258; found multiplet by chemical shift \
+10.9822, S=s, N=2, L=10, E=5.2574; found multiplet by chemical shift \
+156.5668, S=s, L=3, E=1.9977; found multiplet by label chem shifts differ by -0.013275 ppm\
+78.3722, S=s, N=1, L=4, E=1.8203; found multiplet by chemical shift \
+37.4037, S=s, N=2, L=5, E=2.4465; found multiplet by chemical shift \
+15.8821, S=s, N=3, L=6, E=1.8035; found multiplet by chemical shift \
+131.1205, S=s, N=1, L=2, E=0.0265; found multiplet by chemical shift \
+28.1496, S=s, L=1, E=1.3772; found multiplet by label chem shifts differ by 0.022838 ppm\
+88.9733, S=s, N=2, L=7,7', E=1.0487; found multiplet by chemical shift \
+30.8130, S=s, N=3, L=9, E=4.2830; found multiplet by chemical shift \
+30.9487, S=s, N=3, L=8, E=2.6810; found multiplet by chemical shift \
+
+>  <NMREDATA_2D_13C_1J_1H>
+Larmor=499.871949493\
+CorrType=HSQC-EDITED\
+Pulseprogram=hsqcedetgpsisp2.3\
+Spectrum_Location=file:lom-la-288-01/5/pdata/1/\
+
+>  <NMREDATA_2D_13C_1J_1H#2>
+Larmor=499.871949493\
+CorrType=HSQC-EDITED\
+Pulseprogram=hsqcedetgpsisp2.3\
+Spectrum_Location=file:lom-la-288-01/5/pdata/1/\
+11/H11\
+10/H10\
+4/H4\
+5/H5a\
+5/H5b\
+6/H6\
+1/H1\
+3/H4\
+9/H9\
+8/H8\
+
+>  <NMREDATA_2D_13C_NJ_1H>
+Larmor=499.871949493\
+CorrType=HMBC\
+Pulseprogram=hmbcgpndqf\
+Spectrum_Location=file:lom-la-288-01/4/pdata/1/\
+10/H11\
+11/H10\
+3/H4\
+5/H4\
+6/H4\
+4/H6\
+5/H6\
+2/H1\
+3/H1\
+1/H4\
+2/H4\
+5/H4\
+7/H9\
+8/H9\
+7/H8\
+9/H8\
+
+>  <NMREDATA_2D_1H_D_1H>
+Larmor=499.871749545\
+CorrType=NOESY\
+Pulseprogram=noesygpph\
+Spectrum_Location=file:lom-la-288-01/3/pdata/1/\
+H10/H11\
+H9/H11\
+H8/H11\
+H11/H10\
+H4/H10\
+H9/H10\
+H8/H10\
+H10/H4\
+H6/H4\
+H9/H4\
+H8/H4\
+H5b/H5a\
+H6/H5a\
+H5a/H5b\
+H6/H5b\
+H4/H6\
+H5b/H6\
+H5a/H6\
+H4/H1\
+H1/H4\
+H11/H9\
+H10/H9\
+H4/H9\
+H11/H8\
+H10/H8\
+H4/H8\
+
+>  <NMREDATA_1D_11B>
+Larmor=160.37816083\
+Pulseprogram=zgdc30\
+Spectrum_Location=file:lom-la-288-01/8/pdata/1/\
+30.0355, S=s, N=1, L=20, E=12951.1597; found multiplet by chemical shift \
+
+>  <NMREDATA_1D_29Si>
+Larmor=99.310108\
+Pulseprogram=dept\
+Spectrum_Location=file:lom-la-288-01/9/pdata/1/\
+18.5335, S=s, N=1, L=30, E=0.6064; found multiplet by chemical shift \
+
+>  <NMREDATA_1D_13C#2>
+Larmor=125.71503563398\
+Pulseprogram=zgdc30\
+Spectrum_Location=file:lom-la-288-01/7/pdata/1/\
+;nothing at 12.8781 ppm , for signal 11; found 1) no multiplet at this EXACT chem shift or  label 2) no peak +/-0.05 pmm in peak list (smallest:118.303630)\
+;nothing at 10.9822 ppm , for signal 10; found 1) no multiplet at this EXACT chem shift or  label 2) no peak +/-0.05 pmm in peak list (smallest:120.199453)\
+;nothing at 156.5535 ppm , for signal 3; found 1) no multiplet at this EXACT chem shift or  label 2) no peak +/-0.05 pmm in peak list (smallest:-25.371799)\
+;nothing at 78.3722 ppm , for signal 4; found 1) no multiplet at this EXACT chem shift or  label 2) no peak +/-0.05 pmm in peak list (smallest:52.809491)\
+;nothing at 37.4037 ppm , for signal 5; found 1) no multiplet at this EXACT chem shift or  label 2) no peak +/-0.05 pmm in peak list (smallest:93.778035)\
+;nothing at 15.8821 ppm , for signal 6; found 1) no multiplet at this EXACT chem shift or  label 2) no peak +/-0.05 pmm in peak list (smallest:115.299569)\
+131.1817, S=s, L=2, E=0.8821; found multiplet by label chem shifts differ by -0.061197 ppm\
+;nothing at 28.1724 ppm , for signal 1; found 1) no multiplet at this EXACT chem shift or  label 2) no peak +/-0.05 pmm in peak list (smallest:103.009278)\
+;nothing at 88.9733 ppm , for signal 7'; found 1) no multiplet at this EXACT chem shift or  label 2) no peak +/-0.05 pmm in peak list (smallest:42.208421)\
+;nothing at 88.9733 ppm , for signal 7; found 1) no multiplet at this EXACT chem shift or  label 2) no peak +/-0.05 pmm in peak list (smallest:42.208421)\
+;nothing at 30.8130 ppm , for signal 9; found 1) no multiplet at this EXACT chem shift or  label 2) no peak +/-0.05 pmm in peak list (smallest:100.368741)\
+;nothing at 30.9487 ppm , for signal 8; found 1) no multiplet at this EXACT chem shift or  label 2) no peak +/-0.05 pmm in peak list (smallest:100.232950)\
+
+$$$$
