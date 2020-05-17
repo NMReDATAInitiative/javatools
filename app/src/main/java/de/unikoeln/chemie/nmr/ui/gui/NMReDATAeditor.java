@@ -370,7 +370,7 @@ public class NMReDATAeditor extends Application {
 	private void updateMolImage() throws UnsupportedEncodingException, SVGGraphics2DIOException, TranscoderException {
 		//we generate mol image
 		for(IAtom atom : data.getMolecule().atoms()){
-			String label = Integer.toString(1 + data.getMolecule().getAtomNumber(atom));
+			String label = Integer.toString(1 + data.getMolecule().indexOf(atom));
 		    atom.setProperty(StandardGenerator.ANNOTATION_LABEL, label);
 		}
 	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
