@@ -40,6 +40,11 @@
       <version>11</version>
     </dependency>
     <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-base</artifactId>
+        <version>11</version>
+    </dependency>
+    <dependency>
         <groupId>org.openscience.cdk</groupId>
         <artifactId>cdk-render</artifactId>
         <version>2.3</version>
@@ -100,6 +105,17 @@
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
         </plugin>
+		<plugin>
+		  <groupId>org.codehaus.mojo</groupId>
+		  <artifactId>exec-maven-plugin</artifactId>
+		  <version>1.1</version>
+		  <executions><execution>
+		    <goals><goal>java</goal></goals>
+		  </execution></executions>
+		  <configuration>
+		    <mainClass>de.unikoeln.chemie.nmr.ui.gui.NMReDATAeditor</mainClass>
+		  </configuration>
+		</plugin>
       </plugins>
     </pluginManagement>
   </build>
