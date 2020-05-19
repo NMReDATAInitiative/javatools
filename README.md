@@ -1,33 +1,42 @@
-This project contains code to read and write NMReDATA files.
+#Overview 
 
-The project is an Eclipse project and was written in Eclipse Neon. If the project is checked out and open in Eclipse there are three source folders:
-- lib contains code to read and write files. This can potentially be used in other projects.
-- test contains junit tests and test data. This is mainly for internal quality maintenance.
-- ui contains user interface classes. Details see below.
+This project contains code to read and write NMReDATA files. More information can be found in the [wiki](https://github.com/NMReDATAInitiative/javatools/wiki).
 
-The ui sub project:
-Currrently the following tools are available:
-- CheckFormat (command line): This reads an NMReDATA file and prints a summary of its content. If there are problems with the format error messages will be displayed.
-The class takes the file name as a parameter. In Eclipse right-click on the the class and choose Run as->Java Application. This will say "Please provide a file" name in the console window. Then go to Run->Run Configurations... in the menu. Choose "CheckFormat" under "Java Applications", go to the "Arguments" tab and enter a file name with a path (e. g. /home/user/workspace/nmredata/src/test/testdata/example.sd). Click the "Run" button. You should now get the analysis of the file.
-- NMReDATAeditor (GUI): Opens NMReDATA files, checks them, saves as NMReDATA or LSD.
+The project is organized using maven and can be used in Eclipse as well (Neon is recomended). If the project is checked out there are two sub-project, lib and app. Both of them have a maven pom.xml. So for both running 'mvn install' builds the projects and installs the jar file in the maven repository. The jar files can also be found in the target directories of each sub-project. In Eclipse, both subprojects should open automatically as Eclipse project when the repository is checked out or opened as a project.
+
+- lib contains code to read and write files. This can potentially be used in other projects. There is also a set of test files and data. This is mainly for internal quality maintenance. For details, see the [wiki](https://github.com/NMReDATAInitiative/javatools/wiki/library).
+- app contains application code. Details see the [wiki](https://github.com/NMReDATAInitiative/javatools/wiki/standalone).
+
+# Prerequisites
+
+JRE 11 is needed to run the applications.
+
+For development using the command line, Maven is needed. Eclipse can be used alternatively.
+
 # Visualizer
 
 ## Installation
 
-Upload  [nmredata-editor](http://nmr-sdbtest.nmr.uni-koeln.de/nmredata-editor.jar).
-http://nmr-sdbtest.nmr.uni-koeln.de/nmredata-editor.jar
+In order to install the visualizer, you can either checkout the project as explained above or simply download a precompiled file from:
+
+[nmredata-editor](http://nmr-sdbtest.nmr.uni-koeln.de/nmredata-editor.jar)
+
+On linux, you can use wget for this:
 ```
-weget http://nmr-sdbtest.nmr.uni-koeln.de/nmredata-editor.jar
+wget http://nmr-sdbtest.nmr.uni-koeln.de/nmredata-editor.jar
 ```
+
 ## Get an example
 
-The nmredata.sdf file : [isoflavone.nmredata.sdf](https://github.com/NMReDATAInitiative/Examples-of-NMR-records/blob/master/isoflavone/isoflavone1_02.nmredata.sdf
-) file.
+As an exampe, you can use this nmredata.sdf file : [isoflavone.nmredata.sdf](https://github.com/NMReDATAInitiative/Examples-of-NMR-records/blob/master/isoflavone/isoflavone1_02.nmredata.sdf) file.
+
+On linux, download it using wget:
 ```
 wget https://github.com/NMReDATAInitiative/Examples-of-NMR-records/blob/master/isoflavone/isoflavone1_02.nmredata.sdf
 ```
 ## Usage
-Double click on the .jar file and open the .dsf file. 
+If you have installed a Java Runtime Environment and associated the .jar files with it, you can double click on the .jar file and open the .sdf file. Alternatively, run the program on the command line using:
+
 ```
 java -jar nmredata-editor.jar
 ```
