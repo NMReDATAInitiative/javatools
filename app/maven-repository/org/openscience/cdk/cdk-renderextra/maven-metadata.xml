@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.openscience.cdk</groupId>
+  <artifactId>cdk-renderextra</artifactId>
+  <versioning>
+    <release>own</release>
+    <versions>
+      <version>own</version>
+    </versions>
+    <lastUpdated>20200523000558</lastUpdated>
+  </versioning>
+</metadata>
