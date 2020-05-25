@@ -1,11 +1,11 @@
-#Overview 
+# Overview 
 
 This project contains code to read and write NMReDATA files. More information can be found in the [wiki](https://github.com/NMReDATAInitiative/javatools/wiki).
 
 The project is organized using maven and can be used in Eclipse as well (Neon is recomended). If the project is checked out there are two sub-project, lib and app. Both of them have a maven pom.xml. So for both running 'mvn install' builds the projects and installs the jar file in the maven repository. The jar files can also be found in the target directories of each sub-project. In Eclipse, both subprojects should open automatically as Eclipse project when the repository is checked out or opened as a project.
 
-- lib contains code to read and write files. This can potentially be used in other projects. There is also a set of test files and data. This is mainly for internal quality maintenance. For details, see the [wiki](https://github.com/NMReDATAInitiative/javatools/wiki/library).
-- app contains application code. Details see the [wiki](https://github.com/NMReDATAInitiative/javatools/wiki/standalone).
+- `lib/` contains code to read and write files. This can potentially be used in other projects. There is also a set of test files and data. This is mainly for internal quality maintenance. For details, see the [wiki](https://github.com/NMReDATAInitiative/javatools/wiki/library).
+- `app/` contains application code. Details see the [wiki](https://github.com/NMReDATAInitiative/javatools/wiki/standalone).
 
 # Prerequisites
 
