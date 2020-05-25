@@ -40,3 +40,9 @@ If you have installed a Java Runtime Environment and associated the .jar files w
 ```
 java -jar nmredata-editor.jar
 ```
+
+In order to check this file for compliance, run
+
+```
+java -cp nmredata-editor.jar de.unikoeln.chemie.nmr.ui.cl.CheckFormat <yourfile.nmredata.sdf>
+```
