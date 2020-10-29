@@ -67,6 +67,39 @@ public class NmredataWriterTest extends TestCase{
 	}
 	
 	public static void writeStandardFile() throws JCAMPException, CloneNotSupportedException, CDKException, IOException{
+        File testfile=new File(System.getProperty("java.io.tmpdir")+"/test.nmredata.sd");
+        if(testfile.exists())
+        	testfile.delete();
+        FileOutputStream fos=new FileOutputStream(testfile);
+        NmredataWriter writer=new NmredataWriter(fos);
+        NmreData data=getNmredata11();
+        writer.write(data, NmredataVersion.ONEPOINTONE);
+        writer.close();
+        fos.close();
+	}
+	
+	public static void writeStandardFile2() throws JCAMPException, CloneNotSupportedException, CDKException, IOException{
+        File testfile=new File(System.getProperty("java.io.tmpdir")+"/test.nmredata.sd");
+        if(testfile.exists())
+        	testfile.delete();
+        FileOutputStream fos=new FileOutputStream(testfile);
+        NmredataWriter writer=new NmredataWriter(fos);
+        NmreData data=getNmredata2();
+        writer.write(data, NmredataVersion.TWO);
+        writer.close();
+        fos.close();
+	}
+
+    private static NmreData getNmredata2() throws CDKException, CloneNotSupportedException, JCAMPException {
+    	NmreData data=getNmredata11();
+    	data.setAuthor("Version=1\n" + 
+    			"Author=Stefan Kuhn\n" + 
+    			"Affilition=De Montfort University, Leicester\n" + 
+    			"ORCID=0000-0002-5990-4157");
+    	return data;
+    }
+    
+    private static NmreData getNmredata11() throws CDKException, CloneNotSupportedException, JCAMPException {
 		double freq=400;
 		String location=null;
         Peak1D[] peaks1d = new Peak1D[3];
@@ -122,17 +155,10 @@ public class NmredataWriterTest extends TestCase{
         data.setID("Title=Title=NMReDATA test file");
         data.setLevel(0);
         data.setVersion(NmredataVersion.ONE);
-        File testfile=new File(System.getProperty("java.io.tmpdir")+"/test.nmredata.sd");
-        if(testfile.exists())
-        	testfile.delete();
-        FileOutputStream fos=new FileOutputStream(testfile);
-        NmredataWriter writer=new NmredataWriter(fos);
-        writer.write(data, NmredataVersion.ONEPOINTONE);
-        writer.close();
-        fos.close();
+        return data;
 	}
 
-    public static IAtomContainer makeBenzene() throws CDKException {
+	public static IAtomContainer makeBenzene() throws CDKException {
         IAtomContainer mol = new AtomContainer();
         mol.addAtom(new Atom("C")); // 0
         mol.addAtom(new Atom("C")); // 1

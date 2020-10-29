@@ -14,9 +14,16 @@ import org.openscience.cdk.tools.CDKHydrogenAdder;
 import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 
 public class NmreData {
-	public enum NmredataVersion {ONE,ONEPOINTONE};
+	public enum NmredataVersion {ONE,ONEPOINTONE,TWO};
 	
+	//Those are 1.0/1.1 features
 	private IAtomContainer molecule;
+	public String getAuthor() {
+		return author;
+	}
+	public void setAuthor(String author) {
+		this.author = author;
+	}
 	private IAtomContainer moleculeOriginal;
 	private List<Spectrum> spectra;
 	private NmredataVersion version;
@@ -28,6 +35,8 @@ public class NmreData {
 	private IMolecularFormula molecularFormula;
 	private double concentration;
 	private double temperature;
+	//Those are 2.0 features
+	private String author;
 
 	public double getTemperature() {
 		return temperature;

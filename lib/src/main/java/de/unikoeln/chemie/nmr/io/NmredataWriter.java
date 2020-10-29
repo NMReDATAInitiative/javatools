@@ -44,9 +44,9 @@ public class NmredataWriter {
 	public void write(NmreData data, NmredataVersion version) throws CloneNotSupportedException, CDKException, IOException{
 		IAtomContainer ac=(IAtomContainer)data.getMolecule().clone();
 		String endofline="";
-		if(version==NmredataVersion.ONEPOINTONE)
+		if(version.compareTo(NmreData.NmredataVersion.ONE)>0)
 			endofline="\\";
-		ac.setProperty("NMREDATA_VERSION", version==NmredataVersion.ONE? "1.0" : "1.1\\");
+		ac.setProperty("NMREDATA_VERSION", version==NmredataVersion.ONE? "1.0" : version==NmredataVersion.ONEPOINTONE? "1.1\\" : "2.0");
 		ac.setProperty("NMREDATA_LEVEL", "1"+endofline);
 		ac.setProperty("NMREDATA_ID", data.getID()+endofline);
 		if(data.getSolvent()!=null)
@@ -84,6 +84,9 @@ public class NmredataWriter {
 			StringBuffer spectrumbuffer=new StringBuffer();
 	        NoteDescriptor noteDescriptor=new NoteDescriptor("Spectrum_Location");
 			spectrumbuffer.append("Spectrum_Location="+((Note)spectrum.getNotes(noteDescriptor).get(0)).getValue()+endofline+"\r\n");//TODO
+	        NoteDescriptor jcampDescriptor=new NoteDescriptor("Spectrum_Jcamp");
+	        if(data.getVersion().compareTo(NmreData.NmredataVersion.ONEPOINTONE)>0 && spectrum.getNotes(jcampDescriptor)!=null && spectrum.getNotes(jcampDescriptor).size()>0 && ((Note)spectrum.getNotes(jcampDescriptor).get(0)).getValue()!=null)
+	        	spectrumbuffer.append("Spectrum_Jcamp="+((Note)spectrum.getNotes(jcampDescriptor).get(0)).getValue()+endofline+"\r\n");
 			if(spectrum instanceof NMRSpectrum){
 				//we need to count how often each type of spectrum exists for numbering
 				if(!types.containsKey(((NMRSpectrum)spectrum).getNucleus()))
@@ -120,6 +123,8 @@ public class NmredataWriter {
   	  	InChIGenerator gen = factory.getInChIGenerator(data.getMolecule());
   	  	if (gen.getReturnStatus() == INCHI_RET.OKAY || gen.getReturnStatus() == INCHI_RET.WARNING)
   	  		ac.setProperty("NMREDATA_INCHI", gen.getInchi());
+  	  	if(version.compareTo(NmreData.NmredataVersion.ONEPOINTONE)>0 && data.getAuthor()!=null)
+  	  		ac.setProperty("NMREDATA_AUTHOR", data.getAuthor());
 		if(os!=null)
 			sdfwriter=new SDFWriter(os);
 		else

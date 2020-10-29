@@ -103,10 +103,10 @@ public class NmredataReader {
 						throw new NmreDataException((String)key+" is not in the required format for 2D spectra, it should be like NMREDATA_2D_nucleus_coupling_nucleus, with nucleus being 13C, 1H etc.");
 					spectra2d.put(((String)key).substring(9),property);
 				}else if(((String)key).equals("NMREDATA_VERSION")){
-					if(!property.equals("1.0") && !property.equals("1.1"))
-						throw new NmreDataException("Currently 1.0 and 1.1 are the only supported NMReDATA versions");
-					data.setVersion(property.equals("1.0") ? NmredataVersion.ONE : NmredataVersion.ONEPOINTONE);
-					if(property.equals("1.1"))
+					if(!property.equals("1.0") && !property.equals("1.1") && !property.equals("2.0"))
+						throw new NmreDataException("Currently 1.0, 1.1, and 2.0 are the only supported NMReDATA versions");
+					data.setVersion(property.equals("1.0") ? NmredataVersion.ONE : property.equals("1.1") ? NmredataVersion.ONEPOINTONE : NmredataVersion.TWO);
+					if(property.equals("1.1") || property.equals("2.0"))
 						lineseparator="\\";
 				}else if(((String)key).startsWith("NMREDATA_LEVEL")){
 					data.setLevel(Integer.parseInt(property));
@@ -148,7 +148,10 @@ public class NmredataReader {
 					data.setTemperature(Double.parseDouble(property.substring(0, property.length()-1).trim()));
 				}else if(((String)key).startsWith("NMREDATA_J")){
 					couplingblock=property;
+				}else if(((String)key).startsWith("AUTHOR")){
+					data.setAuthor(property);
 				}
+
 			}
 		}
 		if(data.getVersion()==null || data.getLevel()==-1)
@@ -258,6 +261,7 @@ public class NmredataReader {
 		StringTokenizer st=new StringTokenizer(spectrumblock,lineseparator);
 		double[] freq=null;
 		String location=null;
+		String jcamp=null;
 		int peakcount=0;
 		Map<NoteDescriptor, String> descriptors=new HashMap<>();
 		while(st.hasMoreTokens()){
@@ -267,6 +271,8 @@ public class NmredataReader {
 				freq=new double[]{Double.parseDouble(line.substring(7)),Double.parseDouble(line.substring(7))};
 			}else if(line.startsWith("Spectrum_Location=")){
 				location=line.substring(line.indexOf("=")+1);
+			}else if(line.startsWith("Spectrum_Jcamp=") && data.getVersion().compareTo(NmreData.NmredataVersion.ONEPOINTONE)>0){
+				jcamp=line.substring(line.indexOf("=")+1);
 			}else if(line.matches(".*/.*") && (!line.contains("=") || line.indexOf("=")>line.indexOf("/"))){
 				peakcount++;
 			}else if(!line.isEmpty()){
@@ -346,6 +352,8 @@ public class NmredataReader {
         spectrum.setPeakTable(peakTable);
         NoteDescriptor noteDescriptor=new NoteDescriptor("Spectrum_Location");
         spectrum.setNote(noteDescriptor, location);
+        NoteDescriptor jcampDescriptor=new NoteDescriptor("Spectrum_Jcamp");
+        spectrum.setNote(jcampDescriptor, jcamp);
         for(NoteDescriptor descriptor : descriptors.keySet()){
         	spectrum.setNote(descriptor, descriptors.get(descriptor));
         }

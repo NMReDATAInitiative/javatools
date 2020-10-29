@@ -59,4 +59,41 @@ public class RoundtripTest  extends TestCase{
             }
         }
 	}
+
+	public void testStandardRoundtrip2() throws JCAMPException, CloneNotSupportedException, CDKException, IOException, NmreDataException{
+		NmredataWriterTest.writeStandardFile2();
+        File testfile=new File(System.getProperty("java.io.tmpdir")+"/test.nmredata.sd");
+        InputStream ins = new FileInputStream(testfile);
+        NmredataReader reader = new NmredataReader(ins);
+        NmreData data = reader.read();
+        File testfile2=new File(System.getProperty("java.io.tmpdir")+"/test2.nmredata.sd");
+        FileOutputStream fos=new FileOutputStream(testfile2);
+        NmredataWriter writer=new NmredataWriter(fos);
+        writer.write(data, NmredataVersion.TWO);
+        writer.close();
+        StringBuffer result=new StringBuffer();
+        try (BufferedReader br = new BufferedReader(new FileReader(testfile2))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+            	result.append(line+"\r\n");
+            }
+        }
+        try (BufferedReader br = new BufferedReader(new FileReader(testfile))) {
+            String line;
+            boolean inblock=false;
+            StringBuffer block=null;
+            while ((line = br.readLine()) != null) {
+               if(line.startsWith("> <NMREDATA")){
+            	   inblock=true;
+            	   block=new StringBuffer(line+"\r\n");
+               }else if(line.trim().length()==0 && inblock){
+            	   Assert.assertTrue(result.toString().contains(block));
+               }else if(line.trim().length()==0){
+            	   inblock=false;
+               }else if(inblock){
+            	   block.append(line+"\r\n");
+               }
+            }
+        }
+	}
 }
