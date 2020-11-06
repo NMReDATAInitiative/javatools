@@ -1,0 +1,154 @@
+
+  CDK     1128171657
+
+  8  7  0  0  0  0  0  0  0  0999 V2000
+    3.8971   -0.7500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2990   -0.7500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    2.5981   -0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    6.4952   -0.7500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    7.7942   -0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    3.8971   -2.2500    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+    5.1962   -0.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+  6  4  1  0  0  0  0 
+  5  2  1  0  0  0  0 
+  2  3  2  0  0  0  0 
+  4  8  1  0  0  0  0 
+  3  1  1  0  0  0  0 
+  1  8  1  0  0  0  0 
+  1  7  2  0  0  0  0 
+M  END
+> <B_PI>
+166.3  144.5  123.2  60.58  17.44  14.26 0 0
+
+> <B_PRCI>
+0.37
+
+> <IDENTICALS>
+0
+
+> <B_NISO>
+0
+
+> <B_ISOMAP>
+
+
+>  <NMREDATA_ID>
+Title=NMReDATA test file
+
+> <B_ISOBEST>
+0
+
+> <NMREDATA_VERSION>
+1.0
+
+> <NMREDATA_LEVEL>
+3
+
+> <NMREDATA_CERTIFICATION>
+Software=CMC-se
+
+
+> <NMREDATA_SOLVENT>
+CDCl3
+
+> <NMREDATA_SMILES>
+C(C=CC)(OCC)=O
+
+> <NMREDATA_ASSIGNMENT>
+c1, 166.603, 1
+c2, 144.493, 2
+c3, 122.699, 3
+c4, 60.151, 4
+c5, 17.980, 5
+c6, 14.166, 6
+h1,  6.949, H2
+h2,  5.844, H3
+h3,  4.177, H4
+h4,  1.854, H5
+h5,  1.255, H6
+
+
+> <NMREDATA_1D_1H>
+Larmor=500.130
+Spectrum_Location=file:D:/SciPrograms/Bruker/TopSpin3.5.b.91pl7/data/nes/nmr/nesEX9_CMCse_Test/1/pdata/1
+Pulseprogram=zg30
+6.94928, L=h1
+5.84414, L=h2
+4.17706, L=h3
+1.85439, L=h4
+1.25499, L=h5
+
+
+> <NMREDATA_1D_13C>
+Larmor=125.758
+Spectrum_Location=file:D:/SciPrograms/Bruker/TopSpin3.5.b.91pl7/data/nes/nmr/nesEX9_CMCse_Test/2/pdata/1
+Pulseprogram=zgdc30
+166.603, L=c1
+144.493, L=c2
+122.699, L=c3
+60.1508, L=c4
+17.9798, L=c5
+14.1659, L=c6
+
+
+> <NMREDATA_2D_13C_NJ_1H>
+Larmor=500.130
+CorType=HMBC
+Spectrum_Location=file:D:/SciPrograms/Bruker/TopSpin3.5.b.91pl7/data/nes/nmr/nesEX9_CMCse_Test/6/pdata/1
+Pulseprogram=hmbcgplpndqf
+c1/h1, E=6.70107e+09, W2=98.36, W1=418.65
+c1/h3, W2=20.00, W1=80.00
+c2/h4, W2=20.00, W1=80.00
+c3/h4, W2=20.00, W1=80.00
+c4/h5, W2=20.00, W1=80.00
+c6/h3, W2=20.00, W1=80.00
+c5/h2, W2=20.00, W1=80.00
+c5/h1, W2=20.00, W1=80.00
+
+
+> <NMREDATA_2D_13C_1J_1H>
+Larmor=500.130
+CorType=HSQC
+Spectrum_Location=file:D:/SciPrograms/Bruker/TopSpin3.5.b.91pl7/data/nes/nmr/nesEX9_CMCse_Test/3/pdata/1
+Pulseprogram=hsqcg
+c2/h1
+c3/h2
+c4/h3
+c5/h4
+c6/h5
+
+
+> <NMREDATA_2D_1H_NJ_1H>
+Larmor=500.130
+CorType=COSY
+Spectrum_Location=file:D:/SciPrograms/Bruker/TopSpin3.5.b.91pl7/data/nes/nmr/nesEX9_CMCse_Test/4/pdata/1
+Pulseprogram=cosygpqf
+h1/h2, W2=20.00, W1=20.00
+h1/h4, W2=20.00, W1=20.00
+h3/h5, W2=20.00, W1=20.00
+
+
+$$$$
+
+  CDK     1128171657
+
+  8  7  0  0  0  0  0  0  0  0999 V2000
+    3.8971   -0.7500    1.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2990   -0.7500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    2.5981   -0.0000   -1.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    6.4952   -0.7500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    1.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    7.7942   -0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    3.8971   -2.2500  -10.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+    5.1962   -0.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+  6  4  1  0  0  0  0 
+  5  2  1  0  0  0  0 
+  2  3  2  0  0  0  0 
+  4  8  1  0  0  0  0 
+  3  1  1  0  0  0  0 
+  1  8  1  0  0  0  0 
+  1  7  2  0  0  0  0 
+M  END
+
+$$$$

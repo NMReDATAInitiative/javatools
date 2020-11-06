@@ -96,6 +96,10 @@ public class NmredataWriterTest extends TestCase{
     			"Author=Stefan Kuhn\n" + 
     			"Affilition=De Montfort University, Leicester\n" + 
     			"ORCID=0000-0002-5990-4157");
+    	data.setVersion(NmredataVersion.TWO);
+    	IAtomContainer ac = data.getMolecule().clone();
+    	ac.getProperties().clear();
+        data.setMolecule3d(ac);
     	return data;
     }
     

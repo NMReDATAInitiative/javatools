@@ -1,5 +1,7 @@
 package de.unikoeln.chemie.nmr;
 
+import static org.junit.Assert.assertThrows;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -10,6 +12,7 @@ import org.openscience.cdk.exception.CDKException;
 
 import de.unikoeln.chemie.nmr.data.NMR2DSpectrum;
 import de.unikoeln.chemie.nmr.data.NmreData;
+import de.unikoeln.chemie.nmr.io.NmreDataException;
 import de.unikoeln.chemie.nmr.io.NmredataReader;
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -57,6 +60,35 @@ public class NmredataReaderTest  extends TestCase{
         Assert.assertEquals(3, ((NMR2DSpectrum)data.getSpectra().get(2)).getPeakTable().length);
 	}
 	
+	public void testCmcse3d() throws Exception, IOException{
+		String filename = "cmcse3d.sdf";
+        InputStream ins = NmredataReaderTest.class.getResource(filename).openStream();
+        NmredataReader reader = new NmredataReader(ins);
+        NmreData data = reader.read();
+        Assert.assertEquals(8, data.getMolecule().getAtomCount());
+        Assert.assertEquals(7, data.getMolecule().getBondCount());
+        Assert.assertEquals(8, data.getMolecule3d().getAtomCount());
+        Assert.assertEquals(7, data.getMolecule3d().getBondCount());
+        Assert.assertEquals(5, data.getSpectra().size());
+        Assert.assertEquals(5, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
+        Assert.assertEquals(6, ((NMRSpectrum)data.getSpectra().get(1)).getPeakTable().length);
+        Assert.assertEquals(3, ((NMR2DSpectrum)data.getSpectra().get(2)).getPeakTable().length);
+	}
+	
+	public void testCmcse3dfaulty() throws Exception, IOException{
+		String filename = "cmcse3d_faulty.sdf";
+        InputStream ins = NmredataReaderTest.class.getResource(filename).openStream();
+        NmredataReader reader = new NmredataReader(ins);
+        Exception exception = assertThrows(NmreDataException.class, () -> {
+        	reader.read();
+        });
+     
+        String expectedMessage = "there is a second structure";
+        String actualMessage = exception.getMessage();
+     
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
 	public void testReadStandard() throws Exception, IOException{
 		String filename = "test.nmredata.sdf";
         InputStream ins = NmredataReaderTest.class.getResource(filename).openStream();

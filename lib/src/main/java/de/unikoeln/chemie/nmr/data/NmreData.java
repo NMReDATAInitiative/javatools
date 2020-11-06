@@ -25,6 +25,7 @@ public class NmreData {
 		this.author = author;
 	}
 	private IAtomContainer moleculeOriginal;
+	private IAtomContainer moleculeOriginal3d;
 	private List<Spectrum> spectra;
 	private NmredataVersion version;
 	private int level=-1;
@@ -37,6 +38,7 @@ public class NmreData {
 	private double temperature;
 	//Those are 2.0 features
 	private String author;
+	private IAtomContainer mol3d;
 
 	public double getTemperature() {
 		return temperature;
@@ -92,6 +94,24 @@ public class NmreData {
 	    this.molecule = molecule;
 		
 	}
+	public IAtomContainer getMolecule3d() {
+		return mol3d;
+	}
+	public IAtomContainer getMoleculeOriginal3d() {
+		return moleculeOriginal3d;
+	}
+	public void setMolecule3d(IAtomContainer molecule) throws CDKException, CloneNotSupportedException {
+		CDKAtomTypeMatcher matcher = CDKAtomTypeMatcher.getInstance(molecule.getBuilder());
+	    for (IAtom atom : molecule.atoms()) {
+	      IAtomType type = matcher.findMatchingAtomType(molecule, atom);
+	      AtomTypeManipulator.configure(atom, type);
+	    }
+	    this.moleculeOriginal3d=molecule.clone();
+	    CDKHydrogenAdder adder = CDKHydrogenAdder.getInstance(molecule.getBuilder());
+	    adder.addImplicitHydrogens(molecule);
+	    this.mol3d = molecule;
+		
+	}
 	public List<Spectrum> getSpectra() {
 		return spectra;
 	}
@@ -124,5 +144,9 @@ public class NmreData {
 	}
 	public String getID(){
 		return ID;
+	}
+	
+	public boolean has3dCoordinates() {
+		return mol3d!=null;
 	}
 }

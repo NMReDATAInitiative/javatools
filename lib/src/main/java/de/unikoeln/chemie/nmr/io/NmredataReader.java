@@ -34,9 +34,11 @@ import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.formula.MolecularFormulaChecker;
 import org.openscience.cdk.formula.rules.ElementRule;
 import org.openscience.cdk.formula.rules.IRule;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IMolecularFormula;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
+import org.openscience.cdk.isomorphism.IsomorphismTester;
 import org.openscience.cdk.smiles.SmilesParser;
 import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
 
@@ -84,7 +86,6 @@ public class NmredataReader {
 		IteratingSDFReader mdlreader=new IteratingSDFReader(input, DefaultChemObjectBuilder.getInstance());
 		IAtomContainer ac = mdlreader.next();
 		data.setMolecule(ac);
-		mdlreader.close();
 		String signalblock=null;
 		String couplingblock=null;
 		for(Object key : ac.getProperties().keySet()){
@@ -160,6 +161,21 @@ public class NmredataReader {
 			analyzeSignals(data, signalblock);
 		else
 			throw new NmreDataException("There is no NMREDATA_ASSIGNMENT block in this file - required");
+		if(data.getVersion().compareTo(NmreData.NmredataVersion.ONEPOINTONE)>0) {
+			for(IAtom atom : ac.atoms()) {
+				if(atom.getPoint3d()!=null)
+					throw new NmreDataException("There is a 3d coordinate in the first structure for a file version >= 2.0 - the first structure must be flat!");
+			}
+			if(mdlreader.hasNext()) {
+				ac=mdlreader.next();
+				data.setMolecule3d(ac);
+				if(!new IsomorphismTester(data.getMolecule()).isIsomorphic(ac))
+					throw new NmreDataException("The two structures are not isomorphic, but they must be. Only coordinates can be different!");
+			}
+		}
+		if(mdlreader.hasNext())
+			throw new NmreDataException("It seems there is a second structure (for version 1.0/1.1) or third structure (for version >= 2.0), only one or two structures are allowed!");
+		mdlreader.close();
 		if(couplingblock!=null)
 			analyzeCouplings(data, couplingblock);
 		analyzeSpectra(data);

@@ -130,6 +130,8 @@ public class NmredataWriter {
 		else
 			sdfwriter=new SDFWriter(pw);
 		sdfwriter.write(ac);
+		if(version.compareTo(NmreData.NmredataVersion.ONEPOINTONE)>0 && data.has3dCoordinates())
+  	  		sdfwriter.write(data.getMoleculeOriginal3d());
 	}
 	
 	public void close() throws IOException{

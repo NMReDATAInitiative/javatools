@@ -66,6 +66,7 @@ public class RoundtripTest  extends TestCase{
         InputStream ins = new FileInputStream(testfile);
         NmredataReader reader = new NmredataReader(ins);
         NmreData data = reader.read();
+        Assert.assertNotNull(data.getMolecule3d());
         File testfile2=new File(System.getProperty("java.io.tmpdir")+"/test2.nmredata.sd");
         FileOutputStream fos=new FileOutputStream(testfile2);
         NmredataWriter writer=new NmredataWriter(fos);
@@ -87,8 +88,9 @@ public class RoundtripTest  extends TestCase{
             	   inblock=true;
             	   block=new StringBuffer(line+"\r\n");
                }else if(line.trim().length()==0 && inblock){
+            	   System.out.println(block);
             	   Assert.assertTrue(result.toString().contains(block));
-               }else if(line.trim().length()==0){
+               }else if(line.trim().length()==0 || line.trim().equals("$$$$")){
             	   inblock=false;
                }else if(inblock){
             	   block.append(line+"\r\n");
