@@ -7,6 +7,8 @@ The project is organized using maven and can be used in Eclipse as well (Neon is
 - `lib/` contains code to read and write files. This can potentially be used in other projects. There is also a set of test files and data. This is mainly for internal quality maintenance. For details, see the [wiki](https://github.com/NMReDATAInitiative/javatools/wiki/library).
 - `app/` contains application code. Details see the [wiki](https://github.com/NMReDATAInitiative/javatools/wiki/standalone).
 
+This page explaines how to run the the application, also without compiling it.
+
 # Prerequisites
 
 JRE 11 is needed to run the applications.
@@ -17,14 +19,17 @@ For development using the command line, Maven is needed. Eclipse can be used alt
 
 ## Installation
 
-In order to install the visualizer, you can either checkout the project as explained above or simply download a precompiled file from:
+In order to install the visualizer, you can either checkout the project as explained above or simply download a precompiled file from the latest release at:
 
-[nmredata-editor](http://nmr-sdbtest.nmr.uni-koeln.de/nmredata-editor.jar)
+[Downloads](https://github.com/NMReDATAInitiative/javatools/releases)
+
+The nmredata-editor.jar file contains everything needed to run the visualizer.
 
 On linux, you can use wget for this:
 ```
-wget http://nmr-sdbtest.nmr.uni-koeln.de/nmredata-editor.jar
+wget https://github.com/NMReDATAInitiative/javatools/releases/download/vX.Y.Z/nmredata-editor.jar
 ```
+where vX.Y.Z is the desired release.
 
 ## Get an example
 
@@ -34,7 +39,9 @@ On linux, download it using wget:
 ```
 wget https://github.com/NMReDATAInitiative/Examples-of-NMR-records/blob/master/isoflavone/isoflavone1_02.nmredata.sdf
 ```
+
 ## Usage
+
 If you have installed a Java Runtime Environment and associated the .jar files with it, you can double click on the .jar file and open the .sdf file. Alternatively, run the program on the command line using:
 
 ```
@@ -46,3 +53,5 @@ In order to check this file for compliance, run
 ```
 java -cp nmredata-editor.jar de.unikoeln.chemie.nmr.ui.cl.CheckFormat <yourfile.nmredata.sdf>
 ```
+
+You can also download the nmredata-app.jar, which contains only the application classes and not the dependencies. For dependencies, consult the [pom file](https://github.com/NMReDATAInitiative/javatools/blob/master/app/pom.xml).
