@@ -87,6 +87,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -362,7 +363,9 @@ public class NMReDATAeditor extends Application {
 			alert.getDialogPane().setMinWidth(300);
 			alert.setTitle("Error reading file");
 			alert.setHeaderText("Failure");
-			alert.setContentText("File could not be read. Reason: "+ex.getMessage());
+			Text text=new Text("File could not be read. Reason: "+ex.getMessage());
+			text.setWrappingWidth(300);
+			alert.getDialogPane().setContent( text);
 			alert.showAndWait();
 		}		
 	}
