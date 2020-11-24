@@ -188,24 +188,26 @@ public class NmredataReader {
 		while(st.hasMoreTokens()){
 			String line = st.nextToken().trim();
 			line=processLine(line);
-			StringTokenizer st2=new StringTokenizer(line,",");
-			String label1=st2.nextToken().trim();
-			if(!signals.containsKey(label1))
-				throw new NmreDataException("Label "+label1+" in NMREDATA_J (line "+line+") is not in NMREDATA_ASSIGNMENT!");
-			String label2=st2.nextToken().trim();
-			if(!signals.containsKey(label2))
-				throw new NmreDataException("Label "+label2+" in NMREDATA_J (line "+line+") is not in NMREDATA_ASSIGNMENT!");
-			double constant=Double.parseDouble(st2.nextToken());
-			if(st2.hasMoreTokens()) {
-				String coupling=st.nextToken();
-				if(!coupling.startsWith("nb="))
-					throw new NmreDataException("the third part in "+line+" does not start with nb= - if there is a third part in a coupling line, it must be nb=number");
-				Integer.parseInt(coupling.substring(3));
+			if(!line.isEmpty()) {
+				StringTokenizer st2=new StringTokenizer(line,",");
+				String label1=st2.nextToken().trim();
+				if(!signals.containsKey(label1))
+					throw new NmreDataException("Label "+label1+" in NMREDATA_J (line "+line+") is not in NMREDATA_ASSIGNMENT!");
+				String label2=st2.nextToken().trim();
+				if(!signals.containsKey(label2))
+					throw new NmreDataException("Label "+label2+" in NMREDATA_J (line "+line+") is not in NMREDATA_ASSIGNMENT!");
+				double constant=Double.parseDouble(st2.nextToken());
+				if(st2.hasMoreTokens()) {
+					String coupling=st.nextToken();
+					if(!coupling.startsWith("nb="))
+						throw new NmreDataException("the third part in "+line+" does not start with nb= - if there is a third part in a coupling line, it must be nb=number");
+					Integer.parseInt(coupling.substring(3));
+				}
+				if(st2.hasMoreTokens())
+					throw new NmreDataException("line "+line+" has more than three ,-separated parts - only three are possible!");
+				Coupling coupling=new Coupling(constant, assignments.get(label1), assignments.get(label2));
+				couplings.add(coupling);
 			}
-			if(st2.hasMoreTokens())
-				throw new NmreDataException("line "+line+" has more than three ,-separated parts - only three are possible!");
-			Coupling coupling=new Coupling(constant, assignments.get(label1), assignments.get(label2));
-			couplings.add(coupling);
 		}
 	}
 
@@ -283,7 +285,7 @@ public class NmredataReader {
 		while(st.hasMoreTokens()){
 			String line = st.nextToken().trim();
 			line=processLine(line);
-;			if(line.startsWith("Larmor=")){
+			if(line.startsWith("Larmor=")){
 				freq=new double[]{Double.parseDouble(line.substring(7)),Double.parseDouble(line.substring(7))};
 			}else if(line.startsWith("Spectrum_Location=")){
 				location=line.substring(line.indexOf("=")+1);
@@ -310,6 +312,7 @@ public class NmredataReader {
 		int i=0;
 		while(st.hasMoreTokens()){
 			String line = st.nextToken().trim();
+			line=processLine(line);
 			if(line.matches(".*/.*") && (!line.contains("=") || line.indexOf("=")>line.indexOf("/"))){
 				StringTokenizer st2=new StringTokenizer(line,"/,");
 				String label1=st2.nextToken();
@@ -325,8 +328,14 @@ public class NmredataReader {
 					ydata[i]=Double.parseDouble(label2);
 				labels2.add(label2);
 				peakTable[i]=new Peak2D(xdata[i],ydata[i],0);
+				String part=null;
+				String part2=null;
+				if(st2.hasMoreTokens()) {
+					part2=st2.nextToken().trim();
+				}
 				while(st2.hasMoreTokens()) {
-					String part=st2.nextToken().trim();
+					part=part2;
+					part2=st2.nextToken().trim();
 					if(part.indexOf("=")<0)
 						throw new NmreDataException("The line "+ line +" is having an element not like 'x=y', only these are allowed behind the a/b start!");
 					if(part.substring(0, part.indexOf("=")).equals("I")){
@@ -340,10 +349,22 @@ public class NmredataReader {
 					}else if(part.substring(0, part.indexOf("=")).equals("Ja")){
 						//TODO do something
 					}else if(part.substring(0, part.indexOf("=")).equals("J1")){
-						st2.nextToken();
+						if(part2!=null && part2.indexOf("=")==-1) {
+							part=part2;
+							if(st2.hasMoreTokens()) {
+								part2=st2.nextToken();
+							}
+							//part is part of J1
+						}
 						//TODO do something
 					}else if(part.substring(0, part.indexOf("=")).equals("J2")){
-						st2.nextToken();
+						if(part2!=null && part2.indexOf("=")==-1) {
+							part=part2;
+							if(st2.hasMoreTokens()) {
+								part2=st2.nextToken();
+							}
+							//part is part of J2
+						}
 						//TODO do something
 					}else {
 						throw new NmreDataException("The line "+line+" has an entry for "+part.substring(0, part.indexOf("="))+", only I, E, W1, W2, J1, J2, and Ja are allowed!");
@@ -430,7 +451,7 @@ public class NmredataReader {
 						if(label.startsWith("L")){
 							if(label.substring(2).matches("^\\(.*\\)$")){
 								if(!label.substring(2).matches("^\\([0-9]*(\\|[0-9]*)\\)$"))
-									throw new NmreDataException("It seems there is an ambiguous assignment intend in line "+label+", but it is not correct!");
+									throw new NmreDataException("It seems there is an ambiguous assignment intended in line "+label+", but it is not correct!");
 								//TODO do something
 							}else {
 								peak=signals.get(label.substring(2).trim());
