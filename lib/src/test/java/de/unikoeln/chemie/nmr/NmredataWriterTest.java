@@ -159,6 +159,7 @@ public class NmredataWriterTest extends TestCase{
         data.setID("Title=Title=NMReDATA test file");
         data.setLevel(0);
         data.setVersion(NmredataVersion.ONE);
+        data.setTemperature(298);
         return data;
 	}
 

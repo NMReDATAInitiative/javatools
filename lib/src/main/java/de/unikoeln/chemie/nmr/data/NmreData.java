@@ -35,11 +35,12 @@ public class NmreData {
 	private String smiles;
 	private IMolecularFormula molecularFormula;
 	private double concentration;
-	private double temperature;
+	private double temperature=-1;
 	//Those are 2.0 features
 	private String author;
 	private IAtomContainer mol3d;
 
+	//This returns -1 if temperature is not set
 	public double getTemperature() {
 		return temperature;
 	}

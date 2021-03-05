@@ -24,6 +24,9 @@ M  END
 > <NMREDATA_ID>
 Title=Title=NMReDATA test file\
 
+> <NMREDATA_TEMPERATURE>
+298.0 K\
+
 > <NMREDATA_ASSIGNMENT>
 s0, 5.0, 1\
 s1, 10.0, 2\

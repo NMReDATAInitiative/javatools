@@ -137,6 +137,14 @@ public class NmredataReader {
 				}else if(((String)key).startsWith("NMREDATA_SOLVENT")){
 					data.setSolvent(property);
 					//any checks possible?
+				}else if(((String)key).startsWith("NMREDATA_TEMPERATURE")){
+					if(!property.substring(property.length()-1).equals("K"))
+						throw new NmreDataException("Temperature is not in Kelvin (must be like 'XXX.X K')");
+					try {
+						data.setTemperature(Double.parseDouble(property.substring(0,property.length()-1).trim()));
+					}catch(NumberFormatException ex) {
+						throw new NmreDataException("Temperature is not a floating point number!");
+					}
 				}else if(((String)key).startsWith("NMREDATA_PH")){
 					data.setPh(Double.parseDouble(property));
 				}else if(((String)key).startsWith("NMREDATA_CONCENTRATION")){

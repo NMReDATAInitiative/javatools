@@ -51,6 +51,8 @@ public class NmredataWriter {
 		ac.setProperty("NMREDATA_ID", data.getID()+endofline);
 		if(data.getSolvent()!=null)
 			ac.setProperty("NMREDATA_SOLVENT", data.getSolvent()+endofline);
+		if(data.getTemperature()>-1)
+			ac.setProperty("NMREDATA_TEMPERATURE", data.getTemperature()+" K"+endofline);
 		StringBuffer assignment=new StringBuffer();
 		Map<Double,String> peaklabelmap=new HashMap<>();
 		int k=0;

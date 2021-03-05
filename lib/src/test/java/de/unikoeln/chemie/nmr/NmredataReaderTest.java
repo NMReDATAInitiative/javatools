@@ -30,6 +30,7 @@ public class NmredataReaderTest  extends TestCase{
         Assert.assertEquals(1.3, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable()[0].getPosition()[0]);
         Assert.assertEquals(17, ((AtomReference)((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[0].getTargets()[0]).getAtomNumber());
         Assert.assertEquals(6, ((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[0].getTargets().length);
+        Assert.assertEquals(298.0, data.getTemperature());
 	}
 	
 	public void testHAP() throws Exception, IOException{
