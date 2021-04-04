@@ -274,9 +274,9 @@ public class NmredataReader {
 		for(String spectrum : spectra2d.keySet()){
 			String[] nucleus = new String[2];
 			nucleus[0] = spectrum.substring(spectrum.indexOf("_")+1);
-			nucleus[1] = nucleus[0].substring(spectrum.indexOf("_")+1);
+			nucleus[1] = nucleus[0].substring(nucleus[0].indexOf("_")+1);
 			nucleus[0] = nucleus[0].substring(0, nucleus[0].indexOf("_"));
-			nucleus[1] = nucleus[1].substring(spectrum.indexOf("_")+1);
+			nucleus[1] = nucleus[1].substring(nucleus[1].indexOf("_")+1);
 			if(nucleus[1].contains("#"))
 				nucleus[1]=nucleus[1].substring(0,nucleus[1].indexOf('#'));
 			analyze2DSpectrum(spectra2d.get(spectrum), nucleus, data);
