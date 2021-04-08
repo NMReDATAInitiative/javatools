@@ -78,6 +78,29 @@ public class NmredataWriter {
 					k++;
 					assignment.append(endofline+"\r\n");
 				}
+			}else if(spectrum instanceof NMR2DSpectrum) {
+				for(int i=0;i<((NMR2DSpectrum)spectrum).getPeakTable().length;i++){
+					if(!peaklabelmap.containsKey(((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[0])) {
+						peaklabelmap.put(((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[0],"s"+k);
+						assignment.append("s"+k+separator+((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[0]);
+						if(((NMR2DSpectrum)spectrum).getAssignments()!=null){
+							for(Assignment assignmentlocal : ((NMR2DSpectrum)spectrum).getAssignments()){
+								if(assignmentlocal.getPattern().getPosition()[0]==((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[0]){
+									for(IAssignmentTarget atomref : assignmentlocal.getTargets()){
+										IAtom atom = data.getMolecule().getAtom((((AtomReference)atomref)).getAtomNumber());
+										if(((NMR2DSpectrum)spectrum).getXNucleus().equals("H") && !atom.getSymbol().equals("H")){
+											assignment.append(separator+"H"+(data.getMolecule().indexOf(atom)+1));
+										}else {
+											assignment.append(separator+(data.getMolecule().indexOf(atom)+1));
+										}
+									}
+								}
+							}
+						}
+						k++;
+						assignment.append(endofline+"\r\n");
+					}
+				}				
 			}
 		}
 		ac.setProperty("NMREDATA_ASSIGNMENT", assignment.toString());

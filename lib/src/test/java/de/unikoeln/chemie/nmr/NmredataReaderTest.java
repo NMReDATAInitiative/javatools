@@ -59,6 +59,10 @@ public class NmredataReaderTest  extends TestCase{
         Assert.assertEquals(5, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
         Assert.assertEquals(6, ((NMRSpectrum)data.getSpectra().get(1)).getPeakTable().length);
         Assert.assertEquals(3, ((NMR2DSpectrum)data.getSpectra().get(2)).getPeakTable().length);
+        Assert.assertEquals(5, ((NMR2DSpectrum)data.getSpectra().get(3)).getPeakTable().length);
+        Assert.assertEquals(8, ((NMR2DSpectrum)data.getSpectra().get(4)).getPeakTable().length);
+        Assert.assertEquals("13C", ((NMR2DSpectrum)data.getSpectra().get(4)).getXNucleus());
+        Assert.assertEquals("1H", ((NMR2DSpectrum)data.getSpectra().get(4)).getYNucleus());
 	}
 	
 	public void testCmcse3d() throws Exception, IOException{
