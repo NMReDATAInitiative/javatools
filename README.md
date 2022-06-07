@@ -1,4 +1,6 @@
-# Overview 
+[![Build with Maven](https://github.com/NMReDATAInitiative/javatools/actions/workflows/maven.yml/badge.svg)](https://github.com/NMReDATAInitiative/javatools/actions/workflows/maven.yml)
+
+# Overview
 
 This project contains code to read and write NMReDATA files. More information can be found in the [wiki](https://github.com/NMReDATAInitiative/javatools/wiki).
 
