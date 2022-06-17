@@ -11,8 +11,10 @@ import org.jcamp.spectrum.IAssignmentTarget;
 import org.jcamp.spectrum.NMRSpectrum;
 import org.jcamp.spectrum.Spectrum;
 import org.jcamp.spectrum.assignments.AtomReference;
+import org.jcamp.spectrum.assignments.TwoAtomsReference;
 import org.jcamp.spectrum.notes.Note;
 import org.jcamp.spectrum.notes.NoteDescriptor;
+import org.openscience.cdk.AtomContainer;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.inchi.InChIGenerator;
 import org.openscience.cdk.inchi.InChIGeneratorFactory;
@@ -42,7 +44,9 @@ public class NmredataWriter {
 	}
 	
 	public void write(NmreData data, NmredataVersion version) throws CloneNotSupportedException, CDKException, IOException{
-		IAtomContainer ac=(IAtomContainer)data.getMolecule().clone();
+		IAtomContainer ac=new AtomContainer();
+		if(data.getMolecule()!=null)
+			ac = (IAtomContainer)data.getMolecule().clone();
 		String endofline="";
 		if(version.compareTo(NmreData.NmredataVersion.ONE)>0)
 			endofline="\\";
@@ -87,8 +91,28 @@ public class NmredataWriter {
 							for(Assignment assignmentlocal : ((NMR2DSpectrum)spectrum).getAssignments()){
 								if(assignmentlocal.getPattern().getPosition()[0]==((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[0]){
 									for(IAssignmentTarget atomref : assignmentlocal.getTargets()){
-										IAtom atom = data.getMolecule().getAtom((((AtomReference)atomref)).getAtomNumber());
+										IAtom atom = data.getMolecule().getAtom((((TwoAtomsReference)atomref)).getAtomNumber1()[0]);
 										if(((NMR2DSpectrum)spectrum).getXNucleus().equals("H") && !atom.getSymbol().equals("H")){
+											assignment.append(separator+"H"+(data.getMolecule().indexOf(atom)+1));
+										}else {
+											assignment.append(separator+(data.getMolecule().indexOf(atom)+1));
+										}
+									}
+								}
+							}
+						}
+						k++;
+						assignment.append(endofline+"\r\n");
+					}
+					if(!peaklabelmap.containsKey(((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[1])) {
+						peaklabelmap.put(((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[1],"s"+k);
+						assignment.append("s"+k+separator+((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[1]);
+						if(((NMR2DSpectrum)spectrum).getAssignments()!=null){
+							for(Assignment assignmentlocal : ((NMR2DSpectrum)spectrum).getAssignments()){
+								if(assignmentlocal.getPattern().getPosition()[1]==((NMR2DSpectrum)spectrum).getPeakTable()[i].getPosition()[1]){
+									for(IAssignmentTarget atomref : assignmentlocal.getTargets()){
+										IAtom atom = data.getMolecule().getAtom((((TwoAtomsReference)atomref)).getAtomNumber2()[0]);
+										if(((NMR2DSpectrum)spectrum).getYNucleus().equals("H") && !atom.getSymbol().equals("H")){
 											assignment.append(separator+"H"+(data.getMolecule().indexOf(atom)+1));
 										}else {
 											assignment.append(separator+(data.getMolecule().indexOf(atom)+1));
@@ -143,11 +167,13 @@ public class NmredataWriter {
 				ac.setProperty("NMREDATA_2D_"+((NMR2DSpectrum)spectrum).getXNucleus()+"_NJ_"+((NMR2DSpectrum)spectrum).getYNucleus()+(types.get(((NMR2DSpectrum)spectrum).getXNucleus()+"_"+((NMR2DSpectrum)spectrum).getYNucleus()).intValue()>1 ? "#"+types.get(((NMR2DSpectrum)spectrum).getXNucleus()+"_"+((NMR2DSpectrum)spectrum).getYNucleus()).intValue() : ""), spectrumbuffer.toString());//TODO NJ
 			}
 		}
-		ac.setProperty("NMREDATA_SMILES", SmilesGenerator.generic().create(data.getMolecule()));
-  	  	InChIGeneratorFactory factory = InChIGeneratorFactory.getInstance();
-  	  	InChIGenerator gen = factory.getInChIGenerator(data.getMolecule());
-  	  	if (gen.getReturnStatus() == INCHI_RET.OKAY || gen.getReturnStatus() == INCHI_RET.WARNING)
-  	  		ac.setProperty("NMREDATA_INCHI", gen.getInchi());
+		if(data.getMolecule()!=null) {
+			ac.setProperty("NMREDATA_SMILES", SmilesGenerator.generic().create(data.getMolecule()));
+			InChIGeneratorFactory factory = InChIGeneratorFactory.getInstance();
+  	  		InChIGenerator gen = factory.getInChIGenerator(data.getMolecule());
+			if (gen.getReturnStatus() == INCHI_RET.OKAY || gen.getReturnStatus() == INCHI_RET.WARNING)
+	  	  		ac.setProperty("NMREDATA_INCHI", gen.getInchi());
+		}
   	  	if(version.compareTo(NmreData.NmredataVersion.ONEPOINTONE)>0 && data.getAuthor()!=null)
   	  		ac.setProperty("NMREDATA_AUTHOR", data.getAuthor());
 		if(os!=null)

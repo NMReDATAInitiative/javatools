@@ -1,6 +1,8 @@
 FROM maven:3-jdk-11 AS builder
 
-ADD lib /javatools/lib
+ADD target/javatools.jar javatools.jar
+ADD lib lib
 
-WORKDIR /javatools/lib
-RUN mvn clean package
+WORKDIR /
+
+ENTRYPOINT ["java", "-cp", "javatools.jar", "de.unikoeln.chemie.nmr.ui.cl.Convert"]
