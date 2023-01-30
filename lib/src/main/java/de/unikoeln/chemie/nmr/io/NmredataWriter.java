@@ -44,12 +44,17 @@ public class NmredataWriter {
 	}
 	
 	public void write(NmreData data, NmredataVersion version) throws CloneNotSupportedException, CDKException, IOException{
+		write(data, version, new HashMap<Object, Object>());
+	}
+		
+	public void write(NmreData data, NmredataVersion version, Map<Object,Object> props) throws CloneNotSupportedException, CDKException, IOException{
 		IAtomContainer ac=new AtomContainer();
 		if(data.getMolecule()!=null)
 			ac = (IAtomContainer)data.getMolecule().clone();
 		String endofline="";
 		if(version.compareTo(NmreData.NmredataVersion.ONE)>0)
 			endofline="\\";
+		ac.setProperties(props);
 		ac.setProperty("NMREDATA_VERSION", version==NmredataVersion.ONE? "1.0" : version==NmredataVersion.ONEPOINTONE? "1.1\\" : "2.0");
 		ac.setProperty("NMREDATA_LEVEL", "1"+endofline);
 		ac.setProperty("NMREDATA_ID", data.getID()+endofline);
