@@ -27,6 +27,7 @@ import de.unikoeln.chemie.nmr.data.NMR2DSpectrum;
 import de.unikoeln.chemie.nmr.data.NmreData;
 import de.unikoeln.chemie.nmr.data.NmreData.NmredataVersion;
 import de.unikoeln.chemie.nmr.data.Peak2D;
+import de.unikoeln.chemie.nmr.data.SelectiveNMR1DSpectrum;
 import net.sf.jniinchi.INCHI_RET;
 
 public class NmredataWriter {
@@ -54,7 +55,9 @@ public class NmredataWriter {
 		String endofline="";
 		if(version.compareTo(NmreData.NmredataVersion.ONE)>0)
 			endofline="\\";
-		ac.setProperties(props);
+		for(Object key : props.keySet()) {
+			ac.setProperty(key, props.get(key));			
+		}
 		ac.setProperty("NMREDATA_VERSION", version==NmredataVersion.ONE? "1.0" : version==NmredataVersion.ONEPOINTONE? "1.1\\" : "2.0");
 		ac.setProperty("NMREDATA_LEVEL", "1"+endofline);
 		ac.setProperty("NMREDATA_ID", data.getID()+endofline);
@@ -147,6 +150,10 @@ public class NmredataWriter {
 					types.put(((NMRSpectrum)spectrum).getNucleus(),0);
 				types.put(((NMRSpectrum)spectrum).getNucleus(), types.get(((NMRSpectrum)spectrum).getNucleus()).intValue()+1);
 				spectrumbuffer.append("Larmor="+((NMRSpectrum)spectrum).getFrequency()+endofline+"\r\n");
+				if(spectrum instanceof SelectiveNMR1DSpectrum) {
+					noteDescriptor=new NoteDescriptor("CorType");
+					spectrumbuffer.append("CorType="+((Note)spectrum.getNotes(noteDescriptor).get(0)).getValue()+endofline+"\r\n");
+				}
 				for(int i=0;i<((NMRSpectrum)spectrum).getPeakTable().length;i++){
 					spectrumbuffer.append(((NMRSpectrum)spectrum).getPeakTable()[i].getPosition()[0]+separator);
 					if(((NMRSpectrum)spectrum).getPatternTable()!=null && ((NMRSpectrum)spectrum).getPatternTable()[i]!=null)
@@ -154,7 +161,11 @@ public class NmredataWriter {
 					spectrumbuffer.append("L="+peaklabelmap.get(((NMRSpectrum)spectrum).getPeakTable()[i].getPosition()[0]));
 					spectrumbuffer.append(endofline+"\r\n");
 				}
-				ac.setProperty("NMREDATA_1D_"+((NMRSpectrum)spectrum).getNucleus()+(types.get(((NMRSpectrum)spectrum).getNucleus()).intValue()>1 ? "#"+types.get(((NMRSpectrum)spectrum).getNucleus()).intValue() : ""), spectrumbuffer.toString());
+				if(spectrum instanceof SelectiveNMR1DSpectrum) {
+					ac.setProperty("NMREDATA_1D_"+((SelectiveNMR1DSpectrum)spectrum).getXNucleus()+"_D_"+((SelectiveNMR1DSpectrum)spectrum).getYNucleus()+(types.get(((NMRSpectrum)spectrum).getNucleus()).intValue()>1 ? "#"+types.get(((NMRSpectrum)spectrum).getNucleus()).intValue() : ""), spectrumbuffer.toString());
+				}else {
+					ac.setProperty("NMREDATA_1D_"+((NMRSpectrum)spectrum).getNucleus()+(types.get(((NMRSpectrum)spectrum).getNucleus()).intValue()>1 ? "#"+types.get(((NMRSpectrum)spectrum).getNucleus()).intValue() : ""), spectrumbuffer.toString());
+				}
 			}else if(spectrum instanceof NMR2DSpectrum){
 				//we need to count how often each type of spectrum exists for numbering
 				if(!types.containsKey(((NMR2DSpectrum)spectrum).getXNucleus()+"_"+((NMR2DSpectrum)spectrum).getYNucleus()))

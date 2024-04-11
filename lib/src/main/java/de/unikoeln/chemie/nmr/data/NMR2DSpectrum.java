@@ -22,7 +22,7 @@ public class NMR2DSpectrum extends Spectrum2D {
     private final static Range1D.Double DEFAULT_ZRANGE = new Range1D.Double(0., 20.);
     private final static Range1D.Double[] DEFAULT_XYRANGE =
         new Range1D.Double[] { new Range1D.Double(-2., 14.), new Range1D.Double(0., 200.)};
-    String[] nucleus = new String[] { "^13C", "^13C" };
+    String[] nucleus = new String[] { "13C", "13C" };
     double[] frequency = new double[] { 300.0, 300.0 };
     double[] reference = new double[] { 0.0, 0.0 };
     boolean fullSpectrum = true;

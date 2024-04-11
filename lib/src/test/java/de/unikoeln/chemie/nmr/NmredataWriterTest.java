@@ -1,6 +1,7 @@
 package de.unikoeln.chemie.nmr;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -10,6 +11,7 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.jcamp.math.OrderedArray1D;
 import org.jcamp.parser.JCAMPException;
 import org.jcamp.parser.JCAMPReader;
 import org.jcamp.spectrum.ArrayData;
@@ -38,6 +40,7 @@ import de.unikoeln.chemie.nmr.data.NMR2DSpectrum;
 import de.unikoeln.chemie.nmr.data.NmreData;
 import de.unikoeln.chemie.nmr.data.NmreData.NmredataVersion;
 import de.unikoeln.chemie.nmr.data.Peak2D;
+import de.unikoeln.chemie.nmr.data.SelectiveNMR1DSpectrum;
 import de.unikoeln.chemie.nmr.io.NmredataReader;
 import de.unikoeln.chemie.nmr.io.NmredataWriter;
 import junit.framework.Assert;
@@ -64,6 +67,28 @@ public class NmredataWriterTest extends TestCase{
                Assert.assertEquals(linesample, line);
             }
         }
+	}
+	
+	public void testWriteSelectiveTocsy() throws JCAMPException, CloneNotSupportedException, IOException, CDKException{
+		NmreData data=new NmreData();
+		data.setMolecule(makeBenzene());
+   		Peak1D[] peaks = new Peak1D[] {new Peak1D(1,1)};
+		data.addSpectrum(new SelectiveNMR1DSpectrum(new OrderedArrayData(new double[] {1}, CommonUnit.hertz), new ArrayData(new double[] {1}, CommonUnit.intensity), 0, 0, "1H", "1H"));
+		((NMRSpectrum)data.getSpectra().get(0)).setPeakTable((Peak1D[])peaks);
+		((NMRSpectrum)data.getSpectra().get(0)).setNote(new NoteDescriptor("Spectrum_Location"),"test");
+		((NMRSpectrum)data.getSpectra().get(0)).setNote(new NoteDescriptor("CorType"),"test");
+		data.setVersion(NmredataVersion.ONEPOINTONE);
+		File testfile=new File(System.getProperty("java.io.tmpdir")+"/test.nmredata.sd");
+        if(testfile.exists())
+        	testfile.delete();
+        ByteArrayOutputStream fos=new ByteArrayOutputStream();
+        NmredataWriter writer=new NmredataWriter(fos);
+        writer.write(data, NmredataVersion.ONEPOINTONE);
+        writer.close();
+        fos.close();
+        System.out.print(fos.toString());
+        Assert.assertTrue(fos.toString().contains("NMREDATA_1D_1H_D_1H"));
+
 	}
 	
 	public static void writeStandardFile() throws JCAMPException, CloneNotSupportedException, CDKException, IOException{
