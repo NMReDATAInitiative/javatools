@@ -15,7 +15,7 @@ This page explaines how to run the the application, also without compiling it.
 
 # Prerequisites
 
-JRE 11 is needed to run the applications.
+JRE 1.8 is needed to run the applications.
 
 For development using the command line, Maven is needed. Eclipse can be used alternatively.
 
