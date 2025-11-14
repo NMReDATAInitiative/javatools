@@ -286,7 +286,7 @@ public class NmredataReader {
 	private void analyze2DSpectrum(String spectrumblock, String[] nucleus, NmreData data) throws NmreDataException {
 		StringTokenizer st=new StringTokenizer(spectrumblock,lineseparator);
 		double[] freq=null;
-		String location=null;
+		List<String> location=new ArrayList<>();
 		String jcampLocation=null;
 		String jcamp=null;
 		int peakcount=0;
@@ -297,7 +297,7 @@ public class NmredataReader {
 			if(line.startsWith("Larmor=")){
 				freq=new double[]{Double.parseDouble(line.substring(7)),Double.parseDouble(line.substring(7))};
 			}else if(line.startsWith("Spectrum_Location=")){
-				location=line.substring(line.indexOf("=")+1);
+				location.add(line.substring(line.indexOf("=")+1));
 			}else if(line.startsWith("Jcamp_location=")){
 				jcampLocation=line.substring(line.indexOf("=")+1);
 			}else if(line.startsWith("Spectrum_Jcamp=") && data.getVersion().compareTo(NmreData.NmredataVersion.ONEPOINTONE)>0){
@@ -386,7 +386,7 @@ public class NmredataReader {
 		}
 		if(freq==null)
 			throw new NmreDataException("No Larmor= line, this is mandatory");
-		if(location==null)
+		if(location.size()==0)
 			throw new NmreDataException("No Spectrum_Location= line, this is mandatory");
 		NMR2DSpectrum spectrum = null;
         Unit xUnit =  CommonUnit.hertz;
@@ -432,7 +432,7 @@ public class NmredataReader {
 		List<Peak> peaks=new ArrayList<>();
 		Map<Double,String> labels=new HashMap<>();
 		double freq=Double.NaN;
-		String location=null;
+		List<String> location=new ArrayList<>();
 		String sequence=null;
 		Map<NoteDescriptor, String> descriptors=new HashMap<>();
 		while(st.hasMoreTokens()){
@@ -441,7 +441,7 @@ public class NmredataReader {
 			if(line.startsWith("Larmor=")){
 				freq=Double.parseDouble(line.substring(7));
 			}else if(line.startsWith("Spectrum_Location=")){
-				location=line.substring(line.indexOf("=")+1);
+				location.add(line.substring(line.indexOf("=")+1));
 			}else if(line.startsWith("Sequence=")){
 				sequence=line.substring(line.indexOf("=")+1);
 			}else if(line.matches("^[0-9]*\\.[0-9]*")){
@@ -533,7 +533,7 @@ public class NmredataReader {
 		}
 		if(Double.isNaN(freq))
 			throw new NmreDataException("No Larmor= line, this is mandatory");
-		if(location==null)
+		if(location.size()==0)
 			throw new NmreDataException("No Spectrum_Location= line, this is mandatory");
         NMRSpectrum spectrum = null;
         Unit xUnit =  CommonUnit.hertz;

@@ -34,7 +34,7 @@ s2, 15.0, 3, 4\
 
 
 > <NMREDATA_1D_C>
-Spectrum_Location=null\
+Spectrum_Location=testlocation\
 Larmor=400.0\
 5.0, L=s0\
 10.0, L=s1\
@@ -42,7 +42,7 @@ Larmor=400.0\
 
 
 > <NMREDATA_2D_1H_NJ_1H>
-Spectrum_Location=null\
+Spectrum_Location=testlocation\
 Larmor=400.0\
 CorType=cosy\
 s0/s2\

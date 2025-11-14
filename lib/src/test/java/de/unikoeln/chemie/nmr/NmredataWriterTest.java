@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -75,7 +76,9 @@ public class NmredataWriterTest extends TestCase{
    		Peak1D[] peaks = new Peak1D[] {new Peak1D(1,1)};
 		data.addSpectrum(new SelectiveNMR1DSpectrum(new OrderedArrayData(new double[] {1}, CommonUnit.hertz), new ArrayData(new double[] {1}, CommonUnit.intensity), 0, 0, "1H", "1H"));
 		((NMRSpectrum)data.getSpectra().get(0)).setPeakTable((Peak1D[])peaks);
-		((NMRSpectrum)data.getSpectra().get(0)).setNote(new NoteDescriptor("Spectrum_Location"),"test");
+		List <String> location=new ArrayList<>();
+		location.add("testlocation");
+		((NMRSpectrum)data.getSpectra().get(0)).setNote(new NoteDescriptor("Spectrum_Location"),location);
 		((NMRSpectrum)data.getSpectra().get(0)).setNote(new NoteDescriptor("Jcamp_location"),"jcamptest");
 		((NMRSpectrum)data.getSpectra().get(0)).setNote(new NoteDescriptor("CorType"),"test");
 		data.setVersion(NmredataVersion.ONEPOINTONE);
@@ -131,7 +134,8 @@ public class NmredataWriterTest extends TestCase{
     
     private static NmreData getNmredata11() throws CDKException, CloneNotSupportedException, JCAMPException {
 		double freq=400;
-		String location=null;
+		List <String> location=new ArrayList<>();
+		location.add("testlocation");
         Peak1D[] peaks1d = new Peak1D[3];
 		peaks1d[0]=new Peak1D(5,0);
 		peaks1d[1]=new Peak1D(10,0);

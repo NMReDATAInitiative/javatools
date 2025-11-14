@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jcamp.spectrum.Assignment;
@@ -26,7 +27,6 @@ import org.openscience.cdk.smiles.SmilesGenerator;
 import de.unikoeln.chemie.nmr.data.NMR2DSpectrum;
 import de.unikoeln.chemie.nmr.data.NmreData;
 import de.unikoeln.chemie.nmr.data.NmreData.NmredataVersion;
-import de.unikoeln.chemie.nmr.data.Peak2D;
 import de.unikoeln.chemie.nmr.data.SelectiveNMR1DSpectrum;
 import net.sf.jniinchi.INCHI_RET;
 
@@ -140,7 +140,9 @@ public class NmredataWriter {
 		for(Spectrum spectrum : data.getSpectra()){
 			StringBuffer spectrumbuffer=new StringBuffer();
 	        NoteDescriptor noteDescriptor=new NoteDescriptor("Spectrum_Location");
-			spectrumbuffer.append("Spectrum_Location="+((Note)spectrum.getNotes(noteDescriptor).get(0)).getValue()+endofline+"\r\n");
+	        if(((Note)spectrum.getNotes(noteDescriptor).get(0)).getValue()!=null)
+	        	for(String location : (List<String>)((Note)spectrum.getNotes(noteDescriptor).get(0)).getValue())
+	        		spectrumbuffer.append("Spectrum_Location="+location+endofline+"\r\n");
 	        NoteDescriptor jcamplocationNoteDescriptor=new NoteDescriptor("Jcamp_location");
 	        if(spectrum.getNotes(jcamplocationNoteDescriptor)!=null)
 	        	spectrumbuffer.append("Jcamp_location="+((Note)spectrum.getNotes(jcamplocationNoteDescriptor).get(0)).getValue()+endofline+"\r\n");
