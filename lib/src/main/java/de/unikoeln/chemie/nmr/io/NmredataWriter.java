@@ -49,6 +49,7 @@ public class NmredataWriter {
 	}
 		
 	public void write(NmreData data, NmredataVersion version, Map<Object,Object> props) throws CloneNotSupportedException, CDKException, IOException{
+		data.setVersion(version);
 		IAtomContainer ac=new AtomContainer();
 		if(data.getMolecule()!=null)
 			ac = (IAtomContainer)data.getMolecule().clone();
@@ -133,6 +134,11 @@ public class NmredataWriter {
 						assignment.append(endofline+"\r\n");
 					}
 				}				
+			}
+		}
+		if(data.getEquivalences()!=null) {
+			for(List<Double> equiv : data.getEquivalences()) {
+				assignment.append("Equivalent="+peaklabelmap.get(equiv.get(0))+", "+peaklabelmap.get(equiv.get(1))+endofline+"\r\n");
 			}
 		}
 		ac.setProperty("NMREDATA_ASSIGNMENT", assignment.toString());

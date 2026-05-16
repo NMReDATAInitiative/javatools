@@ -141,4 +141,14 @@ public class NmredataReaderTest  extends TestCase{
 	    Assert.assertEquals(9, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
 	    Assert.assertEquals(11, ((NMRSpectrum)data.getSpectra().get(2)).getPeakTable().length);
 	}
+
+	public void testEquivs() throws Exception, IOException{
+		String filename = "meusi_Sp_001.nmredata.sdf";
+        InputStream ins = NmredataReaderTest.class.getResource(filename).openStream();
+        NmredataReader reader = new NmredataReader(ins);
+        NmreData data = reader.read();
+        Assert.assertEquals(4, data.getEquivalences().size());
+        Assert.assertEquals(7.57, data.getEquivalences().get(0).get(0));
+        Assert.assertEquals(6.8, data.getEquivalences().get(0).get(1));
+	}
 }

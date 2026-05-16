@@ -229,7 +229,17 @@ public class NmredataReader {
 					throw new NmreDataException("Interchangeable= only allowed in levels 1 and 3, the file is level "+data.getLevel());
 				}
 			}else if(line.startsWith("Equivalent")) {
-				//we only check this for existance for now
+				String equi=line.substring(line.indexOf('=')+1);
+				if(! (equi.length() - equi.replace(",", "").length()==1))
+					throw new NmreDataException("Equivalent= must have the format 'label,label'!");
+				List<Double> equilist=new ArrayList<>();
+				String label1=equi.substring(0,equi.indexOf(',')).trim();
+				equilist.add(signals.get(label1).getPosition()[0]);
+				String label2=equi.substring(equi.indexOf(',')+1).trim();
+				equilist.add(signals.get(label2).getPosition()[0]);
+				if(data.getEquivalences()==null)
+					data.setEquivalences(new ArrayList<List<Double>>());
+				data.getEquivalences().add(equilist);
 			}else{
 				StringTokenizer st2 = new StringTokenizer(line,",");
 				String label=st2.nextToken();

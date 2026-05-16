@@ -36,6 +36,7 @@ public class NmreData {
 	private IMolecularFormula molecularFormula;
 	private double concentration;
 	private double temperature=-1;
+	private List<List<Double>> equivalences;
 	//Those are 2.0 features
 	private String author;
 	private IAtomContainer mol3d;
@@ -149,5 +150,11 @@ public class NmreData {
 	
 	public boolean has3dCoordinates() {
 		return mol3d!=null;
+	}
+	public List<List<Double>> getEquivalences() {
+		return equivalences;
+	}
+	public void setEquivalences(List<List<Double>> equivalences) {
+		this.equivalences = equivalences;
 	}
 }
