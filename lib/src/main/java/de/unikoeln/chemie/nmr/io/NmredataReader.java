@@ -243,6 +243,8 @@ public class NmredataReader {
 			}else{
 				StringTokenizer st2 = new StringTokenizer(line,",");
 				String label=st2.nextToken();
+				if(!st2.hasMoreTokens())
+					throw new NmreDataException("The NMREDATA_ASSIGNMENT line \""+line+"\" does not have commas in it. It must be like \"label,shift,assignment\"!");
 				double shift = Double.parseDouble(st2.nextToken().trim());
 				Peak peak=new Peak1D(shift,0);
 				List<AtomReference> atoms = new ArrayList<AtomReference>();
