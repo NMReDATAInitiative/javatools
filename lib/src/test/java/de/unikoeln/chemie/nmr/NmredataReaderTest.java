@@ -118,6 +118,32 @@ public class NmredataReaderTest  extends TestCase{
         Assert.assertEquals(5, ((AtomReference)((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[2].getTargets()[1]).getAtomNumber());
 	}
 	
+	public void testReadSi2() throws Exception, IOException{
+		String filename = "SID=dransfld,1996-08-08GMT142807_nmrEook.sdf";
+        InputStream ins = NmredataReaderTest.class.getResource(filename).openStream();
+        NmredataReader reader = new NmredataReader(ins);
+        NmreData data = reader.read();
+        Assert.assertEquals(7, data.getMolecule().getAtomCount());
+        Assert.assertEquals(7, data.getMolecule().getBondCount());
+        Assert.assertEquals(6, data.getSpectra().size());
+        Assert.assertEquals(3, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
+        Assert.assertEquals(3, ((AtomReference)((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[2].getTargets()[0]).getAtomNumber());
+        Assert.assertEquals(5, ((AtomReference)((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[2].getTargets()[1]).getAtomNumber());
+	}
+	
+	public void testReadSi() throws Exception, IOException{
+		String filename = "marsm_Si_neo_data_L10i_nmrE_vx.sdf";
+        InputStream ins = NmredataReaderTest.class.getResource(filename).openStream();
+        NmredataReader reader = new NmredataReader(ins);
+        NmreData data = reader.read();
+        Assert.assertEquals(7, data.getMolecule().getAtomCount());
+        Assert.assertEquals(7, data.getMolecule().getBondCount());
+        Assert.assertEquals(6, data.getSpectra().size());
+        Assert.assertEquals(3, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
+        Assert.assertEquals(3, ((AtomReference)((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[2].getTargets()[0]).getAtomNumber());
+        Assert.assertEquals(5, ((AtomReference)((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[2].getTargets()[1]).getAtomNumber());
+	}
+	
 	public void testReadDamien() throws Exception, IOException{
 		String filename = "compound1_with_jcamp.nmredata.sdf";
         InputStream ins = NmredataReaderTest.class.getResource(filename).openStream();
