@@ -23,6 +23,7 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.SDFWriter;
 import org.openscience.cdk.smiles.SmilesGenerator;
+import org.openscience.cdk.tools.manipulator.MolecularFormulaManipulator;
 
 import de.unikoeln.chemie.nmr.data.NMR2DSpectrum;
 import de.unikoeln.chemie.nmr.data.NmreData;
@@ -200,6 +201,7 @@ public class NmredataWriter {
   	  		InChIGenerator gen = factory.getInChIGenerator(data.getMolecule());
 			if (gen.getReturnStatus() == INCHI_RET.OKAY || gen.getReturnStatus() == INCHI_RET.WARNING)
 	  	  		ac.setProperty("NMREDATA_INCHI", gen.getInchi());
+			ac.setProperty("NMREDATA_FORMULA",MolecularFormulaManipulator.getString(MolecularFormulaManipulator.getMolecularFormula(ac))); 
 		}
   	  	if(version.compareTo(NmreData.NmredataVersion.ONEPOINTONE)>0 && data.getAuthor()!=null)
   	  		ac.setProperty("NMREDATA_AUTHOR", data.getAuthor());

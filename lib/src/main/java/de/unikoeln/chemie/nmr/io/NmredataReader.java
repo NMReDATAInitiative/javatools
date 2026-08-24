@@ -178,7 +178,7 @@ public class NmredataReader {
 				ac=mdlreader.next();
 				data.setMolecule3d(ac);
 				if(!new IsomorphismTester(data.getMolecule()).isIsomorphic(ac))
-					throw new NmreDataException("The two structures are not isomorphic, but they must be. Only coordinates can be different!");
+					throw new NmreDataException("The two structures are not isomorphic, but they must be. Only coordinates can be different! See https://nmredatainitiative.github.io/NMReDATA_tag_format_2_0/#molblock-2d3d-structures for details");
 			}
 		}
 		if(mdlreader.hasNext())

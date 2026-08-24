@@ -1,0 +1,39 @@
+from NMR-SHARCivar  2026-08-08
+SHARCID=dransfld,1996-08-08GMT142807 TEXT FIGU  PH2-F 
+
+  4  0  0  0  0  0  0  0  0  0 10 V2000 
+  -0.073    -0.558     0.000   P   0  0  0  1  0  0  0  0  0  0  0  0    82.01     0.00
+   0.876    -0.734     1.027   H   0  0  0  1  0  0  0  0  0  0  0  0     6.60     0.00
+   0.876    -0.734    -1.027   H   0  0  0  1  0  0  0  0  0  0  0  0     6.60     0.00
+  -0.073     1.093     0.000   F   0  0  0  1  0  0  0  0  0  0  0  0  9999.00     0.00
+M  END
+>  <MOL_NAME>
+SID=dransfld,1996-08-08GMT142807 OR systematic Name or else
+
+>  <COMMENT>
+ Doc. of original Calc.
+ 4
+4th_coord.=Magn.Shield GIAO-G94/RHF/6-311GD F1H2P1 _0. //RMP2-FC/6-31+GDP /CS @m SHARCID dransfld,1996-08-08GMT142807
+P -0.07296700 -0.55814400 0.00000000 264.98
+H 0.87560100 -0.73382700 1.02729000 25.89
+H 0.87560100 -0.73382700 -1.02729000 25.89
+F -0.07296700 1.09331200 0.00000000 514.07  . . . fake Shift 12.3
+
+>  <NMREDATA_VERSION>
+1.1 \ 
+
+>  <NMREDATA_LEVEL>
+0 \ 
+
+>  <NMREDATA_ID>	
+aph2f=1 \ 
+
+>  <NMREDATA_1D_1H>
+Spectrum_Location=CompulsoryCHECK\
+Larmor=600.123456\
+
+>  <NMREDATA_ASSIGNMENT>
+AtoPhos,82.0,1 \ 
+AtoFluo,12.3,4 \ 
+
+$$$$

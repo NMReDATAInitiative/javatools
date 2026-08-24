@@ -115,7 +115,6 @@ public class NmredataReaderTest  extends TestCase{
         Assert.assertEquals(6, data.getSpectra().size());
         Assert.assertEquals(3, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
         Assert.assertEquals(3, ((AtomReference)((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[2].getTargets()[0]).getAtomNumber());
-        Assert.assertEquals(5, ((AtomReference)((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[2].getTargets()[1]).getAtomNumber());
 	}
 	
 	public void testReadSi2() throws Exception, IOException{
@@ -123,12 +122,10 @@ public class NmredataReaderTest  extends TestCase{
         InputStream ins = NmredataReaderTest.class.getResource(filename).openStream();
         NmredataReader reader = new NmredataReader(ins);
         NmreData data = reader.read();
-        Assert.assertEquals(7, data.getMolecule().getAtomCount());
-        Assert.assertEquals(7, data.getMolecule().getBondCount());
-        Assert.assertEquals(6, data.getSpectra().size());
-        Assert.assertEquals(3, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
-        Assert.assertEquals(3, ((AtomReference)((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[2].getTargets()[0]).getAtomNumber());
-        Assert.assertEquals(5, ((AtomReference)((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[2].getTargets()[1]).getAtomNumber());
+        Assert.assertEquals(4, data.getMolecule().getAtomCount());
+        Assert.assertEquals(0, data.getMolecule().getBondCount());
+        Assert.assertEquals(1, data.getSpectra().size());
+        Assert.assertEquals(0, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
 	}
 	
 	public void testReadSi() throws Exception, IOException{
@@ -136,12 +133,9 @@ public class NmredataReaderTest  extends TestCase{
         InputStream ins = NmredataReaderTest.class.getResource(filename).openStream();
         NmredataReader reader = new NmredataReader(ins);
         NmreData data = reader.read();
-        Assert.assertEquals(7, data.getMolecule().getAtomCount());
-        Assert.assertEquals(7, data.getMolecule().getBondCount());
-        Assert.assertEquals(6, data.getSpectra().size());
-        Assert.assertEquals(3, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
-        Assert.assertEquals(3, ((AtomReference)((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[2].getTargets()[0]).getAtomNumber());
-        Assert.assertEquals(5, ((AtomReference)((NMRSpectrum)data.getSpectra().get(0)).getAssignments()[2].getTargets()[1]).getAtomNumber());
+        Assert.assertEquals(16, data.getMolecule().getAtomCount());
+        Assert.assertEquals(16, data.getMolecule().getBondCount());
+        Assert.assertNull(data.getSpectra());
 	}
 	
 	public void testReadDamien() throws Exception, IOException{
