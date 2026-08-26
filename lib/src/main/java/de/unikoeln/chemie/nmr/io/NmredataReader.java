@@ -458,14 +458,14 @@ public class NmredataReader {
 				sequence=line.substring(line.indexOf("=")+1);
 			}else if(line.matches("^[0-9]*\\.[0-9]*")){
 				peaks.add(new Peak1D(Double.parseDouble(line),0));
-			}else if(line.matches("^[0-9]*\\.[0-9].*")){
+			}else if(line.matches("^-*[0-9]*\\.[0-9].*")){
 				StringTokenizer st2 = new StringTokenizer(line,",");
 				Peak peak=null;
 				String multiplicity;
 				double shift=0;
 				String shiftstring=st2.nextToken();
 				//TODO handle range
-				if(shiftstring.contains("-"))
+				if(shiftstring.contains("-") && shiftstring.indexOf('-')>0)
 					shiftstring=shiftstring.substring(0,shiftstring.indexOf('-'));
 				shift=Double.parseDouble(shiftstring);
 				String label="";

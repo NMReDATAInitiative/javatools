@@ -138,6 +138,18 @@ public class NmredataReaderTest  extends TestCase{
         Assert.assertNull(data.getSpectra());
 	}
 	
+	public void testReadSiNegativ() throws Exception, IOException{
+		//this has a negative shift
+		String filename = "sinmr_Freiberg2011SePNN_nmrE,one31P.sdf";
+        InputStream ins = NmredataReaderTest.class.getResource(filename).openStream();
+        NmredataReader reader = new NmredataReader(ins);
+        NmreData data = reader.read();
+        Assert.assertEquals(9, data.getMolecule().getAtomCount());
+        Assert.assertEquals(9, data.getMolecule().getBondCount());
+        Assert.assertEquals(1, data.getSpectra().size());
+        Assert.assertEquals(1, ((NMRSpectrum)data.getSpectra().get(0)).getPeakTable().length);
+	}
+	
 	public void testReadDamien() throws Exception, IOException{
 		String filename = "compound1_with_jcamp.nmredata.sdf";
         InputStream ins = NmredataReaderTest.class.getResource(filename).openStream();

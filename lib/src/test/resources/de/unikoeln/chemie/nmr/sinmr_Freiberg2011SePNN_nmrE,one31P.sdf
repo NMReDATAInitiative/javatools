@@ -1,0 +1,74 @@
+
+  SciDex  04201200002D 1
+
+  9  9  0  0  0  0  0  0  0  0  1 V2000
+    0.000     0.840     0.000  C   0  0  0  0  0  0
+    0.000     0.462     0.000  C   0  0  0  0  0  0
+    0.360     0.345     0.000  Si  0  0  0  0  0  0
+    0.582     0.651     0.000  P   0  0  0  0  0  0
+    0.360     0.957     0.000  Si  0  0  0  0  0  0
+    0.206     0.000     0.000  C   0  0  0  0  0  0
+    0.687     0.156     0.000  C   0  0  0  0  0  0
+    0.206     1.302     0.000  C   0  0  0  0  0  0
+    0.687     1.145     0.000  C   0  0  0  0  0  0
+  1  2  1  0  0  0  0
+  2  3  1  0  0  0  0
+  3  4  1  0  0  0  0
+  4  5  1  0  0  0  0
+  5  1  1  0  0  0  0
+  3  6  1  0  0  0  0
+  3  7  1  0  0  0  0
+  5  8  1  0  0  0  0
+  5  9  1  0  0  0  0
+M  END
+>  <MOL_NAME>
+HonP-statt-schwefell heiss ich = fake_is_SeP replace S by P[auto-aug.H] Data_wrt_phosphor
+
+>  <Comment>
+THISFILE=sinmr_Freiberg2011SePNN.sdf fake 3*UNassigned
+
+>  <Comment>
+3 sdf : 1* .d+nucType (31P und 29Si); 1* .d+nucType (nur 29Si); 1* data...DUMPwarning  
+
+>  <Author>
+Herzog, U.; Boehme, U.
+
+>  <NMRSignal.d>
+-34.5
+
+>  <NMRSignal.Nucleus>
+31P
+
+>  <NMRSignal.d>
+17.001
+
+>  <NMRSignal.Nucleus>
+29Si
+
+>  <NMRSignal.d>
+1.07
+
+>  <NMRSignal.Nucleus>
+13C
+
+>  <COMMENT>
+nmrEdata generated on Wed Aug 26 12:16:07 CEST 2026 by PM 0.1.7 2026-08-26p
+
+>  <NMREDATA_VERSION>
+2.0 \ 
+
+>  <NMREDATA_LEVEL>
+0 \ 
+
+>  <NMREDATA_ID>
+ Doi=comingsoon \ 
+
+>  <NMREDATA_1D_31P>
+Spectrum_Location=datenlager \
+Larmor=123.456890 \
+-34.5  \
+
+>  <NMREDATA_ASSIGNMENT>
+
+
+$$$$
